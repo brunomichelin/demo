@@ -1,7 +1,13 @@
-FROM openjdk:11.0.11-9-jdk
+FROM maven:3.9-eclipse-temurin-26 AS build
+WORKDIR /workspace
 
-ADD target/demo.war app.war
+COPY pom.xml .
+COPY src ./src
+RUN mvn -B -DskipTests package
 
-ENTRYPOINT ["java", "-jar", "/app.war"]
+FROM eclipse-temurin:26-jre
+WORKDIR /app
+COPY --from=build /workspace/target/demo.jar /app/app.jar
 
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
 EXPOSE 8080
