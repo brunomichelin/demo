@@ -10,4 +10,4 @@ WORKDIR /app
 COPY --from=build /workspace/target/demo.jar /app/app.jar
 
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
-EXPOSE 8080
+EXPOSE 10000

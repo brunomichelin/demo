@@ -5,6 +5,13 @@ Os endpoints REST novos seguem o prefixo `/api/v1` e exigem JWT, exceto
 pode ser enviado como `Authorization: Bearer <token>` ou pelo cookie `access_token`.
 O login também define um cookie `refresh_token`, restrito a `/auth/refresh`.
 Configure `API_SECURITY_TOKEN_SECRET` com pelo menos 32 bytes antes de autenticar.
+Para provisionar um usuário inicial em container, configure as variáveis de
+ambiente `APP_BOOTSTRAP_USER_EMAIL`, `APP_BOOTSTRAP_USER_NAME`,
+`APP_BOOTSTRAP_USER_PASSWORD_HASH` (hash BCrypt), e `APP_BOOTSTRAP_USER_ROLE`
+(por exemplo, `ADMIN`) no runtime. `APP_BOOTSTRAP_USER_PHONE` é opcional.
+O provisionamento ocorre na inicialização, somente se o e-mail ainda não
+existir, e não altera contas existentes. Não passe o hash como argumento de
+build nem o grave na imagem Docker.
 
 Listagens aceitam a paginação do Spring Data (`page`, `size`, `sort`). Relatórios
 aceitam `formato=json|pdf|xlsx`; para PDF/XLSX, a resposta é um arquivo para download.
