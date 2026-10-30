@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xml:lang="pt-BR" lang="pt-BR">
+<h:head>
+    <title>Relatórios da obra</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <h:outputStylesheet library="css" name="app.css"/>
+</h:head>
+<h:body styleClass="works-page reports-page">
+    <main id="pagina" class="reports-shell"
+          data-custo="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('FINANCEIRO') or facesContext.externalContext.isUserInRole('CLIENTE')}"
+          data-insumos="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('ORCAMENTISTA')}"
+          data-tarefas="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('CLIENTE')}"
+          data-prazos="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('CLIENTE')}">
+        <header class="reports-header">
+            <div>
+                <nav class="system-return-links" aria-label="Navegação principal">
+                    <a href="index.xhtml">Início</a><span> / </span>
+                    <a class="reports-back-link" id="obraLink" href="gestao.xhtml">Voltar ao painel de obras</a>
+                </nav>
+                <p class="reports-eyebrow">Dados para decisão</p>
+                <h1>Relatórios da obra</h1>
+                <p class="reports-subtitle">Consulte custos, insumos, tarefas e prazos. Visualize ou exporte os resultados.</p>
+            </div>
+            <span class="reports-header-icon" aria-hidden="true">▤</span>
+        </header>
+        <section class="reports-card">
+            <div class="reports-section-heading">
+                <span class="reports-section-icon" aria-hidden="true">01</span>
+                <div><p class="reports-eyebrow">Configuração</p><h2>Gerar relatório</h2></div>
+            </div>
+            <div class="reports-form">
+                <div class="reports-field reports-field-wide">
+                    <label for="tipo">Tipo de relatório</label>
+                    <select id="tipo">
+                        <option value="custo-por-etapa">Custos por etapa</option>
+                        <option value="insumos-por-etapa">Insumos por etapa</option>
+                        <option value="tarefas-por-etapa">Tarefas por etapa</option>
+                        <option value="prazos-entrega">Prazos de entrega</option>
+                    </select>
+                </div>
+                <div class="reports-field">
+                    <label for="formato">Formato de saída</label>
+                    <select id="formato">
+                        <option value="json">Visualizar na tela</option>
+                        <option value="pdf">Documento PDF</option>
+                        <option value="xlsx">Planilha Excel (XLSX)</option>
+                    </select>
+                </div>
+                <div class="reports-field">
+                    <label for="versao">Versão do orçamento <span>(opcional)</span></label>
+                    <input id="versao" type="number" min="1" placeholder="Versão mais recente"/>
+                </div>
+                <button class="reports-button" id="gerar" type="button">
+                    <span aria-hidden="true">↗</span> Gerar relatório
+                </button>
+            </div>
+        </section>
+        <p id="mensagem" class="reports-message" role="status"></p>
+        <section class="reports-card reports-result-card">
+            <div class="reports-section-heading">
+                <span class="reports-section-icon" aria-hidden="true">02</span>
+                <div><p class="reports-eyebrow">Resultado</p><h2>Visualização</h2></div>
+            </div>
+            <pre id="resultado" aria-live="polite">Selecione um relatório e escolha “Visualizar na tela” para ver os dados aqui.</pre>
+        </section>
+    </main>
+    <script type="text/javascript">
+        //<![CDATA[
+        (() => {
+            const root = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+            const params = new URLSearchParams(window.location.search);
+            const obraId = params.get('obraId');
+            const message = document.getElementById('mensagem');
+            const flags = document.getElementById('pagina').dataset;
+            const permissaoPorRelatorio = {
+                'custo-por-etapa': flags.custo,
+                'insumos-por-etapa': flags.insumos,
+                'tarefas-por-etapa': flags.tarefas,
+                'prazos-entrega': flags.prazos
+            };
+            [...document.getElementById('tipo').options].forEach(option => {
+                option.hidden = permissaoPorRelatorio[option.value] !== 'true';
+            });
+            if (document.getElementById('tipo').selectedOptions[0]?.hidden) {
+                const primeiraOpcaoPermitida = [...document.getElementById('tipo').options]
+                    .find(option => !option.hidden);
+                if (primeiraOpcaoPermitida) document.getElementById('tipo').value = primeiraOpcaoPermitida.value;
+            }
+            document.getElementById('obraLink').href = 'gestao.xhtml';
+            document.getElementById('gerar').addEventListener('click', async () => {
+                try {
+                    if (!obraId) throw new Error('Identificador da obra não informado.');
+                    const tipo = document.getElementById('tipo').value;
+                    const formato = document.getElementById('formato').value;
+                    const versao = document.getElementById('versao').value;
+                    const query = new URLSearchParams({formato});
+                    if (versao && (tipo === 'custo-por-etapa' || tipo === 'insumos-por-etapa')) query.set('versaoId', versao);
+                    const url = `#{'${'}root}/api/v1/obras/#{'${'}obraId}/relatorios/#{'${'}tipo}?#{'${'}query}`;
+                    if (formato !== 'json') {
+                        window.location.assign(url);
+                        return;
+                    }
+                    message.textContent = 'Gerando relatório...';
+                    const response = await fetch(url, {credentials: 'same-origin'});
+                    if (!response.ok) {
+                        let error = {}; try { error = await response.json(); } catch (_) {}
+                        throw new Error(error.detail || error.message || `Falha na solicitação (#{'${'}response.status}).`);
+                    }
+                    document.getElementById('resultado').textContent = JSON.stringify(await response.json(), null, 2);
+                    message.textContent = 'Relatório gerado.';
+                } catch (error) { message.textContent = error.message; }
+            });
+        })();
+        //]]>
+    </script>
+</h:body>
+</html>

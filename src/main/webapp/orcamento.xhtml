@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xml:lang="pt-BR" lang="pt-BR">
+<h:head>
+    <title>Orçamento da obra</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <h:outputStylesheet library="css" name="app.css"/>
+</h:head>
+<h:body styleClass="works-page budget-page">
+    <main id="pagina" class="budget-shell" data-can-freeze="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR')}">
+        <header class="budget-header">
+            <div>
+                <nav class="system-return-links" aria-label="Navegação principal">
+                    <a href="index.xhtml">Início</a><span> / </span>
+                    <a class="budget-back-link" id="obraLink" href="gestao.xhtml">Voltar ao painel de obras</a>
+                </nav>
+                <p class="budget-eyebrow">Planejamento financeiro</p>
+                <h1>Orçamento da obra</h1>
+                <p class="budget-subtitle">Organize versões e acompanhe os itens planejados por etapa.</p>
+            </div>
+            <span class="budget-header-icon" aria-hidden="true">R$</span>
+        </header>
+        <p id="mensagem" class="budget-message" role="status"></p>
+        <section class="budget-card budget-version-card">
+            <div class="budget-section-heading">
+                <span class="budget-section-icon" aria-hidden="true">01</span>
+                <div><p class="budget-eyebrow">Controle de versões</p><h2>Versões do orçamento</h2></div>
+            </div>
+            <div class="budget-version-controls">
+                <div class="budget-field">
+                    <label for="versao">Versão selecionada</label>
+                    <select id="versao"></select>
+                </div>
+                <div class="budget-actions">
+                    <button class="budget-button budget-button-primary" type="button" id="criarVersao">
+                        <span aria-hidden="true">＋</span> Criar versão
+                    </button>
+                    <button class="budget-button budget-button-secondary" type="button" id="congelarVersao">Congelar versão</button>
+                </div>
+            </div>
+        </section>
+        <section class="budget-card">
+            <div class="budget-section-heading">
+                <span class="budget-section-icon" aria-hidden="true">02</span>
+                <div><p class="budget-eyebrow">Composição</p><h2>Itens por etapa</h2></div>
+            </div>
+            <div class="budget-item-form">
+                <div class="budget-field">
+                    <label for="etapa">Etapa da obra</label><select id="etapa"></select>
+                </div>
+                <div class="budget-field">
+                    <label for="insumo">Insumo</label><select id="insumo"></select>
+                </div>
+                <div class="budget-field">
+                    <label for="quantidade">Quantidade</label>
+                    <input id="quantidade" type="number" min="0.001" step="0.001" placeholder="0,000"/>
+                </div>
+                <div class="budget-field">
+                    <label for="valor">Preço unitário <span>(opcional)</span></label>
+                    <input id="valor" type="number" min="0.01" step="0.01" placeholder="Usar preço de referência"/>
+                </div>
+                <button class="budget-button budget-button-primary budget-add-button" type="button" id="adicionar">
+                    <span aria-hidden="true">＋</span> Adicionar item
+                </button>
+            </div>
+            <div class="budget-table-wrap">
+                <table class="budget-table">
+                    <thead><tr><th>Insumo</th><th>Etapa</th><th>Quantidade</th><th>Preço unitário</th><th>Total</th></tr></thead>
+                    <tbody id="itens"><tr><td colspan="5">Selecione uma etapa e versão.</td></tr></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    <script type="text/javascript">
+        //<![CDATA[
+        (() => {
+            const api = `#{'${'}window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'))}/api/v1`;
+            const params = new URLSearchParams(window.location.search);
+            const obraId = params.get('obraId');
+            const stageSelect = document.getElementById('etapa');
+            const versionSelect = document.getElementById('versao');
+            const message = document.getElementById('mensagem');
+            document.getElementById('congelarVersao').hidden =
+                document.getElementById('pagina').dataset.canFreeze !== 'true';
+            document.getElementById('obraLink').href = 'gestao.xhtml';
+
+            async function request(url, options = {}) {
+                const response = await fetch(url, {credentials: 'same-origin', ...options,
+                    headers: {'Content-Type': 'application/json', ...(options.headers || {})}});
+                if (!response.ok) {
+                    let body = {};
+                    try { body = await response.json(); } catch (_) {}
+                    throw new Error(body.detail || body.message || `Falha na solicitação (#{'${'}response.status}).`);
+                }
+                return response.status === 204 ? null : response.json();
+            }
+            function showError(error) { message.textContent = error.message; }
+            async function loadItems() {
+                if (!stageSelect.value || !versionSelect.value) return;
+                const page = await request(`#{'${'}api}/etapas/#{'${'}stageSelect.value}/itens-orcamento?size=100&versaoId=#{'${'}versionSelect.value}`);
+                const body = document.getElementById('itens');
+                body.replaceChildren();
+                if (!page.content.length) {
+                    const row = body.insertRow(); row.insertCell().textContent = 'Nenhum item nesta etapa.';
+                    row.cells[0].colSpan = 5; return;
+                }
+                page.content.forEach(item => {
+                    const row = body.insertRow();
+                    [item.insumo?.descricao, item.etapa?.nome, item.quantidade, item.valorUnitario,
+                        Number(item.quantidade) * Number(item.valorUnitario)].forEach(value => {
+                        row.insertCell().textContent = value == null ? '-' : String(value);
+                    });
+                });
+            }
+            async function load() {
+                try {
+                    if (!obraId) throw new Error('Identificador da obra não informado.');
+                    const [stages, versions, supplies] = await Promise.all([
+                        request(`#{'${'}api}/obras/#{'${'}obraId}/etapas?size=100`),
+                        request(`#{'${'}api}/obras/#{'${'}obraId}/orcamento/versoes`),
+                        request(`#{'${'}api}/insumos?size=100`)
+                    ]);
+                    stageSelect.replaceChildren();
+                    stages.content.forEach(stage => stageSelect.add(new Option(`#{'${'}stage.ordem} - #{'${'}stage.nome}`, stage.id)));
+                    const insumoSelect = document.getElementById('insumo');
+                    insumoSelect.replaceChildren();
+                    supplies.content.forEach(supply => insumoSelect.add(new Option(`#{'${'}supply.codigo || ''} #{'${'}supply.descricao}`, supply.id)));
+                    versionSelect.replaceChildren();
+                    versions.forEach(version => versionSelect.add(new Option(
+                        `Versão #{'${'}version.numero}#{'${'}version.congelada ? ' (congelada)' : ''}`, version.id)));
+                    if (versions.length) versionSelect.value = String(versions[versions.length - 1].id);
+                    await loadItems();
+                } catch (error) { showError(error); }
+            }
+            document.getElementById('criarVersao').addEventListener('click', async () => {
+                try { await request(`#{'${'}api}/obras/#{'${'}obraId}/orcamento/versoes`, {method: 'POST'}); message.textContent = 'Versão criada.'; await load(); }
+                catch (error) { showError(error); }
+            });
+            document.getElementById('congelarVersao').addEventListener('click', async () => {
+                try {
+                    if (!versionSelect.value) throw new Error('Não há versão selecionada.');
+                    await request(`#{'${'}api}/orcamento/versoes/#{'${'}versionSelect.value}/congelar`, {method: 'POST'});
+                    message.textContent = 'Versão congelada.'; await load();
+                } catch (error) { showError(error); }
+            });
+            document.getElementById('adicionar').addEventListener('click', async () => {
+                try {
+                    if (!stageSelect.value || !versionSelect.value) throw new Error('Selecione uma etapa e uma versão.');
+                    const body = {insumoId: Number(document.getElementById('insumo').value),
+                        quantidade: Number(document.getElementById('quantidade').value)};
+                    const value = document.getElementById('valor').value;
+                    if (value) body.valorUnitario = Number(value);
+                    await request(`#{'${'}api}/etapas/#{'${'}stageSelect.value}/itens-orcamento?versaoId=#{'${'}versionSelect.value}`,
+                        {method: 'POST', body: JSON.stringify(body)});
+                    document.getElementById('quantidade').value = '';
+                    document.getElementById('valor').value = '';
+                    message.textContent = 'Item incluído.'; await loadItems();
+                } catch (error) { showError(error); }
+            });
+            stageSelect.addEventListener('change', () => loadItems().catch(showError));
+            versionSelect.addEventListener('change', () => loadItems().catch(showError));
+            load();
+        })();
+        //]]>
+    </script>
+</h:body>
+</html>

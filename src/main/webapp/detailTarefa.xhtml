@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xml:lang="pt-BR">
+<h:head>
+    <title>Detalhes da Tarefa</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <h:outputStylesheet library="css" name="app.css"/>
+</h:head>
+<f:view>
+    <f:metadata>
+        <f:viewParam name="id" value="#{tarefaDetailBean.tarefaId}"/>
+        <f:viewAction action="#{tarefaDetailBean.carregar}" onPostback="false"/>
+    </f:metadata>
+    <h:body styleClass="works-page detail-page">
+        <h:form id="formDetailTarefa">
+            <p:growl id="mensagens" showDetail="true" autoUpdate="true" closable="true"/>
+            <h:panelGroup id="statusActions" layout="block" styleClass="detail-status-actions">
+                <p:commandButton id="avancarStatus" value="" icon="pi pi-forward" title="Avançar status"
+                                 styleClass="detail-status-button detail-status-advance"
+                                 action="#{tarefaDetailBean.avancarStatus}" process="@this"
+                                 rendered="#{tarefaDetailBean.podeAvancarStatus}"
+                                 update=":formDetailTarefa:detalhesTarefa :formDetailTarefa:statusActions :formDetailTarefa:mensagens"/>
+                <p:commandButton id="bloquearStatus" value="" icon="pi pi-lock" title="Bloquear tarefa"
+                                 styleClass="detail-status-button detail-status-block"
+                                 action="#{tarefaDetailBean.bloquearStatus}" process="@this"
+                                 rendered="#{tarefaDetailBean.podeBloquearStatus}"
+                                 update=":formDetailTarefa:detalhesTarefa :formDetailTarefa:statusActions :formDetailTarefa:mensagens"/>
+                <p:commandButton id="cancelarStatus" value="" icon="pi pi-times-circle" title="Cancelar tarefa"
+                                 styleClass="detail-status-button detail-status-cancel"
+                                 action="#{tarefaDetailBean.cancelarStatus}" process="@this"
+                                 rendered="#{tarefaDetailBean.podeCancelarStatus}"
+                                 update=":formDetailTarefa:detalhesTarefa :formDetailTarefa:statusActions :formDetailTarefa:mensagens"/>
+            </h:panelGroup>
+            <div class="application-timeline" aria-label="Navegação da tarefa">
+                <p:button value="Início" icon="ui-icon-home" outcome="index.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Painel de obras" icon="ui-icon-dashboard" outcome="gestao.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Voltar para tarefas" icon="ui-icon-arrowthick-1-w" outcome="Tarefa.xhtml"
+                          styleClass="application-timeline-step"/>
+            </div>
+
+            <p:panel id="detalhesTarefa" header="Detalhes da tarefa" rendered="#{not empty tarefaDetailBean.tarefa}">
+                <p:panelGrid columns="2" layout="grid" columnClasses="label,value" styleClass="ui-fluid">
+                    <h:outputText value="Código"/>
+                    <h:outputText value="#{tarefaDetailBean.tarefa.id}"/>
+                    <h:outputText value="Obra"/>
+                    <h:outputText value="#{tarefaDetailBean.tarefa.etapa == null or tarefaDetailBean.tarefa.etapa.obra == null ? '' : tarefaDetailBean.tarefa.etapa.obra.nome}"/>
+                    <h:outputText value="Etapa"/>
+                    <h:outputText value="#{tarefaDetailBean.tarefa.etapa == null ? '' : tarefaDetailBean.tarefa.etapa.nome}"/>
+                    <h:outputText value="Prioridade"/>
+                    <h:outputText value="#{tarefaDetailBean.tarefa.prioridade}"/>
+                    <h:outputText value="Título"/>
+                    <h:outputText value="#{tarefaDetailBean.tarefa.titulo}"/>
+                    <h:outputText value="Descrição"/>
+                    <h:outputText value="#{tarefaDetailBean.tarefa.descricao}"/>
+                    <h:outputText value="Responsável"/>
+                    <h:outputText value="#{tarefaDetailBean.tarefa.responsavel == null ? '' : tarefaDetailBean.tarefa.responsavel.nome}"/>
+                    <h:outputText value="E-mail do responsável"/>
+                    <h:outputText value="#{tarefaDetailBean.tarefa.responsavel == null ? '' : tarefaDetailBean.tarefa.responsavel.email}"/>
+                    <h:outputText value="Início previsto"/>
+                    <h:outputText value="#{tarefaDetailBean.tarefa.dataInicioPrevista}">
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                    <h:outputText value="Fim previsto"/>
+                    <h:outputText value="#{tarefaDetailBean.tarefa.dataFimPrevista}">
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                    <h:outputText value="Status"/>
+                    <h:outputText value="#{tarefaDetailBean.tarefa.status == null ? '' : tarefaDetailBean.tarefa.status.descricao}"/>
+                    <h:outputText value="Criado por"/>
+                    <h:outputText value="#{tarefaDetailBean.tarefa.criadoPor}"/>
+                    <h:outputText value="Data de criação"/>
+                    <h:outputText value="#{tarefaDetailBean.tarefa.dataCriacao}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                    <h:outputText value="Última atualização"/>
+                    <h:outputText value="#{tarefaDetailBean.tarefa.dataAtualizacao}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                    <h:outputText value="Data de exclusão"/>
+                    <h:outputText value="#{tarefaDetailBean.tarefa.dataDelecao}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                    <h:outputText value="Status do registro"/>
+                    <h:outputText value="#{tarefaDetailBean.tarefa.statusRegistro}"/>
+                </p:panelGrid>
+            </p:panel>
+        </h:form>
+    </h:body>
+</f:view>
+</html>

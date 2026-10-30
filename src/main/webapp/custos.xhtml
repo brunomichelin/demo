@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xml:lang="pt-BR" lang="pt-BR">
+<h:head>
+    <title>Lançamentos de custo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <h:outputStylesheet library="css" name="app.css"/>
+</h:head>
+<h:body styleClass="works-page costs-page">
+    <main id="pagina" class="costs-shell"
+          data-can-register="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('FINANCEIRO')}"
+          data-can-validate="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('FINANCEIRO')}">
+        <header class="costs-header">
+            <div>
+                <nav class="system-return-links" aria-label="Navegação principal">
+                    <a href="index.xhtml">Início</a><span> / </span>
+                    <a class="costs-back-link" id="obraLink" href="gestao.xhtml">Voltar ao painel de obras</a>
+                </nav>
+                <p class="costs-eyebrow">Controle financeiro</p>
+                <h1>Lançamentos de custo</h1>
+                <p class="costs-subtitle">Registre despesas e acompanhe as validações da obra.</p>
+            </div>
+            <span class="costs-header-icon" aria-hidden="true">R$</span>
+        </header>
+        <p id="mensagem" class="costs-message" role="status"></p>
+        <section id="formLancamento" class="costs-card">
+            <div class="costs-section-heading">
+                <span class="costs-section-icon" aria-hidden="true">01</span>
+                <div><p class="costs-eyebrow">Novo registro</p><h2>Dados do lançamento</h2></div>
+            </div>
+            <div class="costs-form">
+                <div class="costs-field">
+                    <label for="etapa">Etapa da obra</label><select id="etapa"></select>
+                </div>
+                <div class="costs-field">
+                    <label for="insumo">Insumo</label><select id="insumo"></select>
+                </div>
+                <div class="costs-field">
+                    <label for="quantidade">Quantidade</label><input id="quantidade" type="number" min="0.001" step="0.001" placeholder="0,000"/>
+                </div>
+                <div class="costs-field">
+                    <label for="valor">Preço unitário</label><input id="valor" type="number" min="0.01" step="0.01" placeholder="R$ 0,00"/>
+                </div>
+                <div class="costs-field">
+                    <label for="data">Data do lançamento</label><input id="data" type="date"/>
+                </div>
+                <div class="costs-field">
+                    <label for="documento">Número do comprovante</label><input id="documento" type="text" maxlength="120" placeholder="Número ou referência"/>
+                </div>
+                <div class="costs-field costs-field-wide">
+                    <label for="justificativa">Justificativa <span>(se necessário)</span></label>
+                    <textarea id="justificativa" rows="2" placeholder="Adicione uma observação sobre este lançamento"></textarea>
+                </div>
+            </div>
+            <div class="costs-form-actions">
+                <button class="costs-button costs-button-primary" type="button" id="registrar">
+                    <span aria-hidden="true">＋</span> Registrar lançamento
+                </button>
+            </div>
+        </section>
+        <section class="costs-card costs-table-card">
+            <div class="costs-section-heading">
+                <span class="costs-section-icon" aria-hidden="true">02</span>
+                <div><p class="costs-eyebrow">Acompanhamento</p><h2>Custos da etapa</h2></div>
+            </div>
+            <div class="costs-table-wrap">
+                <table class="costs-table">
+                    <thead><tr><th>Data</th><th>Insumo</th><th>Quantidade</th><th>Valor unitário</th><th>Status</th><th>Ações</th></tr></thead>
+                    <tbody id="lancamentos"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    <script type="text/javascript">
+        //<![CDATA[
+        (() => {
+            const root = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+            const api = `#{'${'}root}/api/v1`;
+            const params = new URLSearchParams(window.location.search);
+            const obraId = params.get('obraId');
+            const etapa = document.getElementById('etapa');
+            const mensagem = document.getElementById('mensagem');
+            const canRegister = document.getElementById('pagina').dataset.canRegister === 'true';
+            const canValidate = document.getElementById('pagina').dataset.canValidate === 'true';
+            document.getElementById('formLancamento').hidden = !canRegister;
+            document.getElementById('obraLink').href = 'gestao.xhtml';
+            async function call(url, options = {}) {
+                const response = await fetch(url, {credentials: 'same-origin', ...options,
+                    headers: {'Content-Type': 'application/json', ...(options.headers || {})}});
+                if (!response.ok) {
+                    let error = {}; try { error = await response.json(); } catch (_) {}
+                    throw new Error(error.detail || error.message || `Falha na solicitação (#{'${'}response.status}).`);
+                }
+                return response.status === 204 ? null : response.json();
+            }
+            function erro(error) { mensagem.textContent = error.message; }
+            async function carregarLancamentos() {
+                if (!etapa.value) return;
+                const page = await call(`#{'${'}api}/etapas/#{'${'}etapa.value}/lancamentos?size=100`);
+                const tbody = document.getElementById('lancamentos'); tbody.replaceChildren();
+                page.content.forEach(item => {
+                    const row = tbody.insertRow();
+                    [item.dataLancamento, item.insumo?.descricao, item.quantidade, item.valorUnitario]
+                        .forEach(value => row.insertCell().textContent = value == null ? '-' : String(value));
+                    const statusCell = row.insertCell();
+                    const statusBadge = document.createElement('span');
+                    statusBadge.className = `costs-status costs-status-${String(item.status || '').toLowerCase()}`;
+                    statusBadge.textContent = item.status || '-';
+                    statusCell.append(statusBadge);
+                    const action = row.insertCell();
+                    if (item.status === 'PENDENTE' && canValidate) {
+                        ['VALIDADO', 'REJEITADO'].forEach(status => {
+                            const button = document.createElement('button'); button.type = 'button';
+                            button.textContent = status === 'VALIDADO' ? 'Validar' : 'Rejeitar';
+                            button.className = status === 'VALIDADO'
+                                ? 'costs-button costs-button-validate'
+                                : 'costs-button costs-button-reject';
+                            button.addEventListener('click', async () => {
+                                try {
+                                    await call(`#{'${'}api}/lancamentos/#{'${'}item.id}/validacao`,
+                                        {method: 'PATCH', body: JSON.stringify({status})});
+                                    mensagem.textContent = `Lançamento #{'${'}status.toLowerCase()}.`; await carregarLancamentos();
+                                } catch (error) { erro(error); }
+                            });
+                            action.append(button);
+                        });
+                    }
+                });
+                if (!page.content.length) { const row = tbody.insertRow(); row.insertCell().textContent = 'Nenhum lançamento.'; row.cells[0].colSpan = 6; }
+            }
+            async function init() {
+                try {
+                    if (!obraId) throw new Error('Identificador da obra não informado.');
+                    const [stages, supplies] = await Promise.all([
+                        call(`#{'${'}api}/obras/#{'${'}obraId}/etapas?size=100`), call(`#{'${'}api}/insumos?size=100`)
+                    ]);
+                    const etapaId = params.get('etapaId');
+                    stages.content.forEach(item => etapa.add(new Option(`#{'${'}item.ordem} - #{'${'}item.nome}`, item.id)));
+                    if (etapaId) etapa.value = etapaId;
+                    const insumos = document.getElementById('insumo');
+                    supplies.content.forEach(item => insumos.add(new Option(`#{'${'}item.codigo || ''} #{'${'}item.descricao}`, item.id)));
+                    await carregarLancamentos();
+                } catch (error) { erro(error); }
+            }
+            document.getElementById('registrar').addEventListener('click', async () => {
+                try {
+                    const body = {insumoId: Number(document.getElementById('insumo').value),
+                        quantidade: Number(document.getElementById('quantidade').value),
+                        valorUnitario: Number(document.getElementById('valor').value),
+                        dataLancamento: document.getElementById('data').value || null,
+                        numeroDocumento: document.getElementById('documento').value || null,
+                        justificativa: document.getElementById('justificativa').value || null};
+                    await call(`#{'${'}api}/etapas/#{'${'}etapa.value}/lancamentos`, {method: 'POST', body: JSON.stringify(body)});
+                    mensagem.textContent = 'Lançamento registrado para validação.';
+                    await carregarLancamentos();
+                } catch (error) { erro(error); }
+            });
+            etapa.addEventListener('change', () => carregarLancamentos().catch(erro));
+            init();
+        })();
+        //]]>
+    </script>
+</h:body>
+</html>

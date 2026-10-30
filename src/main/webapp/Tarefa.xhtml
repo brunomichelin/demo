@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xml:lang="pt-BR">
+<h:head>
+    <title>Lista de Tarefas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/app.css"/>
+</h:head>
+<f:view>
+    <h:body styleClass="works-page">
+        <h:form id="formTarefas">
+            <p:growl id="mensagens" showDetail="true" autoUpdate="true" closable="true"/>
+
+            <div class="application-timeline" aria-label="Navegação dos módulos">
+                <p:button value="Início" icon="ui-icon-home" outcome="index.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Painel de obras" icon="ui-icon-arrowthick-1-w" outcome="gestao.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Etapas" icon="ui-icon-arrowthick-1-w" outcome="Etapa.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:commandButton value="Nova tarefa" icon="ui-icon-plus"
+                                 styleClass="application-timeline-step application-timeline-action"
+                                 action="#{tarefaBean.novaTarefa}" process="@this"
+                                 update=":formTarefas:tarefaDialog"
+                                 oncomplete="PF('tarefaDialog').show()"/>
+                <p:button value="Insumos" icon="ui-icon-arrowthick-1-e" outcome="Insumo.xhtml"
+                          styleClass="application-timeline-step"
+                          rendered="#{facesContext.externalContext.isUserInRole('ADMIN')}"/>
+            </div>
+
+            <p:dataTable id="tabelaTarefas" widgetVar="tarefasTable" var="item" value="#{tarefaBean.tarefas}"
+                         styleClass="table"
+                         paginator="true" rows="15" sortMode="single"
+                         emptyMessage="Não há tarefas cadastradas."
+                         rowKey="#{item.id}"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="10,15,25,50">
+                <p:ajax event="sort" listener="#{tarefaBean.ordenar}"/>
+                <f:facet name="header">
+                    <h:outputText value="Lista de Tarefas: #{tarefaBean.quantidadeTarefas}"/>
+                </f:facet>
+
+                <p:column headerText="Prioridade" field="prioridade" sortBy="#{item.prioridade}" style="width:9%">
+                    <h:outputText value="#{item.prioridade}"/>
+                </p:column>
+                <p:column headerText="Etapa" field="etapa.nome" sortBy="#{item.etapa.nome}"
+                          filterBy="#{item.etapa.nome}" filterMatchMode="contains">
+                    <h:outputText value="#{item.etapa == null ? '' : item.etapa.nome}"/>
+                </p:column>
+                <p:column headerText="Titulo" field="titulo" sortBy="#{item.titulo}" filterBy="#{item.titulo}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{item.titulo}"/>
+                </p:column>
+                <!--
+                <p:column headerText="Descrição" field="descricao" sortBy="#{item.descricao}"
+                          filterBy="#{item.descricao}" filterMatchMode="contains">
+                    <h:outputText value="#{item.descricao}"/>
+                </p:column>
+                -->
+                <p:column headerText="Início previsto" field="dataInicioPrevista"
+                          sortBy="#{item.dataInicioPrevista}" filterBy="#{item.dataInicioPrevista}"
+                          filterMatchMode="equals" style="width:11%">
+                    <f:facet name="filter">
+                        <p:datePicker pattern="dd/MM/yyyy" showIcon="true"
+                                      onchange="PF('tarefasTable').filter()"/>
+                    </f:facet>
+                    <h:outputText value="#{item.dataInicioPrevista}">
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Fim prevista" field="dataFimPrevista"
+                          sortBy="#{item.dataFimPrevista}" filterBy="#{item.dataFimPrevista}"
+                          filterMatchMode="equals" style="width:11%">
+                    <f:facet name="filter">
+                        <p:datePicker pattern="dd/MM/yyyy" showIcon="true"
+                                      onchange="PF('tarefasTable').filter()"/>
+                    </f:facet>
+                    <h:outputText value="#{item.dataFimPrevista}">
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Status" field="status" sortBy="#{item.status}">
+                    <h:outputText value="#{item.status == null ? '' : item.status.descricao}"/>
+                </p:column>
+                <p:column headerText="Ações" exportable="false" style="height: 20px">
+                    <p:button value="" icon="pi pi-eye" title="Detalhes da tarefa"
+                              styleClass="obra-action-button obra-view-button"
+                              outcome="detailTarefa.xhtml">
+                        <f:param name="id" value="#{item.id}"/>
+                    </p:button>
+                    <p:commandButton value="" icon="pi pi-forward" title="Avançar status"
+                                     styleClass="obra-action-button obra-edit-button"
+                                     action="#{tarefaBean.avancarStatus(item)}" process="@this"
+                                     disabled="#{not tarefaBean.podeAvancar(item)}"
+                                     update=":formTarefas:tabelaTarefas :formTarefas:mensagens"/>
+                    <!--
+                    <p:commandButton value="" icon="pi pi-eye" title="Visualizar tarefa"
+                                     styleClass="obra-action-button obra-view-button"
+                                     action="#{tarefaBean.visualizarTarefa(item)}" process="@this"
+                                     update=":formTarefas:tarefaDialog"
+                                     oncomplete="PF('tarefaDialog').show()"/>
+                    -->
+                    <p:commandButton value="" icon="pi pi-pencil" title="Editar tarefa"
+                                     styleClass="obra-action-button obra-edit-button"
+                                     action="#{tarefaBean.editarTarefa(item)}" process="@this"
+                                     update=":formTarefas:tarefaDialog"
+                                     oncomplete="PF('tarefaDialog').show()"/>
+                    <p:commandButton value="" icon="pi pi-trash" title="Excluir tarefa"
+                                     styleClass="obra-action-button obra-delete-button"
+                                     action="#{tarefaBean.excluir(item)}" process="@this"
+                                     update=":formTarefas:tabelaTarefas :formTarefas:mensagens">
+                        <p:confirm header="Confirmar exclusão"
+                                   message="Deseja realmente excluir esta tarefa?"
+                                   icon="ui-icon-alert"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes"
+                                 icon="ui-icon-check"/>
+                <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no"
+                                 icon="ui-icon-close"/>
+            </p:confirmDialog>
+
+            <p:dialog id="tarefaDialog" widgetVar="tarefaDialog" header="Dados da Tarefa"
+                      modal="true" resizable="false" width="600">
+                <p:panelGrid columns="2" layout="grid" columnClasses="label,value"
+                             styleClass="ui-fluid">
+                    <p:outputLabel for="etapa" value="Etapa"/>
+                    <p:selectOneMenu id="etapa" value="#{tarefaBean.etapaSelecionadaId}"
+                                     required="true" disabled="#{tarefaBean.visualizacao}"
+                                     requiredMessage="Selecione a etapa da tarefa.">
+                        <f:selectItem itemLabel="Selecione uma etapa" itemValue="#{null}"
+                                      noSelectionOption="true"/>
+                        <f:selectItems value="#{tarefaBean.etapas}" var="etapaItem"
+                                       itemValue="#{etapaItem.id}" itemLabel="#{etapaItem.nome}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel for="responsavel" value="Responsável"/>
+                    <p:selectOneMenu id="responsavel" value="#{tarefaBean.responsavelSelecionadoId}"
+                                     disabled="#{tarefaBean.visualizacao}">
+                        <f:selectItem itemLabel="Sem responsável" itemValue="#{null}"
+                                      noSelectionOption="true"/>
+                        <f:selectItems value="#{tarefaBean.usuarios}" var="usuario"
+                                       itemValue="#{usuario.id}" itemLabel="#{usuario.nome} (#{usuario.email})"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel for="prioridade" value="Prioridade"/>
+                    <p:inputNumber id="prioridade" value="#{tarefaBean.tarefa.prioridade}" minValue="0"
+                                   decimalPlaces="0" disabled="#{tarefaBean.visualizacao}"/>
+
+                    <p:outputLabel for="titulo" value="Titulo"/>
+                    <p:inputText id="titulo" value="#{tarefaBean.tarefa.titulo}" required="true"
+                                 requiredMessage="Informe o titulo da tarefa."
+                                 disabled="#{tarefaBean.visualizacao}"/>
+
+                    <p:outputLabel for="descricao" value="Descrição"/>
+                    <p:inputTextarea id="descricao" value="#{tarefaBean.tarefa.descricao}"
+                                     rows="4" autoResize="false"
+                                     disabled="#{tarefaBean.visualizacao}"/>
+
+                    <p:outputLabel for="inicio" value="Início previsto"/>
+                    <p:datePicker id="inicio" value="#{tarefaBean.tarefa.dataInicioPrevista}"
+                                  pattern="dd/MM/yyyy" showIcon="true"
+                                  disabled="#{tarefaBean.visualizacao}"/>
+
+                    <p:outputLabel for="fim" value="Fim prevista"/>
+                    <p:datePicker id="fim" value="#{tarefaBean.tarefa.dataFimPrevista}"
+                                  pattern="dd/MM/yyyy" showIcon="true"
+                                  disabled="#{tarefaBean.visualizacao}"/>
+
+                    <p:outputLabel for="status" value="Status"/>
+                    <p:selectOneMenu id="status" value="#{tarefaBean.tarefa.status}"
+                                     required="true" disabled="#{tarefaBean.visualizacao}">
+                        <f:selectItems value="#{tarefaBean.statusDisponiveis}" var="opcaoStatus"
+                                       itemValue="#{opcaoStatus}" itemLabel="#{opcaoStatus.descricao}"/>
+                    </p:selectOneMenu>
+                </p:panelGrid>
+
+                <p:commandButton value="Salvar" icon="ui-icon-disk"
+                                 action="#{tarefaBean.salvar}"
+                                 rendered="#{not tarefaBean.visualizacao}"
+                                 update=":formTarefas:tabelaTarefas :formTarefas:mensagens"
+                                 oncomplete="if (!args.validationFailed) PF('tarefaDialog').hide()"/>
+                <p:commandButton value="Cancelar" type="button" icon="ui-icon-close"
+                                 onclick="PF('tarefaDialog').hide()"/>
+            </p:dialog>
+        </h:form>
+    </h:body>
+</f:view>
+</html>

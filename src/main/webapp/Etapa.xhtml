@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xml:lang="pt-BR">
+<h:head>
+    <title>Lista de Etapas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/app.css"/>
+</h:head>
+<f:view>
+    <h:body styleClass="works-page">
+        <h:form id="formEtapas">
+            <p:growl id="mensagens" showDetail="true" autoUpdate="true" closable="true"/>
+
+            <div class="application-timeline" aria-label="Navegação dos módulos">
+                <p:button value="Início" icon="ui-icon-home" outcome="index.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Painel de obras" icon="ui-icon-arrowthick-1-w" outcome="gestao.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:commandButton value="Nova etapa" icon="ui-icon-plus"
+                                 styleClass="application-timeline-step application-timeline-action"
+                                 action="#{etapaBean.novaEtapa}" process="@this"
+                                 update=":formEtapas:etapaDialog"
+                                 oncomplete="PF('etapaDialog').show()"/>
+                <p:button value="Tarefas" icon="ui-icon-arrowthick-1-e" outcome="Tarefa.xhtml"
+                          styleClass="application-timeline-step"/>
+            </div>
+
+            <p:dataTable id="tabelaEtapas" widgetVar="etapasTable" var="item" value="#{etapaBean.etapas}"
+                         styleClass="table"
+                         paginator="true" rows="15" sortMode="single"
+                         emptyMessage="Não há etapas cadastradas."
+                         rowKey="#{item.id}"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="10,15,25,50">
+                <p:ajax event="sort" listener="#{etapaBean.ordenar}"/>
+                <f:facet name="header">
+                    <h:outputText value="Lista de Etapas: #{etapaBean.quantidadeEtapas}"/>
+                </f:facet>
+
+                <p:column headerText="Ordem" field="ordem" sortBy="#{item.ordem}" style="width:9%">
+                    <h:outputText value="#{item.ordem}"/>
+                </p:column>
+                <p:column headerText="Obra" field="obra.nome" sortBy="#{item.obra.nome}"
+                          filterBy="#{item.obra.nome}" filterMatchMode="contains">
+                    <h:outputText value="#{item.obra == null ? '' : item.obra.nome}"/>
+                </p:column>
+                <p:column headerText="Nome" field="nome" sortBy="#{item.nome}" filterBy="#{item.nome}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{item.nome}"/>
+                </p:column>
+                <!--
+                <p:column headerText="Descrição" field="descricao" sortBy="#{item.descricao}"
+                          filterBy="#{item.descricao}" filterMatchMode="contains">
+                    <h:outputText value="#{item.descricao}"/>
+                </p:column>
+                -->
+                <p:column headerText="Início previsto" field="dataInicioPrevista"
+                          sortBy="#{item.dataInicioPrevista}" filterBy="#{item.dataInicioPrevista}"
+                          filterMatchMode="equals" style="width:11%">
+                    <f:facet name="filter">
+                        <p:datePicker pattern="dd/MM/yyyy" showIcon="true"
+                                      onchange="PF('etapasTable').filter()"/>
+                    </f:facet>
+                    <h:outputText value="#{item.dataInicioPrevista}">
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Entrega prevista" field="dataEntregaPrevista"
+                          sortBy="#{item.dataEntregaPrevista}" filterBy="#{item.dataEntregaPrevista}"
+                          filterMatchMode="equals" style="width:11%">
+                    <f:facet name="filter">
+                        <p:datePicker pattern="dd/MM/yyyy" showIcon="true"
+                                      onchange="PF('etapasTable').filter()"/>
+                    </f:facet>
+                    <h:outputText value="#{item.dataEntregaPrevista}">
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Status" field="status" sortBy="#{item.status}">
+                    <h:outputText value="#{item.status == null ? '' : item.status.descricao}"/>
+                </p:column>
+                <p:column headerText="Ações" exportable="false" style="height: 20px">
+                    <p:button value="" icon="pi pi-eye" title="Detalhes da etapa"
+                              styleClass="obra-action-button obra-view-button"
+                              outcome="detailEtapa.xhtml">
+                        <f:param name="id" value="#{item.id}"/>
+                    </p:button>
+                    <p:commandButton value="" icon="pi pi-forward" title="Avançar status"
+                                     styleClass="obra-action-button obra-edit-button"
+                                     action="#{etapaBean.avancarStatus(item)}" process="@this"
+                                     disabled="#{not etapaBean.podeAvancar(item)}"
+                                     update=":formEtapas:tabelaEtapas :formEtapas:mensagens"/>
+                    <!--
+                    <p:commandButton value="" icon="pi pi-eye" title="Visualizar etapa"
+                                     styleClass="obra-action-button obra-view-button"
+                                     action="#{etapaBean.visualizarEtapa(item)}" process="@this"
+                                     update=":formEtapas:etapaDialog"
+                                     oncomplete="PF('etapaDialog').show()"/>
+                    -->
+                    <p:commandButton value="" icon="pi pi-pencil" title="Editar etapa"
+                                     styleClass="obra-action-button obra-edit-button"
+                                     action="#{etapaBean.editarEtapa(item)}" process="@this"
+                                     update=":formEtapas:etapaDialog"
+                                     oncomplete="PF('etapaDialog').show()"/>
+                    <p:commandButton value="" icon="pi pi-trash" title="Excluir etapa"
+                                     styleClass="obra-action-button obra-delete-button"
+                                     action="#{etapaBean.excluir(item)}" process="@this"
+                                     update=":formEtapas:tabelaEtapas :formEtapas:mensagens">
+                        <p:confirm header="Confirmar exclusão"
+                                   message="Deseja realmente excluir esta etapa?"
+                                   icon="ui-icon-alert"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes"
+                                 icon="ui-icon-check"/>
+                <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no"
+                                 icon="ui-icon-close"/>
+            </p:confirmDialog>
+
+            <p:dialog id="etapaDialog" widgetVar="etapaDialog" header="Dados da Etapa"
+                      modal="true" resizable="false" width="600">
+                <p:panelGrid columns="2" layout="grid" columnClasses="label,value"
+                             styleClass="ui-fluid">
+                    <p:outputLabel for="obra" value="Obra"/>
+                    <p:selectOneMenu id="obra" value="#{etapaBean.obraSelecionadaId}"
+                                     required="true" disabled="#{etapaBean.visualizacao}"
+                                     requiredMessage="Selecione a obra da etapa.">
+                        <f:selectItem itemLabel="Selecione uma obra" itemValue="#{null}"
+                                      noSelectionOption="true"/>
+                        <f:selectItems value="#{etapaBean.obras}" var="obraItem"
+                                       itemValue="#{obraItem.id}" itemLabel="#{obraItem.nome}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel for="ordem" value="Ordem"/>
+                    <p:inputNumber id="ordem" value="#{etapaBean.etapa.ordem}" minValue="0"
+                                   decimalPlaces="0" disabled="#{etapaBean.visualizacao}"/>
+
+                    <p:outputLabel for="nome" value="Nome"/>
+                    <p:inputText id="nome" value="#{etapaBean.etapa.nome}" required="true"
+                                 requiredMessage="Informe o nome da etapa."
+                                 disabled="#{etapaBean.visualizacao}"/>
+
+                    <p:outputLabel for="descricao" value="Descrição"/>
+                    <p:inputTextarea id="descricao" value="#{etapaBean.etapa.descricao}"
+                                     rows="4" autoResize="false"
+                                     disabled="#{etapaBean.visualizacao}"/>
+
+                    <p:outputLabel for="inicio" value="Início previsto"/>
+                    <p:datePicker id="inicio" value="#{etapaBean.etapa.dataInicioPrevista}"
+                                  pattern="dd/MM/yyyy" showIcon="true"
+                                  disabled="#{etapaBean.visualizacao}"/>
+
+                    <p:outputLabel for="entrega" value="Entrega prevista"/>
+                    <p:datePicker id="entrega" value="#{etapaBean.etapa.dataEntregaPrevista}"
+                                  pattern="dd/MM/yyyy" showIcon="true"
+                                  disabled="#{etapaBean.visualizacao}"/>
+
+                    <p:outputLabel for="status" value="Status"/>
+                    <p:selectOneMenu id="status" value="#{etapaBean.etapa.status}"
+                                     required="true" disabled="#{etapaBean.visualizacao}">
+                        <f:selectItems value="#{etapaBean.statusDisponiveis}" var="opcaoStatus"
+                                       itemValue="#{opcaoStatus}" itemLabel="#{opcaoStatus.descricao}"/>
+                    </p:selectOneMenu>
+                </p:panelGrid>
+
+                <p:commandButton value="Salvar" icon="ui-icon-disk"
+                                 action="#{etapaBean.salvar}"
+                                 rendered="#{not etapaBean.visualizacao}"
+                                 update=":formEtapas:tabelaEtapas :formEtapas:mensagens"
+                                 oncomplete="if (!args.validationFailed) PF('etapaDialog').hide()"/>
+                <p:commandButton value="Cancelar" type="button" icon="ui-icon-close"
+                                 onclick="PF('etapaDialog').hide()"/>
+            </p:dialog>
+        </h:form>
+    </h:body>
+</f:view>
+</html>

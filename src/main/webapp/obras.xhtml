@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xml:lang="pt-BR">
+<h:head>
+    <title>Lista de Obras</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/app.css"/>
+</h:head>
+<f:view>
+    <h:body styleClass="works-page">
+        <h:form id="formObras">
+            <p:growl id="mensagens" showDetail="true" autoUpdate="true" closable="true"/>
+
+            <div class="application-timeline" aria-label="Navegação dos módulos">
+                <p:button value="Início" icon="ui-icon-home" outcome="index.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Painel" icon="ui-icon-dashboard" outcome="gestao.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:commandButton value="Nova obra" icon="ui-icon-plus"
+                                 styleClass="application-timeline-step application-timeline-action"
+                                 action="#{obraBean.novaObra}" process="@this"
+                                 update=":formObras:obraDialog"
+                                 oncomplete="PF('obraDialog').show()"/>
+                <p:button value="Etapas" icon="ui-icon-arrowthick-1-e" outcome="Etapa.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Usuários" outcome="usuarios.xhtml"
+                          styleClass="application-timeline-step"
+                          rendered="#{facesContext.externalContext.isUserInRole('ADMIN')}"/>
+                <p:button value="Auditoria" outcome="auditoria.xhtml"
+                          styleClass="application-timeline-step"
+                          rendered="#{facesContext.externalContext.isUserInRole('ADMIN')}"/>
+            </div>
+
+            <p:dataTable id="tabelaObras" widgetVar="obrasTable" var="item"
+                         value="#{obraBean.obras}" styleClass="table"
+                         paginator="true" rows="15" sortMode="single"
+                         emptyMessage="Não há obras cadastradas."
+                         rowKey="#{item.id}"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="10,15,25,50">
+                <p:ajax event="sort" listener="#{obraBean.ordenar}"/>
+                <f:facet name="header">
+                    <h:outputText value="Lista de Obras: #{obraBean.quantidadeObras}"/>
+                </f:facet>
+
+                <p:column headerText="Nome" field="nome" sortBy="#{item.nome}" filterBy="#{item.nome}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{item.nome}"/>
+                </p:column>
+                <p:column headerText="Endereço" field="endereco" sortBy="#{item.endereco}" filterBy="#{item.endereco}"
+                          filterMatchMode="contains">
+                    <h:outputText value="#{item.endereco}"/>
+                </p:column>
+                <p:column headerText="Área (m²)" field="area" sortBy="#{item.area}">
+                    <h:outputText value="#{item.area}">
+                        <f:convertNumber maxFractionDigits="2"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Início previsto" field="dataInicioPrevista"
+                          sortBy="#{item.dataInicioPrevista}" filterBy="#{item.dataInicioPrevista}"
+                          filterMatchMode="equals" style="width:11%">
+                    <f:facet name="filter">
+                        <p:datePicker pattern="dd/MM/yyyy" showIcon="true"
+                                      onchange="PF('obrasTable').filter()"/>
+                    </f:facet>
+                    <h:outputText value="#{item.dataInicioPrevista}">
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Fim previsto" field="dataFimPrevista"
+                          sortBy="#{item.dataFimPrevista}" filterBy="#{item.dataFimPrevista}"
+                          filterMatchMode="equals" style="width:11%">
+                    <f:facet name="filter">
+                        <p:datePicker pattern="dd/MM/yyyy" showIcon="true"
+                                      onchange="PF('obrasTable').filter()"/>
+                    </f:facet>
+                    <h:outputText value="#{item.dataFimPrevista}">
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Status"
+                          field="status" sortBy="#{item.status}">
+                    <h:outputText value="#{item.status == null ? '' : item.status.descricao}"/>
+                </p:column>
+                <p:column headerText="Ações" exportable="false" style="height: 20px">
+                    <p:button value="" icon="pi pi-eye" title="Visualizar obra"
+                              styleClass="obra-action-button obra-view-button"
+                              outcome="detailObra.xhtml">
+                        <f:param name="id" value="#{item.id}"/>
+                    </p:button>
+                    <p:commandButton value="" icon="pi pi-pencil" title="Editar obra"
+                                     styleClass="obra-action-button obra-edit-button"
+                                     action="#{obraBean.editarObra(item)}" process="@this"
+                                     update=":formObras:obraDialog"
+                                     oncomplete="PF('obraDialog').show()"/>
+                    <p:commandButton value="" icon="pi pi-trash" title="Excluir obra"
+                                     styleClass="obra-action-button obra-delete-button"
+                                     action="#{obraBean.excluir(item)}" process="@this"
+                                     update=":formObras:tabelaObras :formObras:mensagens">
+                        <p:confirm header="Confirmar exclusão"
+                                   message="Deseja realmente excluir esta obra?"
+                                   icon="ui-icon-alert"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes"
+                                 icon="ui-icon-check"/>
+                <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no"
+                                 icon="ui-icon-close"/>
+            </p:confirmDialog>
+
+            <p:dialog id="obraDialog" widgetVar="obraDialog" header="Dados da Obra"
+                      modal="true" resizable="false" width="600">
+                <p:panelGrid columns="2" layout="grid" columnClasses="label,value"
+                             styleClass="ui-fluid">
+                    <p:outputLabel for="nome" value="Nome"/>
+                    <p:inputText id="nome" value="#{obraBean.obra.nome}" required="true"
+                                 requiredMessage="Informe o nome da obra." disabled="#{obraBean.visualizacao}"/>
+
+                    <p:outputLabel for="endereco" value="Endereço"/>
+                    <p:inputText id="endereco" value="#{obraBean.obra.endereco}" disabled="#{obraBean.visualizacao}"/>
+
+                    <p:outputLabel for="area" value="Área (m²)"/>
+                    <p:inputNumber id="area" value="#{obraBean.obra.area}" minValue="0"
+                                   decimalPlaces="2" disabled="#{obraBean.visualizacao}"/>
+
+                    <p:outputLabel for="bdi" value="BDI (%)"/>
+                    <p:inputNumber id="bdi" value="#{obraBean.obra.bdi}" minValue="0"
+                                   decimalPlaces="2" disabled="#{obraBean.visualizacao}"/>
+
+                    <p:outputLabel for="inicio" value="Início previsto"/>
+                    <p:datePicker id="inicio" value="#{obraBean.obra.dataInicioPrevista}"
+                                  pattern="dd/MM/yyyy" showIcon="true" disabled="#{obraBean.visualizacao}"/>
+
+                    <p:outputLabel for="fim" value="Fim previsto"/>
+                    <p:datePicker id="fim" value="#{obraBean.obra.dataFimPrevista}"
+                                  pattern="dd/MM/yyyy" showIcon="true" disabled="#{obraBean.visualizacao}"/>
+
+                    <p:outputLabel for="status" value="Status"/>
+                    <p:selectOneMenu id="status" value="#{obraBean.obra.status}"
+                                     required="true" disabled="#{obraBean.visualizacao}">
+                        <f:selectItems value="#{obraBean.statusDisponiveis}" var="opcaoStatus"
+                                       itemValue="#{opcaoStatus}" itemLabel="#{opcaoStatus.descricao}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel for="clientes" value="Clientes"/>
+                    <p:selectCheckboxMenu id="clientes" value="#{obraBean.clientesSelecionados}"
+                                          label="Selecione os clientes" multiple="true"
+                                          filter="true" filterMatchMode="contains" disabled="#{obraBean.visualizacao}">
+                        <f:selectItems value="#{obraBean.usuarios}" var="usuario"
+                                       itemValue="#{usuario.id}" itemLabel="#{usuario.nome}"/>
+                    </p:selectCheckboxMenu>
+                </p:panelGrid>
+
+                <p:commandButton value="Salvar" icon="ui-icon-disk"
+                                 action="#{obraBean.salvar}"
+                                 update=":formObras:tabelaObras :formObras:mensagens"
+                                 oncomplete="if (!args.validationFailed) PF('obraDialog').hide()"/>
+                <p:commandButton value="Cancelar" type="button" icon="ui-icon-close"
+                                 onclick="PF('obraDialog').hide()"/>
+            </p:dialog>
+        </h:form>
+    </h:body>
+</f:view>
+</html>

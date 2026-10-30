@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xml:lang="pt-BR" lang="pt-BR">
+<h:head>
+    <title>Minha biblioteca</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <h:outputStylesheet library="css" name="app.css"/>
+    <h:outputStylesheet library="css" name="livros.css"/>
+</h:head>
+<h:body styleClass="works-page books-page">
+    <main id="booksPage" class="books-shell">
+        <header class="books-header">
+            <div>
+                <a class="books-back-link" href="index.xhtml">← Início</a>
+                <p class="books-eyebrow">MINHA BIBLIOTECA</p>
+                <h1>Livros que fazem parte da sua história</h1>
+                <p class="books-subtitle">Encontre novos títulos no catálogo da CBL e organize suas leituras.</p>
+            </div>
+        </header>
+
+        <section class="books-stats" aria-label="Resumo da biblioteca">
+            <article><span>Na biblioteca</span><strong id="totalLivros">0</strong></article>
+            <article><span>Já lidos</span><strong id="totalLidos">0</strong></article>
+            <article><span>Quero ler</span><strong id="totalDesejados">0</strong></article>
+        </section>
+
+        <section class="books-panel" aria-labelledby="buscaTitulo">
+            <div class="books-section-heading">
+                <div>
+                    <p class="books-eyebrow">CATÁLOGO BRASILEIRO</p>
+                    <h2 id="buscaTitulo">Encontre seu próximo livro</h2>
+                </div>
+                <span>Busca por título, autor, ISBN ou editora</span>
+            </div>
+            <form id="formBusca" class="books-search-form">
+                <label class="books-search-input">
+                    <span>Buscar no catálogo</span>
+                    <input id="termoBusca" name="q" type="search" maxlength="200"
+                           placeholder="Ex.: O avesso da pele, Jeferson Tenório..." required="required"/>
+                </label>
+                <label class="books-field-select">
+                    <span>Buscar por</span>
+                    <select id="campoBusca" name="campo">
+                        <option value="titulo">Título</option>
+                        <option value="autor">Autor</option>
+                        <option value="isbn">ISBN</option>
+                        <option value="editora">Editora</option>
+                    </select>
+                </label>
+                <button id="botaoBuscar" class="books-secondary-button" type="submit">Buscar livros</button>
+                <button id="limparBusca" class="books-clear-button" type="button">Limpar busca</button>
+            </form>
+            <p id="mensagemBusca" class="books-message" role="status"></p>
+            <div id="resultadosBusca" class="books-results" aria-live="polite"></div>
+            <button id="maisResultados" class="books-load-more" type="button" hidden="hidden">Carregar mais</button>
+        </section>
+
+        <section class="books-panel" aria-labelledby="bibliotecaTitulo">
+            <div class="books-section-heading">
+                <div>
+                    <p class="books-eyebrow">SEUS LIVROS</p>
+                    <h2 id="bibliotecaTitulo">Sua lista de leitura</h2>
+                </div>
+                <label class="books-filter">
+                    <span>Mostrar</span>
+                    <select id="filtroStatus">
+                        <option value="TODOS">Todos</option>
+                        <option value="LIDO">Já li</option>
+                        <option value="DESEJADO">Quero ler</option>
+                    </select>
+                </label>
+                <label class="books-filter">
+                    <span>Ordenar por</span>
+                    <select id="ordenarLivros">
+                        <option value="titulo">Título (A–Z)</option>
+                        <option value="autores">Autor (A–Z)</option>
+                        <option value="editora">Editora (A–Z)</option>
+                        <option value="anoLancamento">Lançamento (mais recente)</option>
+                    </select>
+                </label>
+            </div>
+            <p id="mensagemLista" class="books-message" role="status"></p>
+            <div id="listaLivros" class="books-list" aria-live="polite"></div>
+        </section>
+    </main>
+
+    <script type="text/javascript">
+        //<![CDATA[
+        (() => {
+            const root = window.location.pathname.replace(/\/[^/]*$/, '');
+            const api = root + '/api/v1/livros';
+            const livrosContainer = document.getElementById('listaLivros');
+            const resultadosContainer = document.getElementById('resultadosBusca');
+            let livros = [];
+            let paginaBusca = 1;
+            let totalPaginasBusca = 1;
+            let ultimoTermo = '';
+            let ultimoCampo = 'titulo';
+            let resultadosAtuais = [];
+
+            async function requisicao(url, opcoes) {
+                const resposta = await fetch(url, Object.assign({credentials: 'same-origin'}, opcoes || {}));
+                if (!resposta.ok) {
+                    let detalhe = '';
+                    try {
+                        const erro = await resposta.json();
+                        detalhe = erro.detail || erro.message || '';
+                    } catch (_) {
+                        detalhe = '';
+                    }
+                    throw new Error(detalhe || 'Não foi possível concluir a operação (' + resposta.status + ').');
+                }
+                return resposta.status === 204 ? null : resposta.json();
+            }
+
+            function textoElemento(tag, classe, texto) {
+                const elemento = document.createElement(tag);
+                if (classe) elemento.className = classe;
+                elemento.textContent = texto || '';
+                return elemento;
+            }
+
+            function statusLegivel(status) {
+                return status === 'LIDO' ? 'Já li' : 'Quero ler';
+            }
+
+            function compararTexto(primeiro, segundo) {
+                return (primeiro || '').localeCompare(segundo || '', 'pt-BR', {sensitivity: 'base'});
+            }
+
+            function livroJaSalvo(resultado) {
+                if (resultado.isbn) {
+                    const isbn = resultado.isbn.replace(/[^0-9Xx]/g, '').toUpperCase();
+                    const encontradoPorIsbn = livros.find(livro =>
+                        livro.isbn && livro.isbn.replace(/[^0-9Xx]/g, '').toUpperCase() === isbn);
+                    if (encontradoPorIsbn) return encontradoPorIsbn;
+                }
+                const titulo = (resultado.titulo || '').trim().toLocaleLowerCase();
+                const autores = (resultado.autores || '').trim().toLocaleLowerCase();
+                return livros.find(livro =>
+                    livro.titulo.trim().toLocaleLowerCase() === titulo
+                    && (livro.autores || '').trim().toLocaleLowerCase() === autores);
+            }
+
+            function atualizarResumo() {
+                document.getElementById('totalLivros').textContent = livros.length;
+                document.getElementById('totalLidos').textContent =
+                    livros.filter(livro => livro.status === 'LIDO').length;
+                document.getElementById('totalDesejados').textContent =
+                    livros.filter(livro => livro.status === 'DESEJADO').length;
+            }
+
+            function renderizarLivros() {
+                const filtro = document.getElementById('filtroStatus').value;
+                const ordenacao = document.getElementById('ordenarLivros').value;
+                const exibidos = livros
+                    .filter(livro => filtro === 'TODOS' || livro.status === filtro)
+                    .sort((a, b) => {
+                        if (ordenacao === 'anoLancamento') {
+                            const anoA = Number.parseInt(a.anoLancamento, 10);
+                            const anoB = Number.parseInt(b.anoLancamento, 10);
+                            const semAnoA = Number.isNaN(anoA);
+                            const semAnoB = Number.isNaN(anoB);
+                            if (semAnoA !== semAnoB) return semAnoA ? 1 : -1;
+                            if (!semAnoA && anoA !== anoB) return anoB - anoA;
+                            return compararTexto(a.titulo, b.titulo);
+                        }
+                        const ordem = compararTexto(a[ordenacao], b[ordenacao]);
+                        return ordem || compararTexto(a.titulo, b.titulo);
+                    });
+                livrosContainer.replaceChildren();
+                if (!exibidos.length) {
+                    livrosContainer.append(textoElemento('p', 'books-empty',
+                        livros.length ? 'Nenhum livro corresponde a esse filtro.' :
+                            'Sua lista está vazia. Busque um livro no catálogo da CBL para começar.'));
+                    return;
+                }
+                exibidos.forEach(livro => {
+                    const cartao = document.createElement('article');
+                    cartao.className = 'books-list-item';
+                    const detalhe = document.createElement('div');
+                    detalhe.className = 'books-book-details';
+                    detalhe.append(textoElemento('h3', '', livro.titulo));
+                    detalhe.append(textoElemento('p', 'books-book-author', livro.autores || 'Autor não informado'));
+                    const metadados = [livro.isbn, livro.editora, livro.anoLancamento]
+                        .filter(Boolean).join(' · ');
+                    if (metadados) detalhe.append(textoElemento('p', 'books-book-meta', metadados));
+                    const selo = textoElemento('span', 'books-status ' + livro.status.toLowerCase(), statusLegivel(livro.status));
+                    const acoes = document.createElement('div');
+                    acoes.className = 'books-list-actions';
+                    acoes.append(selo);
+                    const seletor = document.createElement('select');
+                    seletor.className = 'books-status-select';
+                    seletor.setAttribute('aria-label', 'Status de leitura de ' + livro.titulo);
+                    [['LIDO', 'Já li'], ['DESEJADO', 'Quero ler']].forEach(([valor, rotulo]) => {
+                        const opcao = document.createElement('option');
+                        opcao.value = valor;
+                        opcao.textContent = rotulo;
+                        opcao.selected = livro.status === valor;
+                        seletor.append(opcao);
+                    });
+                    seletor.addEventListener('change', () => alterarStatus(livro, seletor.value));
+                    acoes.append(seletor);
+                    cartao.append(detalhe, acoes);
+                    livrosContainer.append(cartao);
+                });
+            }
+
+            async function carregarLivros() {
+                const mensagem = document.getElementById('mensagemLista');
+                mensagem.textContent = '';
+                try {
+                    livros = await requisicao(api);
+                    atualizarResumo();
+                    renderizarLivros();
+                } catch (erro) {
+                    mensagem.textContent = erro.message;
+                }
+            }
+
+            async function marcarLivro(livro, status) {
+                try {
+                    const existente = livroJaSalvo(livro);
+                    if (existente) {
+                        await requisicao(api + '/' + existente.id + '/status', {
+                            method: 'PATCH',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({status: status})
+                        });
+                    } else {
+                        await requisicao(api, {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({
+                                titulo: livro.titulo,
+                                autores: livro.autores,
+                                isbn: livro.isbn,
+                                editora: livro.editora,
+                                anoLancamento: livro.ano,
+                                status: status
+                            })
+                        });
+                    }
+                    await carregarLivros();
+                    document.getElementById('mensagemBusca').textContent =
+                        'Livro marcado como "' + statusLegivel(status) + '".';
+                    return true;
+                } catch (erro) {
+                    document.getElementById('mensagemBusca').textContent = erro.message;
+                    return false;
+                }
+            }
+
+            function renderizarResultados(resultados, acrescentar) {
+                if (!acrescentar) {
+                    resultadosContainer.replaceChildren();
+                    resultadosAtuais = resultados;
+                } else {
+                    resultadosAtuais = resultadosAtuais.concat(resultados);
+                }
+                resultados.forEach(livro => {
+                    const cartao = document.createElement('article');
+                    cartao.className = 'books-result-item';
+                    const detalhe = document.createElement('div');
+                    detalhe.className = 'books-book-details';
+                    detalhe.append(textoElemento('h3', '', livro.titulo));
+                    detalhe.append(textoElemento('p', 'books-book-author', livro.autores || 'Autor não informado'));
+                    const metadados = [livro.isbn, livro.editora, livro.ano, livro.assunto].filter(Boolean).join(' · ');
+                    if (metadados) detalhe.append(textoElemento('p', 'books-book-meta', metadados));
+                    const acoes = document.createElement('div');
+                    acoes.className = 'books-result-actions';
+                    const salvo = livroJaSalvo(livro);
+                    [['LIDO', 'Já li'], ['DESEJADO', 'Quero ler']].forEach(([status, rotulo]) => {
+                        const botao = textoElemento('button',
+                            (status === 'LIDO' ? 'books-primary-button' : 'books-secondary-button')
+                                + ' books-small-button', salvo && salvo.status === status ? '✓ ' + rotulo : rotulo);
+                        botao.type = 'button';
+                        botao.disabled = Boolean(salvo && salvo.status === status);
+                        botao.addEventListener('click', async () => {
+                            if (await marcarLivro(livro, status)) {
+                                renderizarResultados(resultadosAtuais, false);
+                            }
+                        });
+                        acoes.append(botao);
+                    });
+                    cartao.append(detalhe, acoes);
+                    resultadosContainer.append(cartao);
+                });
+            }
+
+            async function buscarCatalogo(pagina, acrescentar) {
+                const mensagem = document.getElementById('mensagemBusca');
+                const botao = document.getElementById('botaoBuscar');
+                mensagem.textContent = 'Consultando o catálogo da CBL...';
+                botao.disabled = true;
+                try {
+                    const resultado = await requisicao(api + '/catalogo', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({q: ultimoTermo, campo: ultimoCampo, page: pagina})
+                    });
+                    paginaBusca = resultado.pagina;
+                    totalPaginasBusca = resultado.totalPaginas;
+                    renderizarResultados(resultado.resultados, acrescentar);
+                    mensagem.textContent = resultado.resultados.length
+                        ? resultado.resultados.length + ' livro(s) exibido(s) nesta página.'
+                        : 'Nenhum livro encontrado. Tente outro termo ou campo de busca.';
+                    const mais = document.getElementById('maisResultados');
+                    mais.hidden = resultado.resultados.length < 100 || paginaBusca >= totalPaginasBusca;
+                } catch (erro) {
+                    mensagem.textContent = erro.message;
+                } finally {
+                    botao.disabled = false;
+                }
+            }
+
+            async function alterarStatus(livro, status) {
+                try {
+                    await requisicao(api + '/' + livro.id + '/status', {
+                        method: 'PATCH',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({status: status})
+                    });
+                    await carregarLivros();
+                } catch (erro) {
+                    document.getElementById('mensagemLista').textContent = erro.message;
+                    renderizarLivros();
+                }
+            }
+
+            document.getElementById('formBusca').addEventListener('submit', event => {
+                event.preventDefault();
+                ultimoTermo = document.getElementById('termoBusca').value.trim();
+                ultimoCampo = document.getElementById('campoBusca').value;
+                if (!ultimoTermo) return;
+                buscarCatalogo(1, false);
+            });
+            document.getElementById('limparBusca').addEventListener('click', () => {
+                document.getElementById('formBusca').reset();
+                resultadosContainer.replaceChildren();
+                resultadosAtuais = [];
+                ultimoTermo = '';
+                ultimoCampo = 'titulo';
+                paginaBusca = 1;
+                totalPaginasBusca = 1;
+                document.getElementById('mensagemBusca').textContent = '';
+                document.getElementById('maisResultados').hidden = true;
+            });
+            document.getElementById('maisResultados').addEventListener('click', () =>
+                buscarCatalogo(paginaBusca + 1, true));
+            document.getElementById('filtroStatus').addEventListener('change', renderizarLivros);
+            document.getElementById('ordenarLivros').addEventListener('change', renderizarLivros);
+            document.getElementById('maisResultados').hidden = true;
+            carregarLivros();
+        })();
+        //]]>
+    </script>
+</h:body>
+</html>

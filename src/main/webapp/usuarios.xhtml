@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xml:lang="pt-BR" lang="pt-BR">
+<h:head>
+    <title>Administração de usuários</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <h:outputStylesheet library="css" name="app.css"/>
+</h:head>
+<h:body styleClass="works-page users-page">
+    <main class="admin-users">
+        <header class="users-header">
+            <div>
+                <a class="users-back-link" href="gestao.xhtml"><span aria-hidden="true">←</span> Voltar ao painel de obras</a>
+                <a class="users-back-link" href="index.xhtml">Início</a>
+                <p class="users-eyebrow">Administração</p>
+                <h1>Usuários</h1>
+                <p class="users-subtitle">Gerencie os acessos, papéis e solicitações de cadastro.</p>
+            </div>
+            <div class="users-header-mark" aria-hidden="true">U</div>
+        </header>
+
+        <p id="mensagem" class="users-message" role="status"></p>
+
+        <section class="users-card">
+            <div class="users-section-heading">
+                <div>
+                    <p class="users-eyebrow">Cadastro</p>
+                    <h2>Dados do usuário</h2>
+                </div>
+                <span class="users-heading-icon" aria-hidden="true">+</span>
+            </div>
+            <form id="usuarioForm" class="users-form">
+                <input id="usuarioId" type="hidden"/>
+                <div class="users-field">
+                    <label for="nome">Nome completo</label>
+                    <input id="nome" required="required" maxlength="160" placeholder="Ex.: Maria da Silva"/>
+                </div>
+                <div class="users-field">
+                    <label for="email">E-mail</label>
+                    <input id="email" type="email" required="required" maxlength="180"
+                           placeholder="nome@empresa.com"/>
+                </div>
+                <div class="users-field">
+                    <label for="telefone">Telefone</label>
+                    <input id="telefone" maxlength="40" placeholder="(00) 00000-0000"/>
+                </div>
+                <div class="users-field">
+                    <label for="papel">Papel de acesso</label>
+                    <select id="papel" required="required">
+                        <option value="ADMIN">Administrador</option>
+                        <option value="GESTOR">Gestor</option>
+                        <option value="ENGENHEIRO">Engenheiro</option>
+                        <option value="ORCAMENTISTA">Orçamentista</option>
+                        <option value="MESTRE_OBRA">Mestre de obras</option>
+                        <option value="TECNICO_OBRA">Técnico de obras</option>
+                        <option value="FINANCEIRO">Financeiro</option>
+                        <option value="CLIENTE">Cliente</option>
+                    </select>
+                </div>
+                <div class="users-field users-field-password">
+                    <label for="senha">Senha <span>(mínimo 8 caracteres; deixe vazia ao editar)</span></label>
+                    <input id="senha" type="password" minlength="8" autocomplete="new-password"
+                           placeholder="Informe uma senha segura"/>
+                </div>
+                <div class="users-form-actions">
+                    <button class="users-button users-button-primary" type="submit">
+                        <span aria-hidden="true">＋</span> Salvar usuário
+                    </button>
+                    <button class="users-button users-button-secondary" type="button" id="limpar">Limpar campos</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="users-card users-list-card">
+            <div class="users-section-heading">
+                <div>
+                    <p class="users-eyebrow">Acessos do sistema</p>
+                    <h2>Usuários cadastrados</h2>
+                </div>
+                <span class="users-list-caption">Contas e solicitações</span>
+            </div>
+            <div class="users-table-wrap">
+                <table class="users-table">
+                    <thead>
+                    <tr>
+                        <th>Usuário</th>
+                        <th>Telefone</th>
+                        <th>Papel solicitado/atual</th>
+                        <th>Status</th>
+                        <th class="users-actions-heading">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody id="usuarios"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    <script type="text/javascript">
+        //<![CDATA[
+        (() => {
+            const root = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+            const api = `#{'${'}root}/api/v1/usuarios`;
+            const message = document.getElementById('mensagem');
+            const form = document.getElementById('usuarioForm');
+            async function call(url, options = {}) {
+                const response = await fetch(url, {credentials: 'same-origin', ...options,
+                    headers: {'Content-Type': 'application/json', ...(options.headers || {})}});
+                if (!response.ok) {
+                    let body = {}; try { body = await response.json(); } catch (_) {}
+                    throw new Error(body.detail || body.message || `Falha na solicitação (#{'${'}response.status}).`);
+                }
+                return response.status === 204 ? null : response.json();
+            }
+            function fail(error) { message.textContent = error.message; }
+            function limpar() { form.reset(); document.getElementById('usuarioId').value = ''; }
+            async function load() {
+                try {
+                    const page = await call(`#{'${'}api}?size=100&sort=nome,asc`);
+                    const body = document.getElementById('usuarios'); body.replaceChildren();
+                    page.content.forEach(user => {
+                        const row = body.insertRow();
+                        const identity = row.insertCell();
+                        const name = document.createElement('span');
+                        name.className = 'users-name';
+                        name.textContent = user.nome || '-';
+                        const email = document.createElement('span');
+                        email.className = 'users-email';
+                        email.textContent = user.email || '-';
+                        identity.append(name, email);
+                        row.insertCell().textContent = user.telefone || '-';
+                        row.insertCell().textContent = user.papel || '-';
+                        const statusCell = row.insertCell();
+                        const statusBadge = document.createElement('span');
+                        statusBadge.className = `users-status users-status-#{'${'}String(user.status || '').toLowerCase()}`;
+                        statusBadge.textContent = user.status || '-';
+                        statusCell.append(statusBadge);
+                        const actions = row.insertCell();
+                        if (user.status === 'PENDENTE') {
+                            const approve = document.createElement('button');
+                            approve.type = 'button'; approve.textContent = 'Aprovar';
+                            approve.className = 'users-button users-button-approve';
+                            approve.addEventListener('click', async () => {
+                                try {
+                                    await call(`#{'${'}api}/#{'${'}user.id}/aprovar`, {method: 'PATCH'});
+                                    message.textContent = `Cadastro de #{'${'}user.nome} aprovado.`;
+                                    await load();
+                                } catch (error) { fail(error); }
+                            });
+                            actions.append(approve);
+                        }
+                        const edit = document.createElement('button'); edit.type = 'button'; edit.textContent = 'Editar';
+                        edit.className = 'users-button users-button-edit';
+                        edit.addEventListener('click', () => {
+                            document.getElementById('usuarioId').value = user.id;
+                            document.getElementById('nome').value = user.nome;
+                            document.getElementById('email').value = user.email;
+                            document.getElementById('telefone').value = user.telefone || '';
+                            document.getElementById('papel').value = user.papel;
+                            document.getElementById('senha').value = '';
+                        });
+                        const remove = document.createElement('button'); remove.type = 'button'; remove.textContent = 'Excluir';
+                        remove.className = 'users-button users-button-delete';
+                        remove.addEventListener('click', async () => {
+                            if (!window.confirm(`Excluir o usuário #{'${'}user.nome}?`)) return;
+                            try { await call(`#{'${'}api}/#{'${'}user.id}`, {method: 'DELETE'}); message.textContent = 'Usuário excluído.'; await load(); }
+                            catch (error) { fail(error); }
+                        });
+                        actions.append(edit, remove);
+                    });
+                } catch (error) { fail(error); }
+            }
+            form.addEventListener('submit', async event => {
+                event.preventDefault();
+                try {
+                    const id = document.getElementById('usuarioId').value;
+                    const body = {nome: document.getElementById('nome').value,
+                        email: document.getElementById('email').value,
+                        senha: document.getElementById('senha').value || null,
+                        telefone: document.getElementById('telefone').value || null,
+                        papel: document.getElementById('papel').value};
+                    await call(id ? `#{'${'}api}/#{'${'}id}` : api,
+                        {method: id ? 'PUT' : 'POST', body: JSON.stringify(body)});
+                    message.textContent = id ? 'Usuário atualizado.' : 'Usuário criado.';
+                    limpar(); await load();
+                } catch (error) { fail(error); }
+            });
+            document.getElementById('limpar').addEventListener('click', limpar);
+            load();
+        })();
+        //]]>
+    </script>
+</h:body>
+</html>

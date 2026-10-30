@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xml:lang="pt-BR">
+<h:head>
+    <title>Lista de Fornecedores</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/app.css"/>
+</h:head>
+<f:view>
+    <h:body styleClass="works-page">
+        <h:form id="formFornecedores">
+            <p:growl id="mensagens" showDetail="true" autoUpdate="true" closable="true"/>
+
+            <div class="application-timeline" aria-label="Navegação dos módulos">
+                <p:button value="Início" icon="ui-icon-home" outcome="index.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Painel de obras" icon="ui-icon-arrowthick-1-w" outcome="gestao.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Etapas" icon="ui-icon-arrowthick-1-w" outcome="Etapa.xhtml"
+                          styleClass="application-timeline-step"
+                          rendered="#{facesContext.externalContext.isUserInRole('ADMIN')}"/>
+                <p:button value="Tarefas" icon="ui-icon-arrowthick-1-w" outcome="Tarefa.xhtml"
+                          styleClass="application-timeline-step"
+                          rendered="#{facesContext.externalContext.isUserInRole('ADMIN')}"/>
+                <p:button value="Insumos" icon="ui-icon-arrowthick-1-w" outcome="Insumo.xhtml"
+                          styleClass="application-timeline-step"
+                          rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('ORCAMENTISTA')}"/>
+                <p:commandButton value="Novo fornecedor" icon="ui-icon-plus"
+                                 styleClass="application-timeline-step application-timeline-action"
+                                 action="#{fornecedorBean.novoFornecedor}" process="@this"
+                                 update=":formFornecedores:fornecedorDialog"
+                                 oncomplete="PF('fornecedorDialog').show()"/>
+            </div>
+
+            <p:dataTable id="tabelaFornecedores" widgetVar="fornecedoresTable" var="item"
+                         styleClass="table"
+                         value="#{fornecedorBean.fornecedores}"
+                         paginator="true" rows="15" sortMode="single"
+                         emptyMessage="Não há fornecedores cadastrados."
+                         rowKey="#{item.id}"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="10,15,25,50">
+                <p:ajax event="sort" listener="#{fornecedorBean.ordenar}"/>
+                <f:facet name="header">
+                    <h:outputText value="Lista de Fornecedores: #{fornecedorBean.quantidadeFornecedores}"/>
+                </f:facet>
+
+                <p:column headerText="Razão social" field="razaoSocial" sortBy="#{item.razaoSocial}"
+                          filterBy="#{item.razaoSocial}" filterMatchMode="contains">
+                    <h:outputText value="#{item.razaoSocial}"/>
+                </p:column>
+                <p:column headerText="CNPJ" field="cnpj" sortBy="#{item.cnpj}"
+                          filterBy="#{item.cnpj}" filterMatchMode="contains">
+                    <h:outputText value="#{item.cnpj}"/>
+                </p:column>
+                <p:column headerText="Telefone" field="telefone" sortBy="#{item.telefone}"
+                          filterBy="#{item.telefone}" filterMatchMode="contains">
+                    <h:outputText value="#{item.telefone}"/>
+                </p:column>
+                <p:column headerText="E-mail" field="email" sortBy="#{item.email}"
+                          filterBy="#{item.email}" filterMatchMode="contains">
+                    <h:outputText value="#{item.email}"/>
+                </p:column>
+                <p:column headerText="Ações" exportable="false" style="height: 20px">
+                    <p:commandButton value="" icon="pi pi-eye" title="Visualizar fornecedor"
+                                     styleClass="obra-action-button obra-view-button"
+                                     action="#{fornecedorBean.visualizarFornecedor(item)}" process="@this"
+                                     update=":formFornecedores:fornecedorDialog"
+                                     oncomplete="PF('fornecedorDialog').show()"/>
+                    <p:commandButton value="" icon="pi pi-pencil" title="Editar fornecedor"
+                                     styleClass="obra-action-button obra-edit-button"
+                                     action="#{fornecedorBean.editarFornecedor(item)}" process="@this"
+                                     update=":formFornecedores:fornecedorDialog"
+                                     oncomplete="PF('fornecedorDialog').show()"/>
+                    <p:commandButton value="" icon="pi pi-trash" title="Excluir fornecedor"
+                                     styleClass="obra-action-button obra-delete-button"
+                                     action="#{fornecedorBean.excluir(item)}" process="@this"
+                                     update=":formFornecedores:tabelaFornecedores :formFornecedores:mensagens">
+                        <p:confirm header="Confirmar exclusão"
+                                   message="Deseja realmente excluir este fornecedor?"
+                                   icon="ui-icon-alert"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes"
+                                 icon="ui-icon-check"/>
+                <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no"
+                                 icon="ui-icon-close"/>
+            </p:confirmDialog>
+
+            <p:dialog id="fornecedorDialog" widgetVar="fornecedorDialog" header="Dados do Fornecedor"
+                      modal="true" resizable="false" width="600">
+                <p:panelGrid columns="2" layout="grid" columnClasses="label,value"
+                             styleClass="ui-fluid">
+                    <p:outputLabel for="razaoSocial" value="Razão social"/>
+                    <p:inputText id="razaoSocial" value="#{fornecedorBean.fornecedor.razaoSocial}"
+                                 required="true" requiredMessage="Informe a razão social do fornecedor."
+                                 disabled="#{fornecedorBean.visualizacao}"/>
+
+                    <p:outputLabel for="cnpj" value="CNPJ"/>
+                    <p:inputText id="cnpj" value="#{fornecedorBean.fornecedor.cnpj}"
+                                 disabled="#{fornecedorBean.visualizacao}"/>
+
+                    <p:outputLabel for="telefone" value="Telefone"/>
+                    <p:inputText id="telefone" value="#{fornecedorBean.fornecedor.telefone}"
+                                 disabled="#{fornecedorBean.visualizacao}"/>
+
+                    <p:outputLabel for="email" value="E-mail"/>
+                    <p:inputText id="email" value="#{fornecedorBean.fornecedor.email}"
+                                 disabled="#{fornecedorBean.visualizacao}"/>
+                </p:panelGrid>
+
+                <p:commandButton value="Salvar" icon="ui-icon-disk"
+                                 action="#{fornecedorBean.salvar}"
+                                 rendered="#{not fornecedorBean.visualizacao}"
+                                 update=":formFornecedores:tabelaFornecedores :formFornecedores:mensagens"
+                                 oncomplete="if (!args.validationFailed) PF('fornecedorDialog').hide()"/>
+                <p:commandButton value="Cancelar" type="button" icon="ui-icon-close"
+                                 onclick="PF('fornecedorDialog').hide()"/>
+            </p:dialog>
+        </h:form>
+    </h:body>
+</f:view>
+</html>

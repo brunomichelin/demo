@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xml:lang="pt-BR">
+<h:head>
+    <title>Detalhes da Etapa</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <h:outputStylesheet library="css" name="app.css"/>
+</h:head>
+<f:view>
+    <f:metadata>
+        <f:viewAction action="#{etapaDetailBean.carregar}" onPostback="false"/>
+    </f:metadata>
+    <h:body styleClass="works-page detail-page">
+        <h:form id="formDetailEtapa">
+            <p:growl id="mensagens" showDetail="true" autoUpdate="true" closable="true"/>
+            <h:panelGroup id="statusActions" layout="block" styleClass="detail-status-actions">
+                <p:commandButton id="avancarStatus" value="" icon="pi pi-forward" title="Avançar status"
+                                 styleClass="detail-status-button detail-status-advance"
+                                 action="#{etapaDetailBean.avancarStatus}" process="@this"
+                                 rendered="#{etapaDetailBean.podeAvancarStatus}"
+                                 update=":formDetailEtapa:detalhesEtapa :formDetailEtapa:statusActions :formDetailEtapa:mensagens"/>
+                <p:commandButton id="bloquearStatus" value="" icon="pi pi-lock" title="Bloquear etapa"
+                                 styleClass="detail-status-button detail-status-block"
+                                 action="#{etapaDetailBean.bloquearStatus}" process="@this"
+                                 rendered="#{etapaDetailBean.podeBloquearStatus}"
+                                 update=":formDetailEtapa:detalhesEtapa :formDetailEtapa:statusActions :formDetailEtapa:mensagens"/>
+                <p:commandButton id="cancelarStatus" value="" icon="pi pi-times-circle" title="Cancelar etapa"
+                                 styleClass="detail-status-button detail-status-cancel"
+                                 action="#{etapaDetailBean.cancelarStatus}" process="@this"
+                                 rendered="#{etapaDetailBean.podeCancelarStatus}"
+                                 update=":formDetailEtapa:detalhesEtapa :formDetailEtapa:statusActions :formDetailEtapa:mensagens"/>
+            </h:panelGroup>
+            <div class="application-timeline" aria-label="Navegação da etapa">
+                <p:button value="Início" icon="ui-icon-home" outcome="index.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Painel de obras" icon="ui-icon-dashboard" outcome="gestao.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Voltar para etapas" icon="ui-icon-arrowthick-1-w" outcome="Etapa.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Lançamentos de custo" outcome="custos.xhtml"
+                          styleClass="application-timeline-step"
+                          rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('FINANCEIRO')}">
+                    <f:param name="obraId" value="#{etapaDetailBean.etapa.obra.id}"/>
+                    <f:param name="etapaId" value="#{etapaDetailBean.etapa.id}"/>
+                </p:button>
+                <p:button value="Entrega" outcome="entregas.xhtml"
+                          styleClass="application-timeline-step"
+                          rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('CLIENTE')}">
+                    <f:param name="obraId" value="#{etapaDetailBean.etapa.obra.id}"/>
+                    <f:param name="etapaId" value="#{etapaDetailBean.etapa.id}"/>
+                </p:button>
+            </div>
+
+            <p:panel id="detalhesEtapa" header="Detalhes da etapa" rendered="#{not empty etapaDetailBean.etapa}">
+                <p:panelGrid columns="2" layout="grid" columnClasses="label,value" styleClass="ui-fluid">
+                    <h:outputText value="Código"/>
+                    <h:outputText value="#{etapaDetailBean.etapa.id}"/>
+                    <h:outputText value="Obra"/>
+                    <h:outputText value="#{etapaDetailBean.etapa.obra == null ? '' : etapaDetailBean.etapa.obra.nome}"/>
+                    <h:outputText value="Ordem"/>
+                    <h:outputText value="#{etapaDetailBean.etapa.ordem}"/>
+                    <h:outputText value="Nome"/>
+                    <h:outputText value="#{etapaDetailBean.etapa.nome}"/>
+                    <h:outputText value="Descrição"/>
+                    <h:outputText value="#{etapaDetailBean.etapa.descricao}"/>
+                    <h:outputText value="Início previsto"/>
+                    <h:outputText value="#{etapaDetailBean.etapa.dataInicioPrevista}">
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                    <h:outputText value="Entrega prevista"/>
+                    <h:outputText value="#{etapaDetailBean.etapa.dataEntregaPrevista}">
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                    <h:outputText value="Status"/>
+                    <h:outputText
+                            value="#{etapaDetailBean.etapa.status == null ? '' : etapaDetailBean.etapa.status.descricao}"/>
+                    <h:outputText value="Criado por"/>
+                    <h:outputText value="#{etapaDetailBean.etapa.criadoPor}"/>
+                    <h:outputText value="Data de criação"/>
+                    <h:outputText value="#{etapaDetailBean.etapa.dataCriacao}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                    <h:outputText value="Última atualização"/>
+                    <h:outputText value="#{etapaDetailBean.etapa.dataAtualizacao}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                    <h:outputText value="Data de exclusão"/>
+                    <h:outputText value="#{etapaDetailBean.etapa.dataDelecao}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                    <h:outputText value="Status do registro"/>
+                    <h:outputText value="#{etapaDetailBean.etapa.statusRegistro}"/>
+                </p:panelGrid>
+            </p:panel>
+
+            <p:panel id="progressoTarefas" header="Progresso das tarefas">
+                <div class="etapa-progress-summary">
+                    <div class="etapa-progress-card etapa-progress-complete">
+                        <span class="etapa-progress-label">Concluídas</span>
+                        <strong>
+                            <h:outputText value="#{etapaDetailBean.percentualConcluidas}">
+                                <f:convertNumber minFractionDigits="1" maxFractionDigits="1"/>
+                            </h:outputText>
+                            %
+                        </strong>
+                        <span>#{etapaDetailBean.quantidadeConcluidas} de #{etapaDetailBean.quantidadeTarefas} tarefas</span>
+                    </div>
+                    <div class="etapa-progress-card etapa-progress-active">
+                        <span class="etapa-progress-label">Em andamento</span>
+                        <strong>
+                            <h:outputText value="#{etapaDetailBean.percentualEmAndamento}">
+                                <f:convertNumber minFractionDigits="1" maxFractionDigits="1"/>
+                            </h:outputText>
+                            %
+                        </strong>
+                        <span>#{etapaDetailBean.quantidadeEmAndamento} de #{etapaDetailBean.quantidadeTarefas} tarefas</span>
+                    </div>
+                </div>
+            </p:panel>
+
+            <p:panel header="Tarefas">
+                <p:commandButton value="Nova tarefa" icon="ui-icon-plus"
+                                 rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA')}"
+                                 action="#{etapaDetailBean.prepararNovaTarefa}" process="@this"
+                                 update=":formNovaTarefa:tarefaDialog"
+                                 oncomplete="PF('tarefaDialog').show()"/>
+                <p:dataTable id="tabelaTarefas" var="tarefa" value="#{etapaDetailBean.tarefas}"
+                             emptyMessage="Esta etapa não possui tarefas cadastradas.">
+                    <p:column headerText="Prioridade">
+                        <h:outputText value="#{tarefa.prioridade}"/>
+                    </p:column>
+                    <p:column headerText="Título">
+                        <h:outputText value="#{tarefa.titulo}"/>
+                    </p:column>
+                    <p:column headerText="Descrição">
+                        <h:outputText value="#{tarefa.descricao}"/>
+                    </p:column>
+                    <p:column headerText="Responsável">
+                        <h:outputText value="#{tarefa.responsavel == null ? '' : tarefa.responsavel.nome}"/>
+                    </p:column>
+                    <p:column headerText="Início previsto">
+                        <h:outputText value="#{tarefa.dataInicioPrevista}">
+                            <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Fim previsto">
+                        <h:outputText value="#{tarefa.dataFimPrevista}">
+                            <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Status">
+                        <h:outputText value="#{tarefa.status == null ? '' : tarefa.status.descricao}"/>
+                    </p:column>
+                    <p:column headerText="Ações" exportable="false">
+                        <p:button value="" icon="pi pi-eye" title="Detalhes da tarefa"
+                                  styleClass="obra-action-button obra-view-button"
+                                  outcome="detailTarefa.xhtml">
+                            <f:param name="id" value="#{tarefa.id}"/>
+                        </p:button>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+
+        <h:form id="formNovaTarefa">
+            <p:dialog id="tarefaDialog" widgetVar="tarefaDialog" header="Dados da Tarefa"
+                      modal="true" resizable="false" width="650">
+                <p:panelGrid columns="2" layout="grid" columnClasses="label,value" styleClass="ui-fluid">
+                    <p:outputLabel for="tituloTarefa" value="Título"/>
+                    <p:inputText id="tituloTarefa" value="#{etapaDetailBean.novaTarefa.titulo}"
+                                 required="true" requiredMessage="Informe o título da tarefa."/>
+
+                    <p:outputLabel for="descricaoTarefa" value="Descrição"/>
+                    <p:inputTextarea id="descricaoTarefa" value="#{etapaDetailBean.novaTarefa.descricao}"
+                                     rows="4" autoResize="false"/>
+
+                    <p:outputLabel for="prioridadeTarefa" value="Prioridade"/>
+                    <p:inputNumber id="prioridadeTarefa" value="#{etapaDetailBean.novaTarefa.prioridade}"
+                                   minValue="0" decimalPlaces="0"/>
+
+                    <p:outputLabel for="responsavelTarefa" value="Responsável"/>
+                    <p:selectOneMenu id="responsavelTarefa"
+                                     value="#{etapaDetailBean.responsavelSelecionadoId}">
+                        <f:selectItem itemLabel="Sem responsável" itemValue="#{null}"
+                                      noSelectionOption="true"/>
+                        <f:selectItems value="#{etapaDetailBean.usuarios}" var="usuario"
+                                       itemValue="#{usuario.id}" itemLabel="#{usuario.nome}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel for="inicioTarefa" value="Início previsto"/>
+                    <p:datePicker id="inicioTarefa" value="#{etapaDetailBean.novaTarefa.dataInicioPrevista}"
+                                  pattern="dd/MM/yyyy" showIcon="true"/>
+
+                    <p:outputLabel for="fimTarefa" value="Fim previsto"/>
+                    <p:datePicker id="fimTarefa" value="#{etapaDetailBean.novaTarefa.dataFimPrevista}"
+                                  pattern="dd/MM/yyyy" showIcon="true"/>
+
+                    <p:outputLabel for="statusTarefa" value="Status"/>
+                    <p:selectOneMenu id="statusTarefa" value="#{etapaDetailBean.novaTarefa.status}"
+                                     required="true">
+                        <f:selectItems value="#{etapaDetailBean.statusTarefaDisponiveis}" var="statusItem"
+                                       itemValue="#{statusItem}" itemLabel="#{statusItem.descricao}"/>
+                    </p:selectOneMenu>
+                </p:panelGrid>
+                <p:commandButton value="Salvar" icon="ui-icon-disk"
+                                 action="#{etapaDetailBean.salvarTarefa}"
+                                 update=":formDetailEtapa:tabelaTarefas :formDetailEtapa:progressoTarefas :formDetailEtapa:mensagens"
+                                 oncomplete="if (!args.validationFailed) PF('tarefaDialog').hide()"/>
+                <p:commandButton value="Cancelar" type="button" icon="ui-icon-close"
+                                 onclick="PF('tarefaDialog').hide()"/>
+            </p:dialog>
+        </h:form>
+    </h:body>
+</f:view>
+</html>

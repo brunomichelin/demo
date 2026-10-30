@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xml:lang="pt-BR" lang="pt-BR">
+<h:head>
+    <title>Entregas das etapas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <h:outputStylesheet library="css" name="app.css"/>
+</h:head>
+<h:body styleClass="works-page deliveries-page">
+    <main id="pagina" class="deliveries-shell"
+          data-can-register="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA')}"
+          data-can-decide="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR')}">
+        <header class="deliveries-header">
+            <div>
+                <nav class="system-return-links" aria-label="Navegação principal">
+                    <a href="index.xhtml">Início</a><span> / </span>
+                    <a class="deliveries-back-link" id="obraLink" href="gestao.xhtml">Voltar ao painel de obras</a>
+                </nav>
+                <p class="deliveries-eyebrow">Acompanhamento de obra</p>
+                <h1>Entregas das etapas</h1>
+                <p class="deliveries-subtitle">Registre entregas e acompanhe a validação de cada etapa.</p>
+            </div>
+            <span class="deliveries-header-icon" aria-hidden="true">✓</span>
+        </header>
+        <p id="mensagem" class="deliveries-message" role="status"></p>
+        <section class="deliveries-card">
+            <div class="deliveries-section-heading">
+                <span class="deliveries-section-icon" aria-hidden="true">01</span>
+                <div><p class="deliveries-eyebrow">Etapa e registro</p><h2>Dados da entrega</h2></div>
+            </div>
+            <div class="deliveries-form">
+                <div class="deliveries-field deliveries-field-wide">
+                    <label for="etapa">Etapa da obra</label><select id="etapa"></select>
+                </div>
+                <div class="deliveries-field">
+                    <label for="dataReal">Data real da entrega</label><input id="dataReal" type="date"/>
+                </div>
+                <div class="deliveries-field deliveries-field-wide">
+                    <label for="observacoes">Observações</label>
+                    <textarea id="observacoes" rows="3" placeholder="Registre detalhes relevantes sobre a entrega"></textarea>
+                </div>
+            </div>
+            <div class="deliveries-actions">
+                <button class="delivery-button delivery-button-primary" type="button" id="registrar">
+                    <span aria-hidden="true">＋</span> Registrar entrega
+                </button>
+                <span class="deliveries-actions-divider" aria-hidden="true"></span>
+                <button class="delivery-button delivery-button-approve" type="button" id="aprovar">
+                    <span aria-hidden="true">✓</span> Aprovar
+                </button>
+                <button class="delivery-button delivery-button-reject" type="button" id="reprovar">
+                    <span aria-hidden="true">×</span> Reprovar
+                </button>
+            </div>
+        </section>
+        <section class="deliveries-card deliveries-current-card">
+            <div class="deliveries-section-heading">
+                <span class="deliveries-section-icon" aria-hidden="true">02</span>
+                <div><p class="deliveries-eyebrow">Situação atual</p><h2>Resumo da entrega</h2></div>
+            </div>
+            <dl class="deliveries-summary">
+                <div><dt>Situação</dt><dd id="status">-</dd></div>
+                <div><dt>Data real</dt><dd id="data">-</dd></div>
+                <div><dt>Responsável</dt><dd id="responsavel">-</dd></div>
+                <div class="deliveries-summary-notes"><dt>Observações</dt><dd id="detalhes">-</dd></div>
+            </dl>
+        </section>
+    </main>
+    <script type="text/javascript">
+        //<![CDATA[
+        (() => {
+            const root = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+            const api = `#{'${'}root}/api/v1`;
+            const params = new URLSearchParams(window.location.search);
+            const obraId = params.get('obraId');
+            const select = document.getElementById('etapa');
+            const message = document.getElementById('mensagem');
+            const roleFlags = document.getElementById('pagina').dataset;
+            document.getElementById('registrar').hidden = roleFlags.canRegister !== 'true';
+            document.getElementById('aprovar').hidden = roleFlags.canDecide !== 'true';
+            document.getElementById('reprovar').hidden = roleFlags.canDecide !== 'true';
+            document.getElementById('obraLink').href = 'gestao.xhtml';
+            async function call(url, options = {}) {
+                const response = await fetch(url, {credentials: 'same-origin', ...options,
+                    headers: {'Content-Type': 'application/json', ...(options.headers || {})}});
+                if (!response.ok) {
+                    let body = {}; try { body = await response.json(); } catch (_) {}
+                    throw new Error(body.detail || body.message || `Falha na solicitação (#{'${'}response.status}).`);
+                }
+                return response.status === 204 ? null : response.json();
+            }
+            function erro(error) { message.textContent = error.message; }
+            async function carregarEntrega() {
+                if (!select.value) return;
+                const response = await fetch(`#{'${'}api}/etapas/#{'${'}select.value}/entrega`, {credentials: 'same-origin'});
+                if (response.status === 404) {
+                    ['status', 'data', 'responsavel', 'detalhes'].forEach(id => document.getElementById(id).textContent = '-');
+                    return;
+                }
+                if (!response.ok) throw new Error(`Falha ao carregar entrega (#{'${'}response.status}).`);
+                const item = await response.json();
+                document.getElementById('status').textContent = item.status || '-';
+                document.getElementById('data').textContent = item.dataReal || '-';
+                document.getElementById('responsavel').textContent = item.responsavel?.nome || '-';
+                document.getElementById('detalhes').textContent = item.observacoes || '-';
+            }
+            async function init() {
+                try {
+                    if (!obraId) throw new Error('Identificador da obra não informado.');
+                    const stages = await call(`#{'${'}api}/obras/#{'${'}obraId}/etapas?size=100`);
+                    const selectedId = params.get('etapaId');
+                    stages.content.forEach(item => select.add(new Option(`#{'${'}item.ordem} - #{'${'}item.nome}`, item.id)));
+                    if (selectedId) select.value = selectedId;
+                    await carregarEntrega();
+                } catch (error) { erro(error); }
+            }
+            document.getElementById('registrar').addEventListener('click', async () => {
+                try {
+                    const body = {dataReal: document.getElementById('dataReal').value || null,
+                        observacoes: document.getElementById('observacoes').value || null};
+                    await call(`#{'${'}api}/etapas/#{'${'}select.value}/entrega`, {method: 'POST', body: JSON.stringify(body)});
+                    message.textContent = 'Entrega registrada para aprovação.'; await carregarEntrega();
+                } catch (error) { erro(error); }
+            });
+            async function decidir(status) {
+                try {
+                    await call(`#{'${'}api}/etapas/#{'${'}select.value}/entrega/aprovacao`,
+                        {method: 'PATCH', body: JSON.stringify({status,
+                            observacoes: document.getElementById('observacoes').value || null})});
+                    message.textContent = `Entrega #{'${'}status.toLowerCase()}.`; await carregarEntrega();
+                } catch (error) { erro(error); }
+            }
+            document.getElementById('aprovar').addEventListener('click', () => decidir('APROVADA'));
+            document.getElementById('reprovar').addEventListener('click', () => decidir('REPROVADA'));
+            select.addEventListener('change', () => carregarEntrega().catch(erro));
+            init();
+        })();
+        //]]>
+    </script>
+</h:body>
+</html>

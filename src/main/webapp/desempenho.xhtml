@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xml:lang="pt-BR" lang="pt-BR">
+<h:head>
+    <title>Desempenho da obra</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <h:outputStylesheet library="css" name="app.css"/>
+</h:head>
+<h:body styleClass="works-page performance-page">
+    <main class="performance-shell">
+        <header class="performance-header">
+            <div>
+                <nav class="system-return-links" aria-label="Navegação principal">
+                    <a href="index.xhtml">Início</a><span> / </span>
+                    <a href="gestao.xhtml">Painel de obras</a>
+                </nav>
+                <p class="performance-eyebrow">Indicadores de execução</p>
+                <h1>Desempenho da obra</h1>
+                <p class="performance-subtitle">Acompanhe o avanço das etapas e a situação das tarefas.</p>
+            </div>
+            <span class="performance-header-icon" aria-hidden="true">▥</span>
+        </header>
+
+        <h:form id="formDesempenho">
+            <p:messages id="mensagens" showDetail="false" closable="true"/>
+            <section class="performance-card performance-selector">
+                <h:outputLabel for="obraSelect" value="Obra"/>
+                <p:selectOneMenu id="obraSelect" value="#{desempenhoBean.obraId}"
+                                 disabled="#{empty desempenhoBean.obras}">
+                    <f:selectItems value="#{desempenhoBean.obras}" var="obra"
+                                   itemValue="#{obra.id}" itemLabel="#{obra.nome}"/>
+                    <p:ajax listener="#{desempenhoBean.carregar}" update="@form"/>
+                </p:selectOneMenu>
+            </section>
+
+            <h:panelGroup id="indicadores" layout="block" styleClass="performance-kpis"
+                          rendered="#{desempenhoBean.dadosCarregados}">
+                <article class="performance-kpi">
+                    <span>Avanço geral</span>
+                    <strong>#{desempenhoBean.percentualAvanco}%</strong>
+                    <small>tarefas concluídas</small>
+                </article>
+                <article class="performance-kpi">
+                    <span>Etapas</span>
+                    <strong>#{desempenhoBean.totalEtapas}</strong>
+                    <small>etapas cadastradas</small>
+                </article>
+                <article class="performance-kpi">
+                    <span>Tarefas concluídas</span>
+                    <strong>#{desempenhoBean.tarefasConcluidas}</strong>
+                    <small>de #{desempenhoBean.totalTarefas} tarefas</small>
+                </article>
+                <article class="performance-kpi">
+                    <span>Em atenção</span>
+                    <strong>#{desempenhoBean.tarefasEmAtencao}</strong>
+                    <small>em andamento ou bloqueadas</small>
+                </article>
+            </h:panelGroup>
+
+            <h:panelGroup id="graficos" layout="block" styleClass="performance-chart-grid"
+                          rendered="#{desempenhoBean.dadosCarregados and desempenhoBean.possuiEtapas}">
+                <section class="performance-card">
+                    <div class="performance-card-heading">
+                        <div>
+                            <p class="performance-eyebrow">Progresso</p>
+                            <h2>Conclusão por etapa</h2>
+                        </div>
+                        <span class="performance-card-icon" aria-hidden="true">%</span>
+                    </div>
+                    <p:barChart id="graficoEtapas" model="#{desempenhoBean.progressoPorEtapa}"
+                             styleClass="performance-prime-chart performance-bar-chart"/>
+                </section>
+                <section class="performance-card">
+                    <div class="performance-card-heading">
+                        <div>
+                            <p class="performance-eyebrow">Distribuição</p>
+                            <h2>Status das tarefas</h2>
+                        </div>
+                        <span class="performance-card-icon" aria-hidden="true">◉</span>
+                    </div>
+                    <p:donutChart id="graficoStatus" model="#{desempenhoBean.tarefasPorStatus}"
+                             styleClass="performance-prime-chart performance-donut-chart"/>
+                </section>
+            </h:panelGroup>
+
+            <h:panelGroup id="cronogramaEtapasTarefas" layout="block"
+                          styleClass="performance-card performance-timeline-card"
+                          rendered="#{desempenhoBean.dadosCarregados}">
+                <div class="performance-card-heading">
+                    <div>
+                        <p class="performance-eyebrow">Cronograma</p>
+                        <h2>Tempo de execução das etapas e tarefas</h2>
+                        <p class="performance-timeline-description">
+                            Períodos previstos; as cores indicam a situação em relação ao prazo.
+                        </p>
+                    </div>
+                    <span class="performance-card-icon" aria-hidden="true">▰</span>
+                </div>
+                <div class="performance-timeline-legend" aria-label="Legenda do cronograma"
+                     style="display:flex;flex-wrap:wrap;gap:10px 20px;margin:0 0 15px;color:#475569;font-size:.82rem">
+                    <span style="display:inline-flex;align-items:center;gap:7px">
+                        <span class="on-time" aria-hidden="true"
+                              style="display:inline-block;width:10px;height:10px;flex:0 0 10px;border-radius:50%;background:#16a34a"></span>
+                        Concluída no prazo
+                    </span>
+                    <span style="display:inline-flex;align-items:center;gap:7px">
+                        <span class="in-progress" aria-hidden="true"
+                              style="display:inline-block;width:10px;height:10px;flex:0 0 10px;border-radius:50%;background:#ea580c"></span>
+                        Dentro do prazo
+                    </span>
+                    <span style="display:inline-flex;align-items:center;gap:7px">
+                        <span class="late" aria-hidden="true"
+                              style="display:inline-block;width:10px;height:10px;flex:0 0 10px;border-radius:50%;background:#dc2626"></span>
+                        Atrasada ou concluída com atraso
+                    </span>
+                    <span style="display:inline-flex;align-items:center;gap:7px">
+                        <span class="unknown" aria-hidden="true"
+                              style="display:inline-block;width:10px;height:10px;flex:0 0 10px;border-radius:50%;background:#94a3b8"></span>
+                        Sem avaliação
+                    </span>
+                </div>
+                <h:panelGroup layout="block" rendered="#{desempenhoBean.possuiCronograma}">
+                    <p:barChart id="graficoCronograma" model="#{desempenhoBean.cronograma}"
+                                styleClass="performance-prime-chart performance-timeline-chart"
+                                style="height: #{desempenhoBean.alturaGraficoCronograma}px"/>
+                    <h:panelGroup layout="block" styleClass="performance-timeline-note"
+                                  rendered="#{desempenhoBean.itensSemPeriodoCronograma gt 0}">
+                        #{desempenhoBean.itensSemPeriodoCronograma} etapa(s) ou tarefa(s) sem período válido
+                        não aparecem no gráfico.
+                    </h:panelGroup>
+                </h:panelGroup>
+                <h:panelGroup layout="block" styleClass="performance-empty"
+                              rendered="#{not desempenhoBean.possuiCronograma}">
+                    Defina as datas de início e fim previstas das etapas ou tarefas para exibir o cronograma.
+                </h:panelGroup>
+            </h:panelGroup>
+
+            <h:panelGroup id="semDados" layout="block" styleClass="performance-empty"
+                          rendered="#{desempenhoBean.dadosCarregados and not desempenhoBean.possuiEtapas}">
+                Esta obra ainda não possui etapas ou tarefas para exibir.
+            </h:panelGroup>
+        </h:form>
+    </main>
+</h:body>
+</html>

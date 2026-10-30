@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xml:lang="pt-BR">
+<h:head>
+    <title>Detalhes da Obra</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <h:outputStylesheet library="css" name="app.css"/>
+</h:head>
+<f:view>
+    <f:metadata>
+        <f:viewParam name="id" value="#{obraDetailBean.obraId}"/>
+        <f:viewAction action="#{obraDetailBean.carregar}" onPostback="false"/>
+    </f:metadata>
+    <h:body styleClass="works-page detail-page">
+        <h:form id="formDetail">
+            <p:growl id="mensagens" showDetail="true" autoUpdate="true" closable="true"/>
+            <h:panelGroup id="statusActions" layout="block" styleClass="detail-status-actions">
+                <p:commandButton id="avancarStatus" value="" icon="pi pi-forward" title="Avançar status"
+                                 styleClass="detail-status-button detail-status-advance"
+                                 action="#{obraDetailBean.avancarStatus}" process="@this"
+                                 rendered="#{obraDetailBean.podeAvancarStatus}"
+                                 update=":formDetail:detalhesObra :formDetail:statusActions :formDetail:mensagens"/>
+                <p:commandButton id="bloquearStatus" value="" icon="pi pi-lock" title="Bloquear obra"
+                                 styleClass="detail-status-button detail-status-block"
+                                 action="#{obraDetailBean.bloquearStatus}" process="@this"
+                                 rendered="#{obraDetailBean.podeBloquearStatus}"
+                                 update=":formDetail:detalhesObra :formDetail:statusActions :formDetail:mensagens"/>
+                <p:commandButton id="cancelarStatus" value="" icon="pi pi-times-circle" title="Cancelar obra"
+                                 styleClass="detail-status-button detail-status-cancel"
+                                 action="#{obraDetailBean.cancelarStatus}" process="@this"
+                                 rendered="#{obraDetailBean.podeCancelarStatus}"
+                                 update=":formDetail:detalhesObra :formDetail:statusActions :formDetail:mensagens"/>
+            </h:panelGroup>
+            <div class="application-timeline" aria-label="Navegação da obra">
+                <p:button value="Início" icon="ui-icon-home" outcome="index.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Voltar ao painel de obras" icon="ui-icon-arrowthick-1-w" outcome="gestao.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Orçamento" outcome="orcamento.xhtml"
+                          styleClass="application-timeline-step"
+                          rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('ORCAMENTISTA')}">
+                    <f:param name="obraId" value="#{obraDetailBean.obra.id}"/>
+                </p:button>
+                <p:button value="Custos" outcome="custos.xhtml"
+                          styleClass="application-timeline-step"
+                          rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('FINANCEIRO')}">
+                    <f:param name="obraId" value="#{obraDetailBean.obra.id}"/>
+                </p:button>
+                <p:button value="Entregas" outcome="entregas.xhtml"
+                          styleClass="application-timeline-step"
+                          rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('CLIENTE')}">
+                    <f:param name="obraId" value="#{obraDetailBean.obra.id}"/>
+                </p:button>
+                <p:button value="Relatórios" outcome="relatorios.xhtml"
+                          styleClass="application-timeline-step"
+                          rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('FINANCEIRO') or facesContext.externalContext.isUserInRole('ORCAMENTISTA') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('CLIENTE')}">
+                    <f:param name="obraId" value="#{obraDetailBean.obra.id}"/>
+                </p:button>
+            </div>
+
+            <p:panel id="detalhesObra" header="Detalhes da obra" rendered="#{not empty obraDetailBean.obra}">
+                <p:panelGrid columns="2" layout="grid" columnClasses="label,value" styleClass="ui-fluid">
+                    <h:outputText value="Código"/>
+                    <h:outputText value="#{obraDetailBean.obra.id}"/>
+                    <h:outputText value="Nome"/>
+                    <h:outputText value="#{obraDetailBean.obra.nome}"/>
+                    <h:outputText value="Endereço"/>
+                    <h:outputText value="#{obraDetailBean.obra.endereco}"/>
+                    <h:outputText value="Área (m²)"/>
+                    <h:outputText value="#{obraDetailBean.obra.area}">
+                        <f:convertNumber maxFractionDigits="2"/>
+                    </h:outputText>
+                    <h:outputText value="BDI (%)"/>
+                    <h:outputText value="#{obraDetailBean.obra.bdi}">
+                        <f:convertNumber maxFractionDigits="2"/>
+                    </h:outputText>
+                    <h:outputText value="Início previsto"/>
+                    <h:outputText value="#{obraDetailBean.obra.dataInicioPrevista}">
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                    <h:outputText value="Fim previsto"/>
+                    <h:outputText value="#{obraDetailBean.obra.dataFimPrevista}">
+                        <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                    <h:outputText value="Status"/>
+                    <h:outputText value="#{obraDetailBean.obra.status == null ? '' : obraDetailBean.obra.status.descricao}"/>
+                    <h:outputText value="Criado por"/>
+                    <h:outputText value="#{obraDetailBean.obra.criadoPor}"/>
+                    <h:outputText value="Data de criação"/>
+                    <h:outputText value="#{obraDetailBean.obra.dataCriacao}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                    <h:outputText value="Última atualização"/>
+                    <h:outputText value="#{obraDetailBean.obra.dataAtualizacao}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                    <h:outputText value="Data de exclusão"/>
+                    <h:outputText value="#{obraDetailBean.obra.dataDelecao}">
+                        <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                    <h:outputText value="Status do registro"/>
+                    <h:outputText value="#{obraDetailBean.obra.statusRegistro}"/>
+                </p:panelGrid>
+            </p:panel>
+
+            <p:panel header="Clientes">
+                <p:dataTable id="tabelaClientes" var="cliente" value="#{obraDetailBean.clientes}"
+                             emptyMessage="Esta obra não possui clientes cadastrados.">
+                    <p:column headerText="Nome">
+                        <h:outputText value="#{cliente.nome}"/>
+                    </p:column>
+                    <p:column headerText="E-mail">
+                        <h:outputText value="#{cliente.email}"/>
+                    </p:column>
+                    <p:column headerText="Telefone">
+                        <h:outputText value="#{cliente.telefone}"/>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+
+            <p:panel header="Etapas">
+                <p:commandButton value="Nova etapa" icon="ui-icon-plus"
+                                 rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR')}"
+                                 action="#{obraDetailBean.prepararNovaEtapa}" process="@this"
+                                 update=":formNovaEtapa:etapaDialog"
+                                 oncomplete="PF('etapaDialog').show()"/>
+                <p:dataTable id="tabelaEtapas" var="etapa" value="#{obraDetailBean.etapas}"
+                             emptyMessage="Esta obra não possui etapas cadastradas.">
+                    <p:column headerText="Ordem">
+                        <h:outputText value="#{etapa.ordem}"/>
+                    </p:column>
+                    <p:column headerText="Nome">
+                        <h:outputText value="#{etapa.nome}"/>
+                    </p:column>
+                    <p:column headerText="Descrição">
+                        <h:outputText value="#{etapa.descricao}"/>
+                    </p:column>
+                    <p:column headerText="Início previsto">
+                        <h:outputText value="#{etapa.dataInicioPrevista}">
+                            <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Entrega prevista">
+                        <h:outputText value="#{etapa.dataEntregaPrevista}">
+                            <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Status">
+                        <h:outputText value="#{etapa.status == null ? '' : etapa.status.descricao}"/>
+                    </p:column>
+                    <p:column headerText="Ações" exportable="false">
+                        <p:button value="" icon="pi pi-eye" title="Detalhes da etapa"
+                                  styleClass="obra-action-button obra-view-button"
+                                  outcome="detailEtapa.xhtml">
+                            <f:param name="id" value="#{etapa.id}"/>
+                        </p:button>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+
+            <p:panel header="Orçamentos">
+                <p:dataTable id="tabelaOrcamentos" var="orcamento" value="#{obraDetailBean.orcamentos}"
+                             emptyMessage="Esta obra não possui orçamentos cadastrados.">
+                    <p:column headerText="Número">
+                        <h:outputText value="#{orcamento.numero}"/>
+                    </p:column>
+                    <p:column headerText="Congelado">
+                        <h:outputText value="#{orcamento.congelada ? 'Sim' : 'Não'}"/>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+
+            <p:panel header="Documentação">
+                <p:commandButton value="Adicionar documento" icon="ui-icon-plus"
+                                 action="#{obraDetailBean.novoDocumento}" process="@this"
+                                 update=":formDocumento:documentoDialog"
+                                 oncomplete="PF('documentoDialog').show()"/>
+                <p:dataTable id="tabelaDocumentos" var="doc" value="#{obraDetailBean.documentos}"
+                             emptyMessage="Esta obra não possui documentos cadastrados.">
+                    <p:column headerText="Descrição">
+                        <h:outputText value="#{doc.nome}"/>
+                    </p:column>
+                    <p:column headerText="Arquivo">
+                        <h:outputText value="#{doc.nomeArquivo}"/>
+                    </p:column>
+                    <p:column headerText="Tipo">
+                        <h:outputText value="#{doc.tipo}"/>
+                    </p:column>
+                    <p:column headerText="Tamanho">
+                        <h:outputText value="#{doc.tamanho}">
+                            <f:convertNumber type="number" maxFractionDigits="0"/>
+                        </h:outputText>
+                        <h:outputText value=" bytes"/>
+                    </p:column>
+                    <p:column headerText="Ações" exportable="false">
+                        <p:commandButton value="" icon="pi pi-download" title="Baixar documento"
+                                         ajax="false" styleClass="obra-action-button">
+                            <p:fileDownload value="#{obraDetailBean.baixarDocumento(doc)}"/>
+                        </p:commandButton>
+                        <p:commandButton value="" icon="pi pi-pencil" title="Editar documento"
+                                         action="#{obraDetailBean.editarDocumento(doc)}" process="@this"
+                                         update=":formDocumento:documentoDialog"
+                                         oncomplete="PF('documentoDialog').show()"/>
+                        <p:commandButton value="" icon="pi pi-trash" title="Excluir documento"
+                                         action="#{obraDetailBean.excluirDocumento(doc)}" process="@this"
+                                         update=":formDetail:tabelaDocumentos :formDetail:mensagens">
+                            <p:confirm header="Confirmar exclusão"
+                                       message="Deseja realmente excluir este documento?"
+                                       icon="ui-icon-alert"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes"
+                                 icon="ui-icon-check"/>
+                <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no"
+                                 icon="ui-icon-close"/>
+            </p:confirmDialog>
+        </h:form>
+
+        <h:form id="formNovaEtapa">
+            <p:dialog id="etapaDialog" widgetVar="etapaDialog" header="Dados da Etapa"
+                      modal="true" resizable="false" width="600">
+                <p:panelGrid columns="2" layout="grid" columnClasses="label,value" styleClass="ui-fluid">
+                    <p:outputLabel for="ordemEtapa" value="Ordem"/>
+                    <p:inputNumber id="ordemEtapa" value="#{obraDetailBean.novaEtapa.ordem}"
+                                   minValue="1" decimalPlaces="0" required="true"
+                                   requiredMessage="Informe a ordem da etapa."/>
+
+                    <p:outputLabel for="nomeEtapa" value="Nome"/>
+                    <p:inputText id="nomeEtapa" value="#{obraDetailBean.novaEtapa.nome}" required="true"
+                                 requiredMessage="Informe o nome da etapa."/>
+
+                    <p:outputLabel for="descricaoEtapa" value="Descrição"/>
+                    <p:inputTextarea id="descricaoEtapa" value="#{obraDetailBean.novaEtapa.descricao}"
+                                     rows="4" autoResize="false"/>
+
+                    <p:outputLabel for="inicioEtapa" value="Início previsto"/>
+                    <p:datePicker id="inicioEtapa" value="#{obraDetailBean.novaEtapa.dataInicioPrevista}"
+                                  pattern="dd/MM/yyyy" showIcon="true"/>
+
+                    <p:outputLabel for="entregaEtapa" value="Entrega prevista"/>
+                    <p:datePicker id="entregaEtapa" value="#{obraDetailBean.novaEtapa.dataEntregaPrevista}"
+                                  pattern="dd/MM/yyyy" showIcon="true"/>
+
+                    <p:outputLabel for="statusEtapa" value="Status"/>
+                    <p:selectOneMenu id="statusEtapa" value="#{obraDetailBean.novaEtapa.status}"
+                                     required="true">
+                        <f:selectItems value="#{obraDetailBean.statusEtapaDisponiveis}" var="statusItem"
+                                       itemValue="#{statusItem}" itemLabel="#{statusItem.descricao}"/>
+                    </p:selectOneMenu>
+                </p:panelGrid>
+                <p:commandButton value="Salvar" icon="ui-icon-disk"
+                                 action="#{obraDetailBean.salvarEtapa}"
+                                 update=":formDetail:tabelaEtapas :formDetail:mensagens"
+                                 oncomplete="if (!args.validationFailed) PF('etapaDialog').hide()"/>
+                <p:commandButton value="Cancelar" type="button" icon="ui-icon-close"
+                                 onclick="PF('etapaDialog').hide()"/>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="formDocumento" enctype="multipart/form-data">
+            <p:dialog id="documentoDialog" widgetVar="documentoDialog" header="Documento da obra"
+                      modal="true" resizable="false" width="600">
+                <p:panelGrid columns="2" layout="grid" columnClasses="label,value" styleClass="ui-fluid">
+                    <p:outputLabel for="nomeDocumento" value="Descrição"/>
+                    <p:inputText id="nomeDocumento" value="#{obraDetailBean.documento.nome}" required="true"
+                                 requiredMessage="Informe a descrição do documento."/>
+
+                    <p:outputLabel for="arquivo" value="Arquivo"/>
+                    <h:panelGroup>
+                        <h:outputText value="#{obraDetailBean.documento.nomeArquivo}"
+                                      rendered="#{not empty obraDetailBean.documento.nomeArquivo}"/>
+                        <p:fileUpload id="arquivo" value="#{obraDetailBean.arquivoUpload}" mode="simple"
+                                      skinSimple="true" label="Selecionar arquivo"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <p:commandButton value="Salvar" icon="ui-icon-disk" ajax="false"
+                                 action="#{obraDetailBean.salvarDocumento}"/>
+                <p:commandButton value="Cancelar" type="button" icon="ui-icon-close"
+                                 onclick="PF('documentoDialog').hide()"/>
+            </p:dialog>
+        </h:form>
+    </h:body>
+</f:view>
+</html>

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xml:lang="pt-BR">
+<h:head>
+    <title>Lista de Insumos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" type="text/css" href="resources/css/app.css"/>
+</h:head>
+<f:view>
+    <h:body styleClass="works-page">
+        <h:form id="formInsumos">
+            <p:growl id="mensagens" showDetail="true" autoUpdate="true" closable="true"/>
+
+            <div class="application-timeline" aria-label="Navegação dos módulos">
+                <p:button value="Início" icon="ui-icon-home" outcome="index.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Painel de obras" icon="ui-icon-arrowthick-1-w" outcome="gestao.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Etapas" icon="ui-icon-arrowthick-1-w" outcome="Etapa.xhtml"
+                          styleClass="application-timeline-step"
+                          rendered="#{facesContext.externalContext.isUserInRole('ADMIN')}"/>
+                <p:button value="Tarefas" icon="ui-icon-arrowthick-1-w" outcome="Tarefa.xhtml"
+                          styleClass="application-timeline-step"
+                          rendered="#{facesContext.externalContext.isUserInRole('ADMIN')}"/>
+                <p:commandButton value="Novo insumo" icon="ui-icon-plus"
+                                 styleClass="application-timeline-step application-timeline-action"
+                                 action="#{insumoBean.novoInsumo}" process="@this"
+                                 update=":formInsumos:insumoDialog"
+                                 oncomplete="PF('insumoDialog').show()"/>
+                <p:button value="Fornecedores" icon="ui-icon-arrowthick-1-e" outcome="Fornecedor.xhtml"
+                          styleClass="application-timeline-step"/>
+            </div>
+
+            <p:dataTable id="tabelaInsumos" widgetVar="insumosTable" var="item" value="#{insumoBean.insumos}"
+                         styleClass="table"
+                         paginator="true" rows="15" sortMode="single"
+                         emptyMessage="Não há insumos cadastrados."
+                         rowKey="#{item.id}"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="10,15,25,50">
+                <p:ajax event="sort" listener="#{insumoBean.ordenar}"/>
+                <f:facet name="header">
+                    <h:outputText value="Lista de Insumos: #{insumoBean.quantidadeInsumos}"/>
+                </f:facet>
+
+                <p:column headerText="Descrição" field="descricao" sortBy="#{item.descricao}"
+                          filterBy="#{item.descricao}" filterMatchMode="contains">
+                    <h:outputText value="#{item.descricao}"/>
+                </p:column>
+                <p:column headerText="Código" field="codigo" sortBy="#{item.codigo}">
+                    <h:outputText value="#{item.codigo}"/>
+                </p:column>
+                <p:column headerText="Tipo" field="tipo" sortBy="#{item.tipo}"
+                          filterBy="#{item.tipo}" filterMatchMode="contains">
+                    <h:outputText value="#{item.tipo}"/>
+                </p:column>
+                <p:column headerText="Unidade" field="unidade" sortBy="#{item.unidade}"
+                          filterBy="#{item.unidade.descricao}" filterMatchMode="contains">
+                    <h:outputText value="#{item.unidade == null ? '' : item.unidade.descricao}"/>
+                </p:column>
+                <p:column headerText="Preço de referência" field="precoReferencia"
+                          sortBy="#{item.precoReferencia}">
+                    <h:outputText value="#{item.precoReferencia}">
+                        <f:convertNumber type="currency" currencyCode="BRL"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Fornecedor">
+                    <h:outputText value="#{item.fornecedor == null ? '' : item.fornecedor.razaoSocial}"/>
+                </p:column>
+                <p:column headerText="Ações" exportable="false" style="height: 20px">
+                    <p:commandButton value="Histórico de preços" icon="pi pi-history"
+                                     title="Histórico de preços"
+                                     action="#{insumoBean.visualizarHistoricoPrecos(item)}" process="@this"
+                                     update=":formInsumos:historicoDialog"
+                                     oncomplete="PF('historicoDialog').show()"/>
+                    <p:commandButton value="" icon="pi pi-eye" title="Visualizar insumo"
+                                     styleClass="obra-action-button obra-view-button"
+                                     action="#{insumoBean.visualizarInsumo(item)}" process="@this"
+                                     update=":formInsumos:insumoDialog"
+                                     oncomplete="PF('insumoDialog').show()"/>
+                    <p:commandButton value="" icon="pi pi-pencil" title="Editar insumo"
+                                     styleClass="obra-action-button obra-edit-button"
+                                     action="#{insumoBean.editarInsumo(item)}" process="@this"
+                                     update=":formInsumos:insumoDialog"
+                                     oncomplete="PF('insumoDialog').show()"/>
+                    <p:commandButton value="" icon="pi pi-trash" title="Excluir insumo"
+                                     styleClass="obra-action-button obra-delete-button"
+                                     action="#{insumoBean.excluir(item)}" process="@this"
+                                     update=":formInsumos:tabelaInsumos :formInsumos:mensagens">
+                        <p:confirm header="Confirmar exclusão"
+                                   message="Deseja realmente excluir este insumo?"
+                                   icon="ui-icon-alert"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes"
+                                 icon="ui-icon-check"/>
+                <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no"
+                                 icon="ui-icon-close"/>
+            </p:confirmDialog>
+
+            <p:dialog id="insumoDialog" widgetVar="insumoDialog" header="Dados do Insumo"
+                      modal="true" resizable="false" width="600">
+                <p:panelGrid columns="2" layout="grid" columnClasses="label,value"
+                             styleClass="ui-fluid">
+                    <p:outputLabel for="codigo" value="Código"/>
+                    <p:inputText id="codigo" value="#{insumoBean.insumo.codigo}" required="true"
+                                 requiredMessage="Informe o código do insumo."
+                                 disabled="#{insumoBean.visualizacao}"/>
+
+                    <p:outputLabel for="descricao" value="Descrição"/>
+                    <p:inputText id="descricao" value="#{insumoBean.insumo.descricao}" required="true"
+                                 requiredMessage="Informe a descrição do insumo."
+                                 disabled="#{insumoBean.visualizacao}"/>
+
+                    <p:outputLabel for="tipo" value="Tipo"/>
+                    <p:selectOneMenu id="tipo" value="#{insumoBean.insumo.tipo}" required="true"
+                                     requiredMessage="Selecione o tipo do insumo."
+                                     disabled="#{insumoBean.visualizacao}">
+                        <f:selectItem itemLabel="Selecione um tipo" itemValue="#{null}" noSelectionOption="true"/>
+                        <f:selectItems value="#{insumoBean.tiposDisponiveis}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel for="unidade" value="Unidade"/>
+                    <p:selectOneMenu id="unidade" value="#{insumoBean.insumo.unidade}" required="true"
+                                     requiredMessage="Selecione a unidade do insumo."
+                                     disabled="#{insumoBean.visualizacao}">
+                        <f:selectItem itemLabel="Selecione uma unidade" itemValue="#{null}"
+                                      noSelectionOption="true"/>
+                        <f:selectItems value="#{insumoBean.unidadesDisponiveis}" var="unidadeItem"
+                                       itemValue="#{unidadeItem}" itemLabel="#{unidadeItem.descricao}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel for="precoReferencia" value="Preço de referência"/>
+                    <p:inputNumber id="precoReferencia" value="#{insumoBean.insumo.precoReferencia}"
+                                   minValue="0.01" decimalPlaces="2" required="true"
+                                   disabled="#{insumoBean.visualizacao}"/>
+
+                    <p:outputLabel for="fornecedor" value="Fornecedor"/>
+                    <p:selectOneMenu id="fornecedor" value="#{insumoBean.fornecedorSelecionadoId}"
+                                     disabled="#{insumoBean.visualizacao}">
+                        <f:selectItem itemLabel="Sem fornecedor principal" itemValue="#{null}"
+                                      noSelectionOption="true"/>
+                        <f:selectItems value="#{insumoBean.fornecedores}" var="fornecedorItem"
+                                       itemValue="#{fornecedorItem.id}"
+                                       itemLabel="#{fornecedorItem.razaoSocial}"/>
+                    </p:selectOneMenu>
+                </p:panelGrid>
+
+                <p:commandButton value="Salvar" icon="ui-icon-disk"
+                                 action="#{insumoBean.salvar}"
+                                 rendered="#{not insumoBean.visualizacao}"
+                                 update=":formInsumos:tabelaInsumos :formInsumos:mensagens"
+                                 oncomplete="if (!args.validationFailed) PF('insumoDialog').hide()"/>
+                <p:commandButton value="Cancelar" type="button" icon="ui-icon-close"
+                                 onclick="PF('insumoDialog').hide()"/>
+            </p:dialog>
+
+            <p:dialog id="historicoDialog" widgetVar="historicoDialog" header="Histórico de preços"
+                      modal="true" resizable="false" width="650">
+                <h:outputText value="#{insumoBean.insumo.descricao}" style="font-weight:bold"/>
+                <p:dataTable value="#{insumoBean.historicoPrecos}" var="historico"
+                             emptyMessage="Ainda não há alterações de preço registradas.">
+                    <p:column headerText="Data">
+                        <h:outputText value="#{historico.registradoEm}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Preço anterior">
+                        <h:outputText value="#{historico.precoAnterior}">
+                            <f:convertNumber type="currency" currencyCode="BRL"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Novo preço">
+                        <h:outputText value="#{historico.precoNovo}">
+                            <f:convertNumber type="currency" currencyCode="BRL"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Alterado por">
+                        <h:outputText value="#{historico.alteradoPor}"/>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+    </h:body>
+</f:view>
+</html>
