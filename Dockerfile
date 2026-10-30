@@ -7,7 +7,7 @@ RUN mvn -B -DskipTests package
 
 FROM eclipse-temurin:26-jre
 WORKDIR /app
-COPY --from=build /workspace/target/demo.war /app/app.war
+COPY --from=build /workspace/target/demo.jar /app/app.jar
 
-ENTRYPOINT ["java", "-jar", "/app/app.war"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
 EXPOSE 10000
