@@ -28,7 +28,7 @@ aceitam `formato=json|pdf|xlsx`; para PDF/XLSX, a resposta é um arquivo para do
 | GET/POST/PUT/DELETE | `/api/v1/obras[/{id}]` | Leitura: equipe vinculada; escrita: ADMIN/GESTOR |
 | GET/POST | `/api/v1/obras/{id}/etapas` | Leitura: equipe vinculada; escrita: ADMIN/GESTOR |
 | GET/PUT/DELETE/PATCH | `/api/v1/etapas/{id}` e `/api/v1/etapas/{id}/ordem` | ADMIN/GESTOR para escrita |
-| GET/POST | `/api/v1/etapas/{id}/tarefas` | Leitura: equipe; escrita: ADMIN/GESTOR/MESTRE_OBRA/TECNICO_OBRA |
+| GET/POST | `/api/v1/etapas/{id}/tarefas` | Leitura: equipe (inclui FINANCEIRO); escrita: ADMIN/GESTOR/MESTRE_OBRA/TECNICO_OBRA |
 | PUT/PATCH/DELETE | `/api/v1/tarefas/{id}` e `/api/v1/tarefas/{id}/status` | Escrita: equipe operacional/gestão |
 | GET/POST | `/api/v1/obras/{id}/orcamento/versoes` | ADMIN/GESTOR/ORCAMENTISTA |
 | POST | `/api/v1/etapas/{id}/itens-orcamento?versaoId={id}` | ADMIN/GESTOR/ORCAMENTISTA |
@@ -43,7 +43,8 @@ aceitam `formato=json|pdf|xlsx`; para PDF/XLSX, a resposta é um arquivo para do
 
 O preço unitário de um item de orçamento usa o preço de referência do insumo se
 `valorUnitario` for omitido. Lançamentos iniciam como `PENDENTE` e só entram no
-custo realizado depois de serem marcados `VALIDADO`. Itens e lançamentos exigem
+custo realizado depois de serem marcados `VALIDADO`; podem informar `tarefaId`
+opcional, que deve pertencer à etapa do lançamento. Itens e lançamentos exigem
 quantidades e valores positivos. Uma versão congelada não aceita novos itens; para
 revisões, crie uma nova versão.
 
@@ -64,7 +65,7 @@ informe `versaoId` para selecionar outra.
 - `custos.xhtml?obraId={id}`: registro e validação de lançamentos; aceita também `etapaId`.
 - `entregas.xhtml?obraId={id}`: registro e decisão das entregas; aceita também `etapaId`.
 - `relatorios.xhtml?obraId={id}`: visualização JSON e exportação PDF/XLSX.
-- `desempenho.xhtml?obraId={id}`: gráficos de avanço por etapa e distribuição de tarefas; permite selecionar outra obra do usuário.
+- `desempenho.xhtml?obraId={id}`: gráficos de avanço e cronograma, além de orçamento versus custos validados por etapa e tarefa; usa a versão mais recente do orçamento.
 - `usuarios.xhtml` e `auditoria.xhtml`: administração, disponíveis somente para ADMIN.
 - `livros.xhtml`: busca no catálogo da CBL e gerenciamento da biblioteca pessoal (lidos e desejados).
 

@@ -80,24 +80,39 @@
                           aria-hidden="true">05</span><span><strong>Fornecedores</strong><small>Cadastro e contatos</small></span>
                     <span class="home-card-arrow pi pi-truck" aria-hidden="true"></span>
                 </h:link>
+                <h:link styleClass="home-module-card" outcome="orcamento.xhtml"
+                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('ORCAMENTISTA')}">
+                    <span class="home-module-icon" aria-hidden="true">06</span><span><strong>Orçamento</strong><small>Versões e itens da obra</small></span>
+                    <span class="home-card-arrow pi pi-money-bill" aria-hidden="true"></span>
+                </h:link>
+                <h:link styleClass="home-module-card" outcome="custos.xhtml"
+                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('FINANCEIRO')}">
+                    <span class="home-module-icon" aria-hidden="true">07</span><span><strong>Custos</strong><small>Despesas e validações</small></span>
+                    <span class="home-card-arrow pi pi-wallet" aria-hidden="true"></span>
+                </h:link>
+                <h:link styleClass="home-module-card" outcome="entregas.xhtml"
+                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('CLIENTE')}">
+                    <span class="home-module-icon" aria-hidden="true">08</span><span><strong>Entregas</strong><small>Status e aprovação da obra</small></span>
+                    <span class="home-card-arrow pi pi-check-circle" aria-hidden="true"></span>
+                </h:link>
                 <h:link styleClass="home-module-card" outcome="usuarios.xhtml"
                         rendered="#{facesContext.externalContext.isUserInRole('ADMIN')}">
-                    <span class="home-module-icon" aria-hidden="true">06</span><span><strong>Usuários</strong><small>Contas e permissões</small></span>
+                    <span class="home-module-icon" aria-hidden="true">09</span><span><strong>Usuários</strong><small>Contas e permissões</small></span>
                     <span class="home-card-arrow pi pi-user" aria-hidden="true"></span>
                 </h:link>
                 <h:link styleClass="home-module-card" outcome="auditoria.xhtml"
                         rendered="#{facesContext.externalContext.isUserInRole('ADMIN')}">
-                    <span class="home-module-icon" aria-hidden="true">07</span><span><strong>Auditoria</strong><small>Histórico de alterações</small></span>
+                    <span class="home-module-icon" aria-hidden="true">10</span><span><strong>Auditoria</strong><small>Histórico de alterações</small></span>
                     <span class="home-card-arrow pi pi-history" aria-hidden="true"></span>
                 </h:link>
                 <h:link styleClass="home-module-card" outcome="desempenho.xhtml"
                         rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('CLIENTE')}">
-                    <span class="home-module-icon" aria-hidden="true">08</span><span><strong>Desempenho</strong><small>Gráficos de etapas e tarefas</small></span>
+                    <span class="home-module-icon" aria-hidden="true">11</span><span><strong>Desempenho</strong><small>Gráficos de etapas e tarefas</small></span>
                     <span class="home-card-arrow pi pi-chart-bar" aria-hidden="true"></span>
                 </h:link>
                 <h:link styleClass="home-module-card" outcome="livros.xhtml">
                     <span class="home-module-icon"
-                          aria-hidden="true">09</span><span><strong>Minha biblioteca</strong><small>Livros lidos e próximos da lista</small></span>
+                          aria-hidden="true">12</span><span><strong>Minha biblioteca</strong><small>Livros lidos e próximos da lista</small></span>
                     <span class="home-card-arrow pi pi-book" aria-hidden="true"></span>
                 </h:link>
             </div>

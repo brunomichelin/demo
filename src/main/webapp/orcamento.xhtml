@@ -23,6 +23,16 @@
             </div>
             <span class="budget-header-icon" aria-hidden="true">R$</span>
         </header>
+        <section class="budget-card budget-version-card">
+            <div class="budget-section-heading">
+                <span class="budget-section-icon" aria-hidden="true">00</span>
+                <div><p class="budget-eyebrow">Seleção</p><h2>Obra em análise</h2></div>
+            </div>
+            <div class="budget-field budget-field-wide">
+                <label for="obraSelect">Obra</label>
+                <select id="obraSelect"></select>
+            </div>
+        </section>
         <p id="mensagem" class="budget-message" role="status"></p>
         <section class="budget-card budget-version-card">
             <div class="budget-section-heading">
@@ -79,7 +89,9 @@
         (() => {
             const api = `#{'${'}window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'))}/api/v1`;
             const params = new URLSearchParams(window.location.search);
-            const obraId = params.get('obraId');
+            let obraId = params.get('obraId');
+            const podeTrocarObra = !obraId || params.get('origem') === 'index';
+            const obraSelect = document.getElementById('obraSelect');
             const stageSelect = document.getElementById('etapa');
             const versionSelect = document.getElementById('versao');
             const message = document.getElementById('mensagem');
@@ -98,6 +110,31 @@
                 return response.status === 204 ? null : response.json();
             }
             function showError(error) { message.textContent = error.message; }
+            async function carregarObras() {
+                const response = await fetch(`#{'${'}api}/obras?size=100&sort=nome,asc`, {credentials: 'same-origin'});
+                if (!response.ok) {
+                    let error = {}; try { error = await response.json(); } catch (_) {}
+                    throw new Error(error.detail || error.message || `Falha ao carregar obras (#{'${'}response.status}).`);
+                }
+                const page = await response.json();
+                obraSelect.replaceChildren();
+                page.content.forEach(obra => obraSelect.add(new Option(obra.nome, obra.id)));
+                if (!obraId && page.content[0]) {
+                    obraId = String(page.content[0].id);
+                    obraSelect.value = obraId;
+                    params.set('obraId', obraId);
+                    params.set('origem', 'index');
+                    window.history.replaceState(null, '', `${window.location.pathname}?${params}`);
+                } else if (!page.content.length) {
+                    throw new Error('Você não está vinculado a nenhuma obra.');
+                } else if (obraId) {
+                    obraSelect.value = String(obraId);
+                }
+                obraSelect.disabled = !podeTrocarObra;
+                if (obraId) {
+                    await load();
+                }
+            }
             async function loadItems() {
                 if (!stageSelect.value || !versionSelect.value) return;
                 const page = await request(`#{'${'}api}/etapas/#{'${'}stageSelect.value}/itens-orcamento?size=100&versaoId=#{'${'}versionSelect.value}`);
@@ -135,6 +172,14 @@
                     await loadItems();
                 } catch (error) { showError(error); }
             }
+            obraSelect.addEventListener('change', () => {
+                if (!podeTrocarObra || !obraSelect.value) return;
+                obraId = obraSelect.value;
+                params.set('obraId', obraId);
+                params.set('origem', 'index');
+                window.history.replaceState(null, '', `${window.location.pathname}?${params}`);
+                load();
+            });
             document.getElementById('criarVersao').addEventListener('click', async () => {
                 try { await request(`#{'${'}api}/obras/#{'${'}obraId}/orcamento/versoes`, {method: 'POST'}); message.textContent = 'Versão criada.'; await load(); }
                 catch (error) { showError(error); }
@@ -162,7 +207,7 @@
             });
             stageSelect.addEventListener('change', () => loadItems().catch(showError));
             versionSelect.addEventListener('change', () => loadItems().catch(showError));
-            load();
+            carregarObras().catch(showError);
         })();
         //]]>
     </script>

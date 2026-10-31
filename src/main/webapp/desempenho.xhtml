@@ -87,6 +87,52 @@
                 </section>
             </h:panelGroup>
 
+            <h:panelGroup id="graficosFinanceiros" layout="block"
+                          styleClass="performance-chart-grid performance-financial-grid"
+                          rendered="#{desempenhoBean.dadosCarregados and desempenhoBean.possuiEtapas}">
+                <section class="performance-card">
+                    <div class="performance-card-heading">
+                        <div>
+                            <p class="performance-eyebrow">Controle financeiro</p>
+                            <h2>Orçamento e custos por etapa</h2>
+                            <p class="performance-timeline-description">
+                                Orçamento da versão
+                                #{empty desempenhoBean.numeroVersaoOrcamentoFinanceiro
+                                    ? 'sem versão cadastrada' : desempenhoBean.numeroVersaoOrcamentoFinanceiro};
+                                custos considera somente lançamentos validados.
+                            </p>
+                        </div>
+                        <span class="performance-card-icon" aria-hidden="true">R$</span>
+                    </div>
+                    <p:barChart id="graficoOrcamentoCustosEtapa"
+                                model="#{desempenhoBean.orcamentoCustosPorEtapa}"
+                                styleClass="performance-prime-chart performance-financial-chart"/>
+                </section>
+                <section class="performance-card">
+                    <div class="performance-card-heading">
+                        <div>
+                            <p class="performance-eyebrow">Detalhamento financeiro</p>
+                            <h2>Orçamento e custos por tarefa</h2>
+                            <p class="performance-timeline-description">
+                                Valores vinculados diretamente às tarefas. Lançamentos sem tarefa aparecem apenas
+                                no gráfico por etapa.
+                            </p>
+                        </div>
+                        <span class="performance-card-icon" aria-hidden="true">↳</span>
+                    </div>
+                    <h:panelGroup layout="block" rendered="#{desempenhoBean.possuiTarefasFinanceiras}">
+                        <p:barChart id="graficoOrcamentoCustosTarefa"
+                                    model="#{desempenhoBean.orcamentoCustosPorTarefa}"
+                                    styleClass="performance-prime-chart performance-financial-task-chart"
+                                    style="height: #{desempenhoBean.alturaGraficoFinanceiroTarefas}px"/>
+                    </h:panelGroup>
+                    <h:panelGroup layout="block" styleClass="performance-empty"
+                                  rendered="#{not desempenhoBean.possuiTarefasFinanceiras}">
+                        Esta obra ainda não possui tarefas cadastradas.
+                    </h:panelGroup>
+                </section>
+            </h:panelGroup>
+
             <h:panelGroup id="cronogramaEtapasTarefas" layout="block"
                           styleClass="performance-card performance-timeline-card"
                           rendered="#{desempenhoBean.dadosCarregados}">

@@ -21,6 +21,7 @@ public class LancamentoCustoService {
     private final LancamentoCustoRepository lancamentoRepository;
     private final EtapaRepository etapaRepository;
     private final InsumoRepository insumoRepository;
+    private final TarefaRepository tarefaRepository;
     private final FornecedorRepository fornecedorRepository;
     private final AuditoriaService auditoriaService;
     private final DocObraRepository docObraRepository;
@@ -29,6 +30,7 @@ public class LancamentoCustoService {
             LancamentoCustoRepository lancamentoRepository,
             EtapaRepository etapaRepository,
             InsumoRepository insumoRepository,
+            TarefaRepository tarefaRepository,
             FornecedorRepository fornecedorRepository,
             AuditoriaService auditoriaService,
             DocObraRepository docObraRepository
@@ -36,6 +38,7 @@ public class LancamentoCustoService {
         this.lancamentoRepository = lancamentoRepository;
         this.etapaRepository = etapaRepository;
         this.insumoRepository = insumoRepository;
+        this.tarefaRepository = tarefaRepository;
         this.fornecedorRepository = fornecedorRepository;
         this.auditoriaService = auditoriaService;
         this.docObraRepository = docObraRepository;
@@ -59,6 +62,10 @@ public class LancamentoCustoService {
         }
         Insumo insumo = insumoRepository.findById(request.insumoId())
                 .orElseThrow(() -> erro(HttpStatus.NOT_FOUND, "Insumo não encontrado."));
+        Tarefa tarefa = request.tarefaId() == null ? null : tarefaRepository.findById(request.tarefaId())
+                .filter(item -> item.getEtapa().getId().equals(etapa.getId()))
+                .orElseThrow(() -> erro(HttpStatus.BAD_REQUEST,
+                        "A tarefa informada não pertence à etapa do lançamento."));
         Fornecedor fornecedor = request.fornecedorId() == null ? null : fornecedorRepository.findById(request.fornecedorId())
                 .orElseThrow(() -> erro(HttpStatus.NOT_FOUND, "Fornecedor não encontrado."));
         DocObra documento = request.documentoId() == null ? null : docObraRepository
@@ -68,6 +75,7 @@ public class LancamentoCustoService {
 
         LancamentoCusto lancamento = new LancamentoCusto();
         lancamento.setEtapa(etapa);
+        lancamento.setTarefa(tarefa);
         lancamento.setInsumo(insumo);
         lancamento.setFornecedor(fornecedor);
         lancamento.setDocumento(documento);

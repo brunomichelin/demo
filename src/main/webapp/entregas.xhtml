@@ -24,6 +24,16 @@
             </div>
             <span class="deliveries-header-icon" aria-hidden="true">✓</span>
         </header>
+        <section class="deliveries-card">
+            <div class="deliveries-section-heading">
+                <span class="deliveries-section-icon" aria-hidden="true">00</span>
+                <div><p class="deliveries-eyebrow">Seleção</p><h2>Obra em análise</h2></div>
+            </div>
+            <div class="deliveries-field deliveries-field-wide">
+                <label for="obraSelect">Obra</label>
+                <select id="obraSelect"></select>
+            </div>
+        </section>
         <p id="mensagem" class="deliveries-message" role="status"></p>
         <section class="deliveries-card">
             <div class="deliveries-section-heading">
@@ -74,7 +84,9 @@
             const root = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
             const api = `#{'${'}root}/api/v1`;
             const params = new URLSearchParams(window.location.search);
-            const obraId = params.get('obraId');
+            let obraId = params.get('obraId');
+            const podeTrocarObra = !obraId || params.get('origem') === 'index';
+            const obraSelect = document.getElementById('obraSelect');
             const select = document.getElementById('etapa');
             const message = document.getElementById('mensagem');
             const roleFlags = document.getElementById('pagina').dataset;
@@ -92,8 +104,33 @@
                 return response.status === 204 ? null : response.json();
             }
             function erro(error) { message.textContent = error.message; }
+            async function carregarObras() {
+                const response = await fetch(`#{'${'}root}/api/v1/obras?size=100&sort=nome,asc`, {credentials: 'same-origin'});
+                if (!response.ok) {
+                    let error = {}; try { error = await response.json(); } catch (_) {}
+                    throw new Error(error.detail || error.message || `Falha ao carregar obras (#{'${'}response.status}).`);
+                }
+                const page = await response.json();
+                obraSelect.replaceChildren();
+                page.content.forEach(obra => obraSelect.add(new Option(obra.nome, obra.id)));
+                if (!obraId && page.content[0]) {
+                    obraId = String(page.content[0].id);
+                    params.set('obraId', obraId);
+                    params.set('origem', 'index');
+                    window.history.replaceState(null, '', `${window.location.pathname}?${params}`);
+                } else if (!page.content.length) {
+                    throw new Error('Você não está vinculado a nenhuma obra.');
+                } else if (obraId) {
+                    obraSelect.value = String(obraId);
+                }
+                obraSelect.disabled = !podeTrocarObra;
+                await init();
+            }
             async function carregarEntrega() {
-                if (!select.value) return;
+                if (!select.value) {
+                    ['status', 'data', 'responsavel', 'detalhes'].forEach(id => document.getElementById(id).textContent = '-');
+                    return;
+                }
                 const response = await fetch(`#{'${'}api}/etapas/#{'${'}select.value}/entrega`, {credentials: 'same-origin'});
                 if (response.status === 404) {
                     ['status', 'data', 'responsavel', 'detalhes'].forEach(id => document.getElementById(id).textContent = '-');
@@ -111,11 +148,21 @@
                     if (!obraId) throw new Error('Identificador da obra não informado.');
                     const stages = await call(`#{'${'}api}/obras/#{'${'}obraId}/etapas?size=100`);
                     const selectedId = params.get('etapaId');
+                    select.replaceChildren();
                     stages.content.forEach(item => select.add(new Option(`#{'${'}item.ordem} - #{'${'}item.nome}`, item.id)));
                     if (selectedId) select.value = selectedId;
                     await carregarEntrega();
                 } catch (error) { erro(error); }
             }
+            obraSelect.addEventListener('change', () => {
+                if (!podeTrocarObra || !obraSelect.value) return;
+                obraId = obraSelect.value;
+                params.set('obraId', obraId);
+                params.set('origem', 'index');
+                params.delete('etapaId');
+                window.history.replaceState(null, '', `${window.location.pathname}?${params}`);
+                init();
+            });
             document.getElementById('registrar').addEventListener('click', async () => {
                 try {
                     const body = {dataReal: document.getElementById('dataReal').value || null,
@@ -135,7 +182,7 @@
             document.getElementById('aprovar').addEventListener('click', () => decidir('APROVADA'));
             document.getElementById('reprovar').addEventListener('click', () => decidir('REPROVADA'));
             select.addEventListener('change', () => carregarEntrega().catch(erro));
-            init();
+            carregarObras().catch(erro);
         })();
         //]]>
     </script>

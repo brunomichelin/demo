@@ -24,6 +24,16 @@
             </div>
             <span class="costs-header-icon" aria-hidden="true">R$</span>
         </header>
+        <section class="costs-card costs-table-card">
+            <div class="costs-section-heading">
+                <span class="costs-section-icon" aria-hidden="true">00</span>
+                <div><p class="costs-eyebrow">Seleção</p><h2>Obra em análise</h2></div>
+            </div>
+            <div class="costs-field costs-field-wide">
+                <label for="obraSelect">Obra</label>
+                <select id="obraSelect"></select>
+            </div>
+        </section>
         <p id="mensagem" class="costs-message" role="status"></p>
         <section id="formLancamento" class="costs-card">
             <div class="costs-section-heading">
@@ -33,6 +43,9 @@
             <div class="costs-form">
                 <div class="costs-field">
                     <label for="etapa">Etapa da obra</label><select id="etapa"></select>
+                </div>
+                <div class="costs-field">
+                    <label for="tarefa">Tarefa <span>(opcional)</span></label><select id="tarefa"></select>
                 </div>
                 <div class="costs-field">
                     <label for="insumo">Insumo</label><select id="insumo"></select>
@@ -67,7 +80,7 @@
             </div>
             <div class="costs-table-wrap">
                 <table class="costs-table">
-                    <thead><tr><th>Data</th><th>Insumo</th><th>Quantidade</th><th>Valor unitário</th><th>Status</th><th>Ações</th></tr></thead>
+                <thead><tr><th>Data</th><th>Tarefa</th><th>Insumo</th><th>Quantidade</th><th>Valor unitário</th><th>Status</th><th>Ações</th></tr></thead>
                     <tbody id="lancamentos"></tbody>
                 </table>
             </div>
@@ -79,8 +92,11 @@
             const root = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
             const api = `#{'${'}root}/api/v1`;
             const params = new URLSearchParams(window.location.search);
-            const obraId = params.get('obraId');
+            let obraId = params.get('obraId');
+            const podeTrocarObra = !obraId || params.get('origem') === 'index';
+            const obraSelect = document.getElementById('obraSelect');
             const etapa = document.getElementById('etapa');
+            const tarefaSelect = document.getElementById('tarefa');
             const mensagem = document.getElementById('mensagem');
             const canRegister = document.getElementById('pagina').dataset.canRegister === 'true';
             const canValidate = document.getElementById('pagina').dataset.canValidate === 'true';
@@ -96,13 +112,41 @@
                 return response.status === 204 ? null : response.json();
             }
             function erro(error) { mensagem.textContent = error.message; }
+            async function carregarObras() {
+                const response = await fetch(`#{'${'}root}/api/v1/obras?size=100&sort=nome,asc`, {credentials: 'same-origin'});
+                if (!response.ok) {
+                    let error = {}; try { error = await response.json(); } catch (_) {}
+                    throw new Error(error.detail || error.message || `Falha ao carregar obras (#{'${'}response.status}).`);
+                }
+                const page = await response.json();
+                obraSelect.replaceChildren();
+                page.content.forEach(obra => obraSelect.add(new Option(obra.nome, obra.id)));
+                if (!obraId && page.content[0]) {
+                    obraId = String(page.content[0].id);
+                    params.set('obraId', obraId);
+                    params.set('origem', 'index');
+                    window.history.replaceState(null, '', `${window.location.pathname}?${params}`);
+                } else if (!page.content.length) {
+                    throw new Error('Você não está vinculado a nenhuma obra.');
+                } else if (obraId) {
+                    obraSelect.value = String(obraId);
+                }
+                obraSelect.disabled = !podeTrocarObra;
+                await init();
+            }
             async function carregarLancamentos() {
-                if (!etapa.value) return;
+                const tbody = document.getElementById('lancamentos');
+                tbody.replaceChildren();
+                if (!etapa.value) {
+                    const row = tbody.insertRow(); row.insertCell().textContent = 'Nenhum lançamento.';
+                    row.cells[0].colSpan = 7;
+                    return;
+                }
                 const page = await call(`#{'${'}api}/etapas/#{'${'}etapa.value}/lancamentos?size=100`);
-                const tbody = document.getElementById('lancamentos'); tbody.replaceChildren();
                 page.content.forEach(item => {
                     const row = tbody.insertRow();
-                    [item.dataLancamento, item.insumo?.descricao, item.quantidade, item.valorUnitario]
+                    [item.dataLancamento, item.tarefa?.titulo || 'Sem tarefa',
+                        item.insumo?.descricao, item.quantidade, item.valorUnitario]
                         .forEach(value => row.insertCell().textContent = value == null ? '-' : String(value));
                     const statusCell = row.insertCell();
                     const statusBadge = document.createElement('span');
@@ -128,7 +172,13 @@
                         });
                     }
                 });
-                if (!page.content.length) { const row = tbody.insertRow(); row.insertCell().textContent = 'Nenhum lançamento.'; row.cells[0].colSpan = 6; }
+                if (!page.content.length) { const row = tbody.insertRow(); row.insertCell().textContent = 'Nenhum lançamento.'; row.cells[0].colSpan = 7; }
+            }
+            async function carregarTarefas() {
+                tarefaSelect.replaceChildren(new Option('Sem tarefa', ''));
+                if (!etapa.value) return;
+                const page = await call(`#{'${'}api}/etapas/#{'${'}etapa.value}/tarefas?size=100`);
+                page.content.forEach(tarefa => tarefaSelect.add(new Option(tarefa.titulo, tarefa.id)));
             }
             async function init() {
                 try {
@@ -137,16 +187,29 @@
                         call(`#{'${'}api}/obras/#{'${'}obraId}/etapas?size=100`), call(`#{'${'}api}/insumos?size=100`)
                     ]);
                     const etapaId = params.get('etapaId');
+                    etapa.replaceChildren();
                     stages.content.forEach(item => etapa.add(new Option(`#{'${'}item.ordem} - #{'${'}item.nome}`, item.id)));
                     if (etapaId) etapa.value = etapaId;
+                    await carregarTarefas();
                     const insumos = document.getElementById('insumo');
+                    insumos.replaceChildren();
                     supplies.content.forEach(item => insumos.add(new Option(`#{'${'}item.codigo || ''} #{'${'}item.descricao}`, item.id)));
                     await carregarLancamentos();
                 } catch (error) { erro(error); }
             }
+            obraSelect.addEventListener('change', () => {
+                if (!podeTrocarObra || !obraSelect.value) return;
+                obraId = obraSelect.value;
+                params.set('obraId', obraId);
+                params.set('origem', 'index');
+                params.delete('etapaId');
+                window.history.replaceState(null, '', `${window.location.pathname}?${params}`);
+                init();
+            });
             document.getElementById('registrar').addEventListener('click', async () => {
                 try {
                     const body = {insumoId: Number(document.getElementById('insumo').value),
+                        tarefaId: tarefaSelect.value ? Number(tarefaSelect.value) : null,
                         quantidade: Number(document.getElementById('quantidade').value),
                         valorUnitario: Number(document.getElementById('valor').value),
                         dataLancamento: document.getElementById('data').value || null,
@@ -157,8 +220,11 @@
                     await carregarLancamentos();
                 } catch (error) { erro(error); }
             });
-            etapa.addEventListener('change', () => carregarLancamentos().catch(erro));
-            init();
+            etapa.addEventListener('change', async () => {
+                try { await carregarTarefas(); await carregarLancamentos(); }
+                catch (error) { erro(error); }
+            });
+            carregarObras().catch(erro);
         })();
         //]]>
     </script>

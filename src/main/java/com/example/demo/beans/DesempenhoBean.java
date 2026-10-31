@@ -3,8 +3,17 @@ package com.example.demo.beans;
 import com.example.demo.config.ObraAuthorization;
 import com.example.demo.dtos.RelatorioCronogramaResponse;
 import com.example.demo.dtos.RelatorioTarefasResponse;
+import com.example.demo.models.ItemOrcamento;
+import com.example.demo.models.LancamentoCusto;
 import com.example.demo.models.Obra;
+import com.example.demo.models.Orcamento;
 import com.example.demo.models.StatusCronEnum;
+import com.example.demo.models.StatusLancamentoEnum;
+import com.example.demo.models.Tarefa;
+import com.example.demo.repositories.ItemOrcamentoRepository;
+import com.example.demo.repositories.LancamentoCustoRepository;
+import com.example.demo.repositories.OrcamentoRepository;
+import com.example.demo.repositories.TarefaRepository;
 import com.example.demo.services.impl.ObraService;
 import com.example.demo.services.impl.RelatorioService;
 import jakarta.annotation.PostConstruct;
@@ -29,11 +38,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component("desempenhoBean")
 @Scope(value = "view", proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -54,6 +68,21 @@ public class DesempenhoBean {
 
     @Getter
     private BarChartModel cronograma;
+
+    @Getter
+    private BarChartModel orcamentoCustosPorEtapa;
+
+    @Getter
+    private BarChartModel orcamentoCustosPorTarefa;
+
+    @Getter
+    private boolean possuiTarefasFinanceiras;
+
+    @Getter
+    private int alturaGraficoFinanceiroTarefas;
+
+    @Getter
+    private Long numeroVersaoOrcamentoFinanceiro;
 
     @Getter
     private boolean possuiCronograma;
@@ -93,6 +122,18 @@ public class DesempenhoBean {
 
     @Autowired
     private ObraAuthorization obraAuthorization;
+
+    @Autowired
+    private OrcamentoRepository orcamentoRepository;
+
+    @Autowired
+    private ItemOrcamentoRepository itemOrcamentoRepository;
+
+    @Autowired
+    private LancamentoCustoRepository lancamentoCustoRepository;
+
+    @Autowired
+    private TarefaRepository tarefaRepository;
 
     @PostConstruct
     public void init() {
@@ -143,6 +184,7 @@ public class DesempenhoBean {
         possuiEtapas = !relatorio.isEmpty();
         progressoPorEtapa = criarGraficoEtapas(relatorio);
         tarefasPorStatus = criarGraficoStatus(relatorio);
+        criarGraficosFinanceiros(relatorio);
         criarGraficoCronograma(relatorioService.cronogramaPorEtapa(obraId));
         dadosCarregados = true;
     }
@@ -194,6 +236,96 @@ public class DesempenhoBean {
         options.setResponsive(true);
         options.setMaintainAspectRatio(false);
         return new DonutChartModel(data, options);
+    }
+
+    private void criarGraficosFinanceiros(List<RelatorioTarefasResponse> etapas) {
+        Map<Long, BigDecimal> orcamentoPorEtapa = new HashMap<>();
+        Map<Long, BigDecimal> custoPorEtapa = new HashMap<>();
+        Map<Long, BigDecimal> orcamentoPorTarefa = new HashMap<>();
+        Map<Long, BigDecimal> custoPorTarefa = new HashMap<>();
+
+        List<Orcamento> versoes = orcamentoRepository.findByObraIdOrderByNumeroAsc(obraId);
+        Orcamento versaoMaisRecente = versoes.isEmpty() ? null : versoes.get(versoes.size() - 1);
+        numeroVersaoOrcamentoFinanceiro = versaoMaisRecente == null ? null : versaoMaisRecente.getNumero();
+        if (versaoMaisRecente != null) {
+            for (ItemOrcamento item : itemOrcamentoRepository.findByOrcamentoId(versaoMaisRecente.getId())) {
+                BigDecimal total = valorTotal(item.getQuantidade(), item.getValorUnitario());
+                orcamentoPorEtapa.merge(item.getEtapa().getId(), total, BigDecimal::add);
+                if (item.getTarefa() != null) {
+                    orcamentoPorTarefa.merge(item.getTarefa().getId(), total, BigDecimal::add);
+                }
+            }
+        }
+
+        for (LancamentoCusto lancamento : lancamentoCustoRepository.findAllByObraId(obraId)) {
+            if (lancamento.getStatus() != StatusLancamentoEnum.VALIDADO) {
+                continue;
+            }
+            BigDecimal total = valorTotal(lancamento.getQuantidade(), lancamento.getValorUnitario());
+            custoPorEtapa.merge(lancamento.getEtapa().getId(), total, BigDecimal::add);
+            if (lancamento.getTarefa() != null) {
+                custoPorTarefa.merge(lancamento.getTarefa().getId(), total, BigDecimal::add);
+            }
+        }
+
+        orcamentoCustosPorEtapa = criarGraficoFinanceiro(
+                etapas.stream().map(RelatorioTarefasResponse::etapa).toList(),
+                etapas.stream().map(etapa -> orcamentoPorEtapa.getOrDefault(etapa.etapaId(), BigDecimal.ZERO))
+                        .toList(),
+                etapas.stream().map(etapa -> custoPorEtapa.getOrDefault(etapa.etapaId(), BigDecimal.ZERO))
+                        .toList());
+
+        List<Tarefa> tarefas = tarefaRepository.findAllByObraId(obraId).stream()
+                .sorted(Comparator.comparing((Tarefa tarefa) -> tarefa.getEtapa().getOrdem(),
+                                Comparator.nullsLast(Comparator.naturalOrder()))
+                        .thenComparing(Tarefa::getTitulo, Comparator.nullsLast(Comparator.naturalOrder())))
+                .toList();
+        possuiTarefasFinanceiras = !tarefas.isEmpty();
+        alturaGraficoFinanceiroTarefas = Math.max(300, tarefas.size() * 32 + 100);
+        orcamentoCustosPorTarefa = criarGraficoFinanceiro(
+                tarefas.stream().map(tarefa -> tarefa.getEtapa().getNome() + " - " + tarefa.getTitulo()).toList(),
+                tarefas.stream().map(tarefa -> orcamentoPorTarefa.getOrDefault(tarefa.getId(), BigDecimal.ZERO))
+                        .toList(),
+                tarefas.stream().map(tarefa -> custoPorTarefa.getOrDefault(tarefa.getId(), BigDecimal.ZERO))
+                        .toList());
+    }
+
+    private BarChartModel criarGraficoFinanceiro(
+            List<String> labels,
+            List<BigDecimal> orcados,
+            List<BigDecimal> custos
+    ) {
+        ChartData data = new ChartData();
+        data.setLabels(labels);
+
+        BarChartDataSet orcadosDataset = new BarChartDataSet();
+        orcadosDataset.setLabel("Orçado (versão mais recente)");
+        orcadosDataset.setData(orcados.stream().map(valor -> (Object) valor).toList());
+        orcadosDataset.setBackgroundColor("rgba(37, 99, 235, 0.78)");
+        orcadosDataset.setBorderColor("#1d4ed8");
+        orcadosDataset.setBorderWidth(1);
+        data.addChartDataSet(orcadosDataset);
+
+        BarChartDataSet custosDataset = new BarChartDataSet();
+        custosDataset.setLabel("Custo validado");
+        custosDataset.setData(custos.stream().map(valor -> (Object) valor).toList());
+        custosDataset.setBackgroundColor("rgba(234, 88, 12, 0.78)");
+        custosDataset.setBorderColor("#c2410c");
+        custosDataset.setBorderWidth(1);
+        data.addChartDataSet(custosDataset);
+
+        BarChartOptions options = new BarChartOptions();
+        options.setIndexAxis("y");
+        options.setResponsive(true);
+        options.setMaintainAspectRatio(false);
+        return new BarChartModel(data, options);
+    }
+
+    private BigDecimal valorTotal(BigDecimal quantidade, BigDecimal valorUnitario) {
+        if (quantidade == null || valorUnitario == null) {
+            return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        }
+        return quantidade.multiply(valorUnitario).setScale(2, RoundingMode.HALF_UP);
     }
 
     private void criarGraficoCronograma(List<RelatorioCronogramaResponse> itens) {

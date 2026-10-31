@@ -21,6 +21,9 @@ public class LancamentoCusto extends AbstractModel implements Serializable {
     private Etapa etapa;
 
     @ManyToOne
+    private Tarefa tarefa;
+
+    @ManyToOne
     private Insumo insumo;
 
     @ManyToOne
@@ -44,6 +47,7 @@ public class LancamentoCusto extends AbstractModel implements Serializable {
     public String toString() {
         return "LancamentoCusto{" +
                 "etapa=" + etapa +
+                ", tarefa=" + tarefa +
                 ", insumo=" + insumo +
                 ", fornecedor=" + fornecedor +
                 ", quantidade=" + quantidade +

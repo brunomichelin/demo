@@ -11,6 +11,7 @@ public record LancamentoCustoRequest(
         LocalDate dataLancamento,
         String numeroDocumento,
         String justificativa,
-        Long documentoId
+        Long documentoId,
+        Long tarefaId
 ) {
 }

@@ -202,7 +202,7 @@ public class GestaoObraApiController {
     }
 
     @GetMapping("/etapas/{etapaId}/tarefas")
-    @PreAuthorize("hasAnyRole('ADMIN','GESTOR','MESTRE_OBRA','TECNICO_OBRA','CLIENTE') and @obraAuthorization.podeAcessarEtapa(#etapaId, authentication)")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR','MESTRE_OBRA','TECNICO_OBRA','FINANCEIRO','CLIENTE') and @obraAuthorization.podeAcessarEtapa(#etapaId, authentication)")
     public org.springframework.data.domain.Page<Tarefa> listarTarefas(
             @PathVariable Long etapaId,
             org.springframework.data.domain.Pageable pageable
