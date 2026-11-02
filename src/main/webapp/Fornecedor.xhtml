@@ -95,9 +95,9 @@
             </p:confirmDialog>
 
             <p:dialog id="fornecedorDialog" widgetVar="fornecedorDialog" header="Dados do Fornecedor"
-                      modal="true" resizable="false" width="600">
+                      modal="true" resizable="false" width="600" styleClass="object-form-dialog">
                 <p:panelGrid columns="2" layout="grid" columnClasses="label,value"
-                             styleClass="ui-fluid">
+                             styleClass="ui-fluid object-dialog-grid">
                     <p:outputLabel for="razaoSocial" value="Razão social"/>
                     <p:inputText id="razaoSocial" value="#{fornecedorBean.fornecedor.razaoSocial}"
                                  required="true" requiredMessage="Informe a razão social do fornecedor."

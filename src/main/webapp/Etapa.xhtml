@@ -125,9 +125,9 @@
             </p:confirmDialog>
 
             <p:dialog id="etapaDialog" widgetVar="etapaDialog" header="Dados da Etapa"
-                      modal="true" resizable="false" width="600">
+                      modal="true" resizable="false" width="600" styleClass="object-form-dialog">
                 <p:panelGrid columns="2" layout="grid" columnClasses="label,value"
-                             styleClass="ui-fluid">
+                             styleClass="ui-fluid object-dialog-grid">
                     <p:outputLabel for="obra" value="Obra"/>
                     <p:selectOneMenu id="obra" value="#{etapaBean.obraSelecionadaId}"
                                      required="true" disabled="#{etapaBean.visualizacao}"

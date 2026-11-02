@@ -168,8 +168,9 @@
 
         <h:form id="formNovaTarefa">
             <p:dialog id="tarefaDialog" widgetVar="tarefaDialog" header="Dados da Tarefa"
-                      modal="true" resizable="false" width="650">
-                <p:panelGrid columns="2" layout="grid" columnClasses="label,value" styleClass="ui-fluid">
+                      modal="true" resizable="false" width="650" styleClass="object-form-dialog">
+                <p:panelGrid columns="2" layout="grid" columnClasses="label,value"
+                             styleClass="ui-fluid object-dialog-grid">
                     <p:outputLabel for="tituloTarefa" value="Título"/>
                     <p:inputText id="tituloTarefa" value="#{etapaDetailBean.novaTarefa.titulo}"
                                  required="true" requiredMessage="Informe o título da tarefa."/>

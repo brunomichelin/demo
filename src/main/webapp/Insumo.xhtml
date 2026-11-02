@@ -106,9 +106,9 @@
             </p:confirmDialog>
 
             <p:dialog id="insumoDialog" widgetVar="insumoDialog" header="Dados do Insumo"
-                      modal="true" resizable="false" width="600">
+                      modal="true" resizable="false" width="600" styleClass="object-form-dialog">
                 <p:panelGrid columns="2" layout="grid" columnClasses="label,value"
-                             styleClass="ui-fluid">
+                             styleClass="ui-fluid object-dialog-grid">
                     <p:outputLabel for="codigo" value="Código"/>
                     <p:inputText id="codigo" value="#{insumoBean.insumo.codigo}" required="true"
                                  requiredMessage="Informe o código do insumo."

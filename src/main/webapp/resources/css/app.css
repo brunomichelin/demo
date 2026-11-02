@@ -1149,6 +1149,31 @@ a:hover {
         padding: 20px 12px;
     }
 
+    .object-form-dialog {
+        max-width: calc(100vw - 24px) !important;
+        max-height: calc(100vh - 24px);
+        max-height: calc(100dvh - 24px);
+        box-sizing: border-box;
+    }
+
+    .object-form-dialog .ui-dialog-content {
+        max-height: calc(100vh - 120px);
+        max-height: calc(100dvh - 120px);
+        overflow-y: auto;
+        box-sizing: border-box;
+    }
+
+    .object-dialog-grid > .ui-panelgrid-cell {
+        flex: 0 0 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .object-form-dialog .ui-dialog-content > .ui-button {
+        width: 100%;
+        margin: 6px 0 0;
+    }
+
     .auth-page form {
         padding: 24px 20px;
     }

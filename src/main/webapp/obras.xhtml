@@ -116,9 +116,9 @@
             </p:confirmDialog>
 
             <p:dialog id="obraDialog" widgetVar="obraDialog" header="Dados da Obra"
-                      modal="true" resizable="false" width="600">
+                      modal="true" resizable="false" width="600" styleClass="object-form-dialog">
                 <p:panelGrid columns="2" layout="grid" columnClasses="label,value"
-                             styleClass="ui-fluid">
+                             styleClass="ui-fluid object-dialog-grid">
                     <p:outputLabel for="nome" value="Nome"/>
                     <p:inputText id="nome" value="#{obraBean.obra.nome}" required="true"
                                  requiredMessage="Informe o nome da obra." disabled="#{obraBean.visualizacao}"/>
