@@ -66,6 +66,7 @@ informe `versaoId` para selecionar outra.
 - `entregas.xhtml?obraId={id}`: registro e decisão das entregas; aceita também `etapaId`.
 - `relatorios.xhtml?obraId={id}`: visualização JSON e exportação PDF/XLSX.
 - `desempenho.xhtml?obraId={id}`: gráficos de avanço e cronograma, além de orçamento versus custos validados por etapa e tarefa; usa a versão mais recente do orçamento.
+- `financiamento.xhtml`: simulação comparativa SAC/PRICE com gráficos de pagamentos acumulados, variação das prestações, saldo devedor, juros, correção acumulada pela TR, seguros e taxa administrativa, e saldo FGTS projetado; inclui TR, MIP estimado por idade, DFI e taxa administrativa, depósitos mensais estimados de FGTS (8% do salário bruto, com rendimento de 3% a.a.), amortização bienal e modalidade que acumula FGTS por 12 meses para dividir o saldo em 12 abatimentos nas prestações seguintes; cronogramas exportáveis. Clique em calcular para aplicar alterações; os valores ficam salvos somente no navegador.
 - `usuarios.xhtml` e `auditoria.xhtml`: administração, disponíveis somente para ADMIN.
 - `livros.xhtml`: busca no catálogo da CBL e gerenciamento da biblioteca pessoal (lidos e desejados).
 

@@ -1793,6 +1793,460 @@ a:hover {
         var(--color-background);
 }
 
+.financing-page {
+    padding: 28px 20px 56px;
+}
+
+.financing-shell {
+    width: min(100%, 1280px);
+}
+
+.financing-page .performance-header {
+    margin-bottom: 20px;
+}
+
+.financing-input-card,
+.financing-comparison-card,
+.financing-schedule-card {
+    margin-bottom: 18px;
+}
+
+.financing-card-heading,
+.financing-page .performance-card-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 16px;
+}
+
+.financing-page .performance-card-heading h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    letter-spacing: -.02em;
+}
+
+.financing-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 15px;
+}
+
+.financing-field label {
+    display: block;
+    margin-bottom: 7px;
+    color: #334155;
+    font-size: .86rem;
+    font-weight: 700;
+}
+
+.financing-field input,
+.financing-field select {
+    width: 100%;
+    min-height: 44px;
+    padding: 9px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    background: #fff;
+    color: var(--color-ink);
+    font: inherit;
+}
+
+.financing-field input:focus,
+.financing-field select:focus,
+.financing-extra-input:focus {
+    border-color: var(--color-orange);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, .14);
+}
+
+.financing-strategy-field {
+    grid-column: span 2;
+}
+
+.financing-hint,
+.financing-disclaimer,
+.financing-chart-card > p,
+.financing-schedule-description,
+.financing-calculation-actions > span {
+    color: var(--color-muted);
+    font-size: .86rem;
+}
+
+.financing-hint {
+    margin: 15px 0 0;
+}
+
+.financing-disclaimer {
+    margin: 7px 0 0;
+    font-size: .78rem;
+}
+
+.financing-message {
+    min-height: 0;
+    margin: 0;
+    color: #166534;
+    font-size: .86rem;
+}
+
+.financing-message:not(:empty) {
+    margin-bottom: 12px;
+}
+
+.financing-message-error {
+    color: #b91c1c;
+}
+
+.financing-calculation-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.financing-calculation-actions > span {
+    font-size: .82rem;
+}
+
+.financing-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.financing-cost-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin-top: 13px;
+    padding: 13px 15px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    color: #475569;
+    font-size: .82rem;
+}
+
+.financing-cost-breakdown strong {
+    flex-basis: 100%;
+    color: var(--color-ink);
+}
+
+.financing-cost-breakdown b {
+    color: #1f2937;
+}
+
+.financing-mip-settings {
+    margin-top: 15px;
+    padding: 13px 15px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+.financing-mip-settings summary {
+    color: #7c2d12;
+    cursor: pointer;
+    font-size: .88rem;
+    font-weight: 700;
+}
+
+.financing-mip-settings > p {
+    margin: 8px 0;
+    color: var(--color-muted);
+    font-size: .8rem;
+}
+
+.financing-mip-table-wrap {
+    max-height: 260px;
+    overflow: auto;
+}
+
+.financing-mip-table {
+    width: min(100%, 440px);
+    border-collapse: collapse;
+    font-size: .82rem;
+}
+
+.financing-mip-table th,
+.financing-mip-table td {
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
+}
+
+.financing-mip-table th {
+    position: sticky;
+    top: 0;
+    background: #f8fafc;
+}
+
+.financing-mip-table input {
+    width: 120px;
+    min-height: 34px;
+    padding: 5px 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    font: inherit;
+}
+
+.financing-summary {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 5px;
+    padding: 17px;
+    border: 1px solid #fed7aa;
+    border-radius: 13px;
+    background: linear-gradient(145deg, #fff, #fff7ed);
+}
+
+.financing-summary > span,
+.financing-summary small {
+    color: var(--color-muted);
+    font-size: .82rem;
+}
+
+.financing-summary strong {
+    font-size: clamp(1.25rem, 3vw, 1.7rem);
+    font-weight: 800;
+    letter-spacing: -.035em;
+    overflow-wrap: anywhere;
+}
+
+.financing-sac strong,
+.financing-legend-sac {
+    color: #ea580c;
+}
+
+.financing-price strong,
+.financing-legend-price {
+    color: #2563eb;
+}
+
+.financing-savings strong {
+    color: #15803d;
+}
+
+.financing-chart-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.financing-chart-card {
+    min-width: 0;
+    padding: 16px 14px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: #fff;
+}
+
+.financing-chart-card h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.financing-chart-card > p {
+    margin: 4px 0 0;
+    font-size: .8rem;
+}
+
+.financing-chart {
+    width: 100%;
+    margin-top: 12px;
+}
+
+.financing-chart svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+.financing-chart text {
+    fill: #64748b;
+    font-family: inherit;
+    font-size: 11px;
+}
+
+.financing-chart-gridline {
+    stroke: #e2e8f0;
+    stroke-width: 1;
+}
+
+.financing-chart-zero-line {
+    stroke: #94a3b8;
+    stroke-width: 1.5;
+}
+
+.financing-chart-line {
+    fill: none;
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+
+.financing-chart-line-sac {
+    stroke: #ea580c;
+}
+
+.financing-chart-line-price {
+    stroke: #2563eb;
+}
+
+.financing-chart-axis-label {
+    font-size: 10px !important;
+}
+
+.financing-legend {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    margin-top: 4px;
+    color: #475569;
+    font-size: .8rem;
+}
+
+.financing-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.financing-legend i {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+}
+
+.financing-legend-sac {
+    background: #ea580c;
+}
+
+.financing-legend-price {
+    background: #2563eb;
+}
+
+.financing-schedule-heading {
+    align-items: flex-start !important;
+}
+
+.financing-download,
+.financing-tab {
+    min-height: 40px;
+    padding: 9px 14px;
+    border: 1px solid #fed7aa;
+    border-radius: 9px;
+    background: #fff7ed;
+    color: #9a3412;
+    cursor: pointer;
+    font: inherit;
+    font-size: .85rem;
+    font-weight: 700;
+}
+
+.financing-download:hover,
+.financing-tab:hover,
+.financing-tab.is-active {
+    border-color: var(--color-orange);
+    background: var(--color-orange);
+    color: #fff;
+}
+
+.financing-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 0 0 10px;
+}
+
+.financing-schedule-description {
+    margin: 0 0 11px;
+}
+
+.financing-table-wrap {
+    max-height: 620px;
+    overflow: auto;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+}
+
+.financing-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: .82rem;
+    white-space: nowrap;
+}
+
+.financing-table th,
+.financing-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: right;
+}
+
+.financing-table th {
+    position: sticky;
+    z-index: 1;
+    top: 0;
+    background: #fff7ed;
+    color: #7c2d12;
+    font-size: .76rem;
+}
+
+.financing-table th:first-child,
+.financing-table td:first-child {
+    text-align: center;
+}
+
+.financing-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.financing-month-cell {
+    color: #475569;
+    font-weight: 700;
+}
+
+.financing-extra-input {
+    width: 126px;
+    min-height: 36px;
+    padding: 6px 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    font: inherit;
+    text-align: right;
+}
+
+.dashboard-financing-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 13px;
+    font-size: .88rem;
+}
+
+@media (max-width: 760px) {
+    .financing-page {
+        padding: 22px 14px 38px;
+    }
+
+    .financing-summary-grid,
+    .financing-chart-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .financing-schedule-heading {
+        flex-direction: column;
+    }
+
+    .financing-download {
+        width: 100%;
+    }
+}
+
 .performance-page [hidden] {
     display: none !important;
 }

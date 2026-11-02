@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xml:lang="pt-BR" lang="pt-BR">
+<h:head>
+    <title>Financiamento imobiliário</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <h:outputStylesheet library="css" name="app.css"/>
+    <h:outputScript library="js" name="financiamento.js" target="body"/>
+</h:head>
+<h:body styleClass="works-page financing-page">
+    <main class="performance-shell financing-shell">
+        <header class="performance-header">
+            <div>
+                <nav class="system-return-links" aria-label="Navegação principal">
+                    <a href="index.xhtml">Início</a><span> / </span>
+                    <a href="gestao.xhtml">Painel de obras</a>
+                </nav>
+                <p class="performance-eyebrow">Planejamento imobiliário</p>
+                <h1>Financiamento imobiliário</h1>
+                <p class="performance-subtitle">Simule parcelas, compare SAC e PRICE e acompanhe abatimentos extras.</p>
+            </div>
+            <span class="performance-header-icon" aria-hidden="true">
+                <span class="pi pi-building" aria-hidden="true"></span>
+            </span>
+        </header>
+
+        <section class="performance-card financing-input-card" aria-labelledby="financingInputsTitle">
+            <div class="performance-card-heading">
+                <div>
+                    <p class="performance-eyebrow">Sua simulação</p>
+                    <h2 id="financingInputsTitle">Dados do financiamento</h2>
+                </div>
+                <span class="performance-card-icon" aria-hidden="true">
+                    <span class="home-card-arrow pi pi-chart-line" aria-hidden="true"></span>
+                </span>
+            </div>
+            <p id="financingMessage" class="financing-message" role="status" aria-live="polite"></p>
+            <div class="financing-form-grid">
+                <div class="financing-field">
+                    <label for="loanAmount">Valor financiado (R$)</label>
+                    <input id="loanAmount" type="number" min="1" max="1000000000" step="1000" value="350000"
+                           inputmode="decimal"/>
+                </div>
+                <div class="financing-field">
+                    <label for="annualRate">Taxa efetiva anual (%)</label>
+                    <input id="annualRate" type="number" min="0" max="100" step="0.01" value="10.5"
+                           inputmode="decimal"/>
+                </div>
+                <div class="financing-field">
+                    <label for="trRate">TR anual estimada (%)</label>
+                    <input id="trRate" type="number" min="0" max="30" step="0.01" value="0" inputmode="decimal"/>
+                </div>
+                <div class="financing-field">
+                    <label for="termMonths">Prazo (meses)</label>
+                    <input id="termMonths" type="number" min="1" max="600" step="1" value="360" inputmode="numeric"/>
+                </div>
+                <div class="financing-field">
+                    <label for="birthDate">Data de nascimento do mutuário</label>
+                    <input id="birthDate" type="date" required="required"/>
+                </div>
+                <div class="financing-field">
+                    <label for="propertyValue">Valor do imóvel para o DFI (R$)</label>
+                    <input id="propertyValue" type="number" min="1" max="1000000000" step="1000" value="450000"
+                           inputmode="decimal"/>
+                </div>
+                <div class="financing-field">
+                    <label for="dfiRate">Taxa DFI mensal (% do imóvel)</label>
+                    <input id="dfiRate" type="number" min="0" max="1" step="0.001" value="0.01" inputmode="decimal"/>
+                </div>
+                <div class="financing-field">
+                    <label for="fgtsBalance">Saldo inicial do FGTS (R$)</label>
+                    <input id="fgtsBalance" type="number" min="0" max="1000000000" step="1000" value="0"
+                           inputmode="decimal"/>
+                </div>
+                <div class="financing-field">
+                    <label for="grossSalary">Salário bruto mensal (R$)</label>
+                    <input id="grossSalary" type="number" min="0" max="1000000000" step="100" value="0"
+                           inputmode="decimal"/>
+                </div>
+                <div class="financing-field">
+                    <label for="monthlyExtra">Abatimento extra mensal (R$)</label>
+                    <input id="monthlyExtra" type="number" min="0" max="1000000000" step="100" value="0"
+                           inputmode="decimal"/>
+                </div>
+                <div class="financing-field">
+                    <label for="extraStrategy">Ao antecipar, prefiro</label>
+                    <select id="extraStrategy">
+                        <option value="term">Reduzir o prazo</option>
+                        <option value="payment">Reduzir o valor das parcelas</option>
+                    </select>
+                </div>
+                <div class="financing-field">
+                    <label for="fgtsMode">Modalidade de uso do FGTS</label>
+                    <select id="fgtsMode">
+                        <option value="none">Não usar FGTS</option>
+                        <option value="amortize">Amortizar saldo a cada 2 anos</option>
+                        <option value="installments">Acumular 12 meses e pagar as 12 seguintes</option>
+                    </select>
+                </div>
+                <div class="financing-field" id="fgtsStrategyField" hidden="hidden">
+                    <label for="fgtsStrategy">Na amortização bienal, prefiro</label>
+                    <select id="fgtsStrategy">
+                        <option value="term">Reduzir o prazo</option>
+                        <option value="payment">Reduzir o valor das parcelas</option>
+                    </select>
+                </div>
+            </div>
+            <details class="financing-mip-settings">
+                <summary>Configurar as taxas estimadas de MIP por idade</summary>
+                <p>Percentuais mensais ilustrativos sobre o saldo devedor. Ajuste-os conforme a seguradora ou proposta
+                    do banco.</p>
+                <div class="financing-mip-table-wrap">
+                    <table class="financing-mip-table">
+                        <thead>
+                        <tr>
+                            <th scope="col">Faixa etária</th>
+                            <th scope="col">MIP mensal (%)</th>
+                        </tr>
+                        </thead>
+                        <tbody id="mipRateRows"></tbody>
+                    </table>
+                </div>
+            </details>
+            <p class="financing-hint">
+                O FGTS recebe depósito mensal estimado de 8% do salário bruto, com rendimento de 3% a.a. aplicado
+                mensalmente ao saldo; os depósitos e rendimentos são considerados nos abatimentos selecionados.
+                A TR anual é convertida em taxa mensal equivalente e corrige o saldo antes do cálculo dos juros.
+                Na opção bienal, o FGTS amortiza o saldo nos meses 24, 48, 72 etc.; na opção de parcelas, o FGTS
+                acumula depósitos e rendimentos nos primeiros 12 meses e usa o saldo acumulado, dividido em 12,
+                para abater as 12 parcelas seguintes. Durante esses pagamentos, os novos depósitos formam o próximo
+                ciclo.
+                Abatimentos pontuais podem ser informados no cronograma.
+            </p>
+            <p class="financing-disclaimer">
+                MIP, DFI, TR e regras de uso do FGTS são estimativas configuráveis e podem diferir do contrato e da
+                seguradora. A taxa administrativa é R$ 25,00 por mês. Os dados ficam salvos somente neste navegador.
+            </p>
+            <div class="financing-calculation-actions">
+                <button id="calculateWithAbatements" class="financing-download" type="button">
+                    Calcular valores com os abatimentos
+                </button>
+                <span id="calculationStatus" role="status" aria-live="polite"></span>
+            </div>
+        </section>
+
+        <section id="comparison" class="financing-results" aria-live="polite">
+            <div class="performance-card financing-comparison-card">
+                <div class="performance-card-heading">
+                    <div>
+                        <p class="performance-eyebrow">Comparativo</p>
+                        <h2>Quanto você pagará em cada sistema</h2>
+                    </div>
+                </div>
+                <div class="financing-summary-grid">
+                    <article class="financing-summary financing-sac">
+                        <span>SAC · juros totais</span>
+                        <strong id="sacInterest">—</strong>
+                        <small id="sacSummary">—</small>
+                    </article>
+                    <article class="financing-summary financing-price">
+                        <span>PRICE · juros totais</span>
+                        <strong id="priceInterest">—</strong>
+                        <small id="priceSummary">—</small>
+                    </article>
+                    <article class="financing-summary financing-savings">
+                        <span>Diferença de juros</span>
+                        <strong id="interestDifference">—</strong>
+                        <small id="differenceSummary">—</small>
+                    </article>
+                </div>
+                <div class="financing-cost-breakdown" aria-label="Composição estimada do custo SAC">
+                    <strong>Composição SAC</strong>
+                    <span>Correção TR: <b id="sacTrTotal">—</b></span>
+                    <span>Seguros MIP + DFI: <b id="sacInsuranceTotal">—</b></span>
+                    <span>Taxa administrativa: <b id="sacAdminTotal">—</b></span>
+                    <span>Depósitos FGTS: <b id="sacFgtsDeposits">—</b></span>
+                    <span>Rendimento FGTS: <b id="sacFgtsYield">—</b></span>
+                    <span>FGTS utilizado: <b id="sacFgtsUsed">—</b></span>
+                    <span>Saldo FGTS final: <b id="sacFgtsRemaining">—</b></span>
+                </div>
+                <div class="financing-cost-breakdown" aria-label="Composição estimada do custo PRICE">
+                    <strong>Composição PRICE</strong>
+                    <span>Correção TR: <b id="priceTrTotal">—</b></span>
+                    <span>Seguros MIP + DFI: <b id="priceInsuranceTotal">—</b></span>
+                    <span>Taxa administrativa: <b id="priceAdminTotal">—</b></span>
+                    <span>Depósitos FGTS: <b id="priceFgtsDeposits">—</b></span>
+                    <span>Rendimento FGTS: <b id="priceFgtsYield">—</b></span>
+                    <span>FGTS utilizado: <b id="priceFgtsUsed">—</b></span>
+                    <span>Saldo FGTS final: <b id="priceFgtsRemaining">—</b></span>
+                </div>
+                <div class="financing-chart-grid">
+                    <section class="financing-chart-card" aria-labelledby="monthlyInterestTitle">
+                        <h3 id="monthlyInterestTitle">Juros em cada parcela</h3>
+                        <p>Veja como os juros mensais diminuem ao longo do financiamento.</p>
+                        <div id="monthlyInterestChart" class="financing-chart"></div>
+                        <div class="financing-legend">
+                            <span><i class="financing-legend-sac"></i>SAC</span>
+                            <span><i class="financing-legend-price"></i>PRICE</span>
+                        </div>
+                    </section>
+                    <section class="financing-chart-card" aria-labelledby="cumulativeInterestTitle">
+                        <h3 id="cumulativeInterestTitle">Juros acumulados</h3>
+                        <p>Compare o total de juros pago em cada etapa do contrato.</p>
+                        <div id="cumulativeInterestChart" class="financing-chart"></div>
+                        <div class="financing-legend">
+                            <span><i class="financing-legend-sac"></i>SAC</span>
+                            <span><i class="financing-legend-price"></i>PRICE</span>
+                        </div>
+                    </section>
+                    <section class="financing-chart-card" aria-labelledby="cumulativePaymentsTitle">
+                        <h3 id="cumulativePaymentsTitle">Total de pagamentos acumulados</h3>
+                        <p>Compara o total desembolsado, incluindo parcelas, abatimentos e amortizações extras.</p>
+                        <div id="cumulativePaymentsChart" class="financing-chart"></div>
+                        <div class="financing-legend">
+                            <span><i class="financing-legend-sac"></i>SAC</span>
+                            <span><i class="financing-legend-price"></i>PRICE</span>
+                        </div>
+                    </section>
+                    <section class="financing-chart-card" aria-labelledby="installmentDeviationTitle">
+                        <h3 id="installmentDeviationTitle">Variação do valor das parcelas</h3>
+                        <p>Desvio mensal da prestação total em relação à primeira parcela de cada sistema.</p>
+                        <div id="installmentDeviationChart" class="financing-chart"></div>
+                        <div class="financing-legend">
+                            <span><i class="financing-legend-sac"></i>SAC</span>
+                            <span><i class="financing-legend-price"></i>PRICE</span>
+                        </div>
+                    </section>
+                    <section class="financing-chart-card" aria-labelledby="outstandingBalanceTitle">
+                        <h3 id="outstandingBalanceTitle">Saldo devedor ao longo do tempo</h3>
+                        <p>Mostra a redução do saldo financiado nos sistemas SAC e PRICE.</p>
+                        <div id="outstandingBalanceChart" class="financing-chart"></div>
+                        <div class="financing-legend">
+                            <span><i class="financing-legend-sac"></i>SAC</span>
+                            <span><i class="financing-legend-price"></i>PRICE</span>
+                        </div>
+                    </section>
+                    <section class="financing-chart-card" aria-labelledby="cumulativeTrTitle">
+                        <h3 id="cumulativeTrTitle">Correção acumulada pela TR</h3>
+                        <p>Visualize o impacto estimado da TR sobre o saldo devedor ao longo do contrato.</p>
+                        <div id="cumulativeTrChart" class="financing-chart"></div>
+                        <div class="financing-legend">
+                            <span><i class="financing-legend-sac"></i>SAC</span>
+                            <span><i class="financing-legend-price"></i>PRICE</span>
+                        </div>
+                    </section>
+                    <section class="financing-chart-card" aria-labelledby="monthlyChargesTitle">
+                        <h3 id="monthlyChargesTitle">Seguros e taxa administrativa</h3>
+                        <p>Compare a evolução mensal estimada de MIP, DFI e taxa administrativa.</p>
+                        <div id="monthlyChargesChart" class="financing-chart"></div>
+                        <div class="financing-legend">
+                            <span><i class="financing-legend-sac"></i>SAC</span>
+                            <span><i class="financing-legend-price"></i>PRICE</span>
+                        </div>
+                    </section>
+                    <section class="financing-chart-card" aria-labelledby="fgtsBalanceTitle">
+                        <h3 id="fgtsBalanceTitle">Saldo FGTS projetado</h3>
+                        <p>Acompanhe o saldo estimado do FGTS após depósitos, rendimentos e uso nos abatimentos.</p>
+                        <div id="fgtsBalanceChart" class="financing-chart"></div>
+                        <div class="financing-legend">
+                            <span><i class="financing-legend-sac"></i>SAC</span>
+                            <span><i class="financing-legend-price"></i>PRICE</span>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <section class="performance-card financing-schedule-card" aria-labelledby="scheduleTitle">
+                <div class="performance-card-heading financing-schedule-heading">
+                    <div>
+                        <p class="performance-eyebrow">Acompanhamento</p>
+                        <h2 id="scheduleTitle">Cronograma de parcelas e abatimentos</h2>
+                    </div>
+                    <button id="downloadSchedule" class="financing-download" type="button">Baixar cronogramas CSV
+                    </button>
+                </div>
+                <div class="financing-tabs" role="tablist" aria-label="Sistema de amortização">
+                    <button id="sacTab" class="financing-tab is-active" type="button" role="tab"
+                            aria-selected="true" aria-controls="schedulePanel" data-system="SAC">Tabela SAC
+                    </button>
+                    <button id="priceTab" class="financing-tab" type="button" role="tab"
+                            aria-selected="false" aria-controls="schedulePanel" data-system="PRICE">Tabela PRICE
+                    </button>
+                </div>
+                <p id="scheduleDescription" class="financing-schedule-description"></p>
+                <div id="schedulePanel" class="financing-table-wrap" role="tabpanel" aria-labelledby="sacTab">
+                    <table class="financing-table">
+                        <thead>
+                        <tr>
+                            <th scope="col">Nº parcela</th>
+                            <th scope="col">Saldo inicial</th>
+                            <th scope="col">Correção TR</th>
+                            <th scope="col">Prestação total (juros + amortização + seguros + adm.)</th>
+                            <th scope="col">Juros</th>
+                            <th scope="col">Amortização</th>
+                            <th scope="col">Idade</th>
+                            <th scope="col">Taxa MIP (%)</th>
+                            <th scope="col">MIP</th>
+                            <th scope="col">DFI</th>
+                            <th scope="col">Taxa adm.</th>
+                            <th scope="col">Extra mensal</th>
+                            <th scope="col">Amortização extra pontual (R$)</th>
+                            <th scope="col">Depósito FGTS</th>
+                            <th scope="col">Rendimento FGTS</th>
+                            <th scope="col">FGTS parcelas</th>
+                            <th scope="col">FGTS reservado futuro</th>
+                            <th scope="col">FGTS amortização</th>
+                            <th scope="col">Pago em dinheiro</th>
+                            <th scope="col">Saldo final</th>
+                            <th scope="col">Saldo FGTS</th>
+                        </tr>
+                        </thead>
+                        <tbody id="scheduleRows"></tbody>
+                    </table>
+                </div>
+            </section>
+        </section>
+    </main>
+</h:body>
+</html>
