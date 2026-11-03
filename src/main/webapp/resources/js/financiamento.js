@@ -5,6 +5,9 @@
     const defaults = {
         amount: 350000,
         annualRate: 10.5,
+        selicRate: 0,
+        ipcaRate: 0,
+        propertyAppreciationRate: 0,
         trRate: 0,
         months: 360,
         birthDate: '',
@@ -23,6 +26,9 @@
     const fields = {
         amount: document.getElementById('loanAmount'),
         annualRate: document.getElementById('annualRate'),
+        selicRate: document.getElementById('selicRate'),
+        ipcaRate: document.getElementById('ipcaRate'),
+        propertyAppreciationRate: document.getElementById('propertyAppreciationRate'),
         trRate: document.getElementById('trRate'),
         months: document.getElementById('termMonths'),
         birthDate: document.getElementById('birthDate'),
@@ -39,6 +45,7 @@
     const message = document.getElementById('financingMessage');
     const money = new Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'});
     const number = new Intl.NumberFormat('pt-BR', {maximumFractionDigits: 3});
+    const percentage = new Intl.NumberFormat('pt-BR', {maximumFractionDigits: 2});
     const svgNamespace = 'http://www.w3.org/2000/svg';
     let schedules = {};
     let activeSystem = 'SAC';
@@ -53,7 +60,7 @@
     function markCalculationDirty() {
         calculationDirty = true;
         document.getElementById('calculationStatus').textContent =
-            'Há alterações pendentes. Clique em “Calcular valores com os abatimentos” para atualizar a simulação.';
+            'Há alterações pendentes. Clique em “Calcular simulação e valorização do imóvel” para atualizar os resultados.';
     }
 
     function roundMoney(value) {
@@ -69,7 +76,8 @@
             }
             const parsed = JSON.parse(stored);
             for (const key of [
-                'amount', 'annualRate', 'trRate', 'months', 'propertyValue',
+                'amount', 'annualRate', 'selicRate', 'ipcaRate', 'propertyAppreciationRate',
+                'trRate', 'months', 'propertyValue',
                 'dfiRate', 'monthlyExtra', 'fgtsBalance', 'grossSalary'
             ]) {
                 if (typeof parsed[key] === 'number' && Number.isFinite(parsed[key])) state[key] = parsed[key];
@@ -96,6 +104,9 @@
         }
         fields.amount.value = state.amount;
         fields.annualRate.value = state.annualRate;
+        fields.selicRate.value = state.selicRate;
+        fields.ipcaRate.value = state.ipcaRate;
+        fields.propertyAppreciationRate.value = state.propertyAppreciationRate;
         fields.trRate.value = state.trRate;
         fields.months.value = state.months;
         fields.birthDate.value = state.birthDate;
@@ -123,6 +134,9 @@
     function readInputs() {
         state.amount = Number(fields.amount.value);
         state.annualRate = Number(fields.annualRate.value);
+        state.selicRate = Number(fields.selicRate.value);
+        state.ipcaRate = Number(fields.ipcaRate.value);
+        state.propertyAppreciationRate = Number(fields.propertyAppreciationRate.value);
         state.trRate = Number(fields.trRate.value);
         state.months = Number(fields.months.value);
         state.birthDate = fields.birthDate.value;
@@ -140,6 +154,16 @@
         }
         if (!Number.isFinite(state.annualRate) || state.annualRate < 0 || state.annualRate > 100) {
             throw new Error('Informe uma taxa anual entre 0% e 100%.');
+        }
+        if (!Number.isFinite(state.selicRate) || state.selicRate < 0 || state.selicRate > 100) {
+            throw new Error('Informe uma taxa média anual da SELIC entre 0% e 100%.');
+        }
+        if (!Number.isFinite(state.ipcaRate) || state.ipcaRate < 0 || state.ipcaRate > 100) {
+            throw new Error('Informe uma taxa média anual do IPCA entre 0% e 100%.');
+        }
+        if (!Number.isFinite(state.propertyAppreciationRate)
+            || state.propertyAppreciationRate < 0 || state.propertyAppreciationRate > 100) {
+            throw new Error('Informe uma valorização anual estimada do imóvel entre 0% e 100%.');
         }
         if (!Number.isFinite(state.trRate) || state.trRate < 0 || state.trRate > 30) {
             throw new Error('Informe uma TR anual entre 0% e 30%.');
@@ -237,6 +261,7 @@
         let cumulativeInsurance = 0;
         let cumulativeAdmin = 0;
         let cumulativePaid = 0;
+        let cumulativeFgtsUsed = 0;
         let totalFgtsUsed = 0;
         let totalFgtsDeposits = 0;
         let totalFgtsYield = 0;
@@ -321,6 +346,7 @@
             cumulativeAdmin = roundMoney(cumulativeAdmin + adminFee);
             const fgtsUsed = roundMoney(fgtsForInstallment + fgtsForAmortization);
             totalFgtsUsed = roundMoney(totalFgtsUsed + fgtsUsed);
+            cumulativeFgtsUsed = roundMoney(cumulativeFgtsUsed + fgtsUsed);
             const cashPayment = roundMoney(totalInstallment - fgtsForInstallment + extra);
             const paid = roundMoney(totalInstallment + extra + fgtsForAmortization);
             cumulativePaid = roundMoney(cumulativePaid + paid);
@@ -345,6 +371,7 @@
                 fgtsInstallmentReserve,
                 fgtsForAmortization,
                 fgtsUsed,
+                cumulativeFgtsUsed,
                 cashPayment,
                 closingBalance: balance,
                 fgtsBalance: roundMoney(fgtsBalance + fgtsInstallmentReserve),
@@ -441,6 +468,28 @@
     function updateSummaries() {
         const sac = schedules.SAC;
         const price = schedules.PRICE;
+        const projectRate = (annualRate, months, baseAmount = state.amount) => {
+            const factor = Math.pow(1 + annualRate / 100, months / 12);
+            const projectedAmount = roundMoney(baseAmount * factor);
+            return {
+                accumulatedRate: (factor - 1) * 100,
+                projectedAmount,
+                accumulatedAmount: roundMoney(projectedAmount - baseAmount)
+            };
+        };
+        const formatDifference = value => value > 0 ? `+${money.format(value)}` : money.format(value);
+        const selicProjection = {
+            SAC: projectRate(state.selicRate, sac.duration),
+            PRICE: projectRate(state.selicRate, price.duration)
+        };
+        const ipcaProjection = {
+            SAC: projectRate(state.ipcaRate, sac.duration),
+            PRICE: projectRate(state.ipcaRate, price.duration)
+        };
+        const propertyProjection = {
+            SAC: projectRate(state.propertyAppreciationRate, sac.duration, state.propertyValue),
+            PRICE: projectRate(state.propertyAppreciationRate, price.duration, state.propertyValue)
+        };
         document.getElementById('sacInterest').textContent = money.format(sac.totalInterest);
         document.getElementById('priceInterest').textContent = money.format(price.totalInterest);
         document.getElementById('sacSummary').textContent =
@@ -452,6 +501,53 @@
         document.getElementById('interestDifference').textContent = money.format(difference);
         document.getElementById('differenceSummary').textContent =
             difference === 0 ? 'Mesmo total de juros' : `Menos juros no ${lowerCost}`;
+        document.getElementById('sacTotalPaid').textContent = money.format(sac.totalPaid);
+        document.getElementById('priceTotalPaid').textContent = money.format(price.totalPaid);
+        const paymentDifference = roundMoney(Math.abs(sac.totalPaid - price.totalPaid));
+        const lowerPayment = sac.totalPaid <= price.totalPaid ? 'SAC' : 'PRICE';
+        document.getElementById('paymentDifference').textContent = money.format(paymentDifference);
+        document.getElementById('paymentDifferenceSummary').textContent =
+            paymentDifference === 0 ? 'Mesmo total de pagamentos' : `Menor total no ${lowerPayment}`;
+        [
+            ['projectionMonthsSac', `${number.format(sac.duration)} meses`],
+            ['projectionMonthsPrice', `${number.format(price.duration)} meses`],
+            ['selicAnnualRateSac', `${percentage.format(state.selicRate)}%`],
+            ['selicAnnualRatePrice', `${percentage.format(state.selicRate)}%`],
+            ['selicAccumulatedRateSac', `${percentage.format(selicProjection.SAC.accumulatedRate)}%`],
+            ['selicAccumulatedRatePrice', `${percentage.format(selicProjection.PRICE.accumulatedRate)}%`],
+            ['selicProjectedAmountSac', money.format(selicProjection.SAC.projectedAmount)],
+            ['selicProjectedAmountPrice', money.format(selicProjection.PRICE.projectedAmount)],
+            ['ipcaAnnualRateSac', `${percentage.format(state.ipcaRate)}%`],
+            ['ipcaAnnualRatePrice', `${percentage.format(state.ipcaRate)}%`],
+            ['ipcaAccumulatedRateSac', `${percentage.format(ipcaProjection.SAC.accumulatedRate)}%`],
+            ['ipcaAccumulatedRatePrice', `${percentage.format(ipcaProjection.PRICE.accumulatedRate)}%`],
+            ['ipcaProjectedAmountSac', money.format(ipcaProjection.SAC.projectedAmount)],
+            ['ipcaProjectedAmountPrice', money.format(ipcaProjection.PRICE.projectedAmount)],
+            ['propertyInitialValueSac', money.format(state.propertyValue)],
+            ['propertyInitialValuePrice', money.format(state.propertyValue)],
+            ['propertyAnnualRateSac', `${percentage.format(state.propertyAppreciationRate)}%`],
+            ['propertyAnnualRatePrice', `${percentage.format(state.propertyAppreciationRate)}%`],
+            ['propertyAccumulatedRateSac', `${percentage.format(propertyProjection.SAC.accumulatedRate)}%`],
+            ['propertyAccumulatedRatePrice', `${percentage.format(propertyProjection.PRICE.accumulatedRate)}%`],
+            ['propertyAppreciationSac', money.format(propertyProjection.SAC.accumulatedAmount)],
+            ['propertyAppreciationPrice', money.format(propertyProjection.PRICE.accumulatedAmount)],
+            ['propertyProjectedValueSac', money.format(propertyProjection.SAC.projectedAmount)],
+            ['propertyProjectedValuePrice', money.format(propertyProjection.PRICE.projectedAmount)]
+        ].forEach(([id, value]) => {
+            document.getElementById(id).textContent = value;
+        });
+        [
+            ['selicVsSacInterest', selicProjection.SAC.accumulatedAmount - sac.totalInterest],
+            ['selicVsPriceInterest', selicProjection.PRICE.accumulatedAmount - price.totalInterest],
+            ['selicVsSacPayments', selicProjection.SAC.projectedAmount - sac.totalPaid],
+            ['selicVsPricePayments', selicProjection.PRICE.projectedAmount - price.totalPaid],
+            ['ipcaVsSacInterest', ipcaProjection.SAC.accumulatedAmount - sac.totalInterest],
+            ['ipcaVsPriceInterest', ipcaProjection.PRICE.accumulatedAmount - price.totalInterest],
+            ['ipcaVsSacPayments', ipcaProjection.SAC.projectedAmount - sac.totalPaid],
+            ['ipcaVsPricePayments', ipcaProjection.PRICE.projectedAmount - price.totalPaid]
+        ].forEach(([id, difference]) => {
+            document.getElementById(id).textContent = formatDifference(roundMoney(difference));
+        });
         [
             ['sac', sac],
             ['price', price]
@@ -511,9 +607,9 @@
             }
         ], 'Comparação mensal dos custos estimados de seguros MIP e DFI e da taxa administrativa nos sistemas SAC e PRICE.');
         drawChart('fgtsBalanceChart', [
-            {className: 'financing-chart-line-sac', values: chartValues(sac, 'fgtsBalance', sac.remainingFgts)},
-            {className: 'financing-chart-line-price', values: chartValues(price, 'fgtsBalance', price.remainingFgts)}
-        ], 'Evolução do saldo FGTS projetado nos sistemas SAC e PRICE.');
+            {className: 'financing-chart-line-sac', values: chartValues(sac, 'cumulativeFgtsUsed', sac.totalFgtsUsed)},
+            {className: 'financing-chart-line-price', values: chartValues(price, 'cumulativeFgtsUsed', price.totalFgtsUsed)}
+        ], 'Soma acumulada dos valores pagos pelo FGTS nos sistemas SAC e PRICE.');
         document.getElementById('scheduleDescription').textContent =
             `Exibindo ${activeSystem}: ${schedules[activeSystem].duration} parcelas, com abatimentos aplicados após cada parcela.`;
         document.getElementById('schedulePanel').setAttribute(
@@ -612,8 +708,8 @@
             const saved = saveState();
             calculationDirty = false;
             document.getElementById('calculationStatus').textContent = saved
-                ? 'Simulação calculada e salva neste navegador.'
-                : 'Simulação calculada, mas não foi possível salvá-la neste navegador.';
+                ? 'Simulação, taxas e valorização do imóvel recalculadas e salvas neste navegador.'
+                : 'Simulação, taxas e valorização do imóvel recalculadas, mas não foi possível salvar neste navegador.';
             if (storageWarning) {
                 showMessage('Simulação carregada com valores padrão: os dados salvos estavam inválidos.', true);
                 storageWarning = false;

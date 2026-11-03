@@ -49,6 +49,16 @@
                            inputmode="decimal"/>
                 </div>
                 <div class="financing-field">
+                    <label for="selicRate">SELIC média estimada (% a.a.)</label>
+                    <input id="selicRate" type="number" min="0" max="100" step="0.01" value="0"
+                           inputmode="decimal"/>
+                </div>
+                <div class="financing-field">
+                    <label for="ipcaRate">IPCA médio estimado (% a.a.)</label>
+                    <input id="ipcaRate" type="number" min="0" max="100" step="0.01" value="0"
+                           inputmode="decimal"/>
+                </div>
+                <div class="financing-field">
                     <label for="trRate">TR anual estimada (%)</label>
                     <input id="trRate" type="number" min="0" max="30" step="0.01" value="0" inputmode="decimal"/>
                 </div>
@@ -63,6 +73,11 @@
                 <div class="financing-field">
                     <label for="propertyValue">Valor do imóvel para o DFI (R$)</label>
                     <input id="propertyValue" type="number" min="1" max="1000000000" step="1000" value="450000"
+                           inputmode="decimal"/>
+                </div>
+                <div class="financing-field">
+                    <label for="propertyAppreciationRate">Valorização estimada (% a.a.)</label>
+                    <input id="propertyAppreciationRate" type="number" min="0" max="100" step="0.01" value="0"
                            inputmode="decimal"/>
                 </div>
                 <div class="financing-field">
@@ -139,7 +154,7 @@
             </p>
             <div class="financing-calculation-actions">
                 <button id="calculateWithAbatements" class="financing-download" type="button">
-                    Calcular valores com os abatimentos
+                    Calcular simulação e valorização do imóvel
                 </button>
                 <span id="calculationStatus" role="status" aria-live="polite"></span>
             </div>
@@ -170,6 +185,145 @@
                         <small id="differenceSummary">—</small>
                     </article>
                 </div>
+                <div class="financing-summary-grid" style="padding-top: 1rem;">
+                    <article class="financing-summary financing-sac">
+                        <span>SAC · total de pagamentos</span>
+                        <strong id="sacTotalPaid">—</strong>
+                        <small>Parcelas, extras e amortizações pelo FGTS</small>
+                    </article>
+                    <article class="financing-summary financing-price">
+                        <span>PRICE · total de pagamentos</span>
+                        <strong id="priceTotalPaid">—</strong>
+                        <small>Parcelas, extras e amortizações pelo FGTS</small>
+                    </article>
+                    <article class="financing-summary financing-savings">
+                        <span>Diferença de pagamentos</span>
+                        <strong id="paymentDifference">—</strong>
+                        <small id="paymentDifferenceSummary">—</small>
+                    </article>
+                </div>
+                <section class="financing-economic-comparison" aria-labelledby="economicComparisonTitle">
+                    <h3 id="economicComparisonTitle">SELIC e IPCA no prazo do financiamento</h3>
+                    <p class="financing-economic-note">
+                        Projeção nominal composta sobre o valor financiado, usando as taxas médias anuais informadas
+                        durante o prazo efetivo de quitação de cada sistema. Não há desconto a valor presente; são
+                        estimativas, não previsões nem taxas consultadas. Diferenças positivas indicam que o montante
+                        nominal projetado supera o valor de referência.
+                    </p>
+                    <div class="financing-economic-table-wrap">
+                        <table class="financing-economic-table">
+                            <thead>
+                            <tr>
+                                <th scope="col">Comparação</th>
+                                <th scope="col">SAC</th>
+                                <th scope="col">PRICE</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th scope="row">Prazo efetivo de quitação</th>
+                                <td id="projectionMonthsSac">—</td>
+                                <td id="projectionMonthsPrice">—</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">SELIC média informada (% a.a.)</th>
+                                <td id="selicAnnualRateSac">—</td>
+                                <td id="selicAnnualRatePrice">—</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">SELIC acumulada no prazo</th>
+                                <td id="selicAccumulatedRateSac">—</td>
+                                <td id="selicAccumulatedRatePrice">—</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Montante nominal projetado pela SELIC</th>
+                                <td id="selicProjectedAmountSac">—</td>
+                                <td id="selicProjectedAmountPrice">—</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">IPCA médio informado (% a.a.)</th>
+                                <td id="ipcaAnnualRateSac">—</td>
+                                <td id="ipcaAnnualRatePrice">—</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">IPCA acumulado no prazo</th>
+                                <td id="ipcaAccumulatedRateSac">—</td>
+                                <td id="ipcaAccumulatedRatePrice">—</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Montante corrigido pelo IPCA</th>
+                                <td id="ipcaProjectedAmountSac">—</td>
+                                <td id="ipcaProjectedAmountPrice">—</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Montante nominal SELIC − juros totais</th>
+                                <td id="selicVsSacInterest">—</td>
+                                <td id="selicVsPriceInterest">—</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Montante nominal SELIC − total de pagamentos</th>
+                                <td id="selicVsSacPayments">—</td>
+                                <td id="selicVsPricePayments">—</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Correção IPCA − juros totais</th>
+                                <td id="ipcaVsSacInterest">—</td>
+                                <td id="ipcaVsPriceInterest">—</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Montante IPCA − total de pagamentos</th>
+                                <td id="ipcaVsSacPayments">—</td>
+                                <td id="ipcaVsPricePayments">—</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <section class="financing-economic-comparison" aria-labelledby="propertyAppreciationTitle">
+                    <h3 id="propertyAppreciationTitle">Valorização projetada do imóvel</h3>
+                    <p class="financing-economic-note">
+                        Estimativa composta com a taxa anual informada sobre o valor inicial do imóvel, até a quitação
+                        projetada de cada sistema. Não representa uma previsão de mercado.
+                    </p>
+                    <div class="financing-economic-table-wrap">
+                        <table class="financing-economic-table">
+                            <thead>
+                            <tr>
+                                <th scope="col">Projeção</th>
+                                <th scope="col">SAC</th>
+                                <th scope="col">PRICE</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th scope="row">Valor inicial do imóvel</th>
+                                <td id="propertyInitialValueSac">—</td>
+                                <td id="propertyInitialValuePrice">—</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Taxa de valorização informada (% a.a.)</th>
+                                <td id="propertyAnnualRateSac">—</td>
+                                <td id="propertyAnnualRatePrice">—</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Valorização acumulada no prazo</th>
+                                <td id="propertyAccumulatedRateSac">—</td>
+                                <td id="propertyAccumulatedRatePrice">—</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Valorização estimada em reais</th>
+                                <td id="propertyAppreciationSac">—</td>
+                                <td id="propertyAppreciationPrice">—</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Valor estimado do imóvel na quitação</th>
+                                <td id="propertyProjectedValueSac">—</td>
+                                <td id="propertyProjectedValuePrice">—</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
                 <div class="financing-cost-breakdown" aria-label="Composição estimada do custo SAC">
                     <strong>Composição SAC</strong>
                     <span>Correção TR: <b id="sacTrTotal">—</b></span>
@@ -254,9 +408,10 @@
                             <span><i class="financing-legend-price"></i>PRICE</span>
                         </div>
                     </section>
-                    <section class="financing-chart-card" aria-labelledby="fgtsBalanceTitle">
-                        <h3 id="fgtsBalanceTitle">Saldo FGTS projetado</h3>
-                        <p>Acompanhe o saldo estimado do FGTS após depósitos, rendimentos e uso nos abatimentos.</p>
+                    <section class="financing-chart-card" aria-labelledby="fgtsPaymentsTitle">
+                        <h3 id="fgtsPaymentsTitle">Pagamentos acumulados pelo FGTS</h3>
+                        <p>Acompanhe a soma dos valores pagos pelo FGTS em parcelas e amortizações ao longo do
+                            financiamento.</p>
                         <div id="fgtsBalanceChart" class="financing-chart"></div>
                         <div class="financing-legend">
                             <span><i class="financing-legend-sac"></i>SAC</span>

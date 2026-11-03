@@ -1936,6 +1936,50 @@ a:hover {
     color: #1f2937;
 }
 
+.financing-economic-comparison {
+    margin-top: 20px;
+}
+
+.financing-economic-comparison h3 {
+    margin: 0;
+    color: var(--color-ink);
+    font-size: 1.05rem;
+}
+
+.financing-economic-note {
+    margin: 6px 0 12px;
+    color: var(--color-muted);
+    font-size: .86rem;
+}
+
+.financing-economic-table-wrap {
+    overflow-x: auto;
+    margin-top: 10px;
+}
+
+.financing-economic-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .84rem;
+}
+
+.financing-economic-table th,
+.financing-economic-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--color-border);
+    text-align: right;
+    white-space: nowrap;
+}
+
+.financing-economic-table thead th {
+    color: var(--color-ink);
+    font-weight: 700;
+}
+
+.financing-economic-table th:first-child {
+    text-align: left;
+}
+
 .financing-mip-settings {
     margin-top: 15px;
     padding: 13px 15px;
