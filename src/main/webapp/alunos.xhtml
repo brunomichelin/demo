@@ -33,6 +33,11 @@
         <h:form id="formAlunos">
             <input type="hidden" name="#{requestScope._csrf.parameterName}"
                    value="#{requestScope._csrf.token}"/>
+            <nav aria-label="Navegação principal">
+                <h:link outcome="index.xhtml">Início</h:link>
+                <span> / </span>
+                <h:link outcome="gestao.xhtml">Painel de obras</h:link>
+            </nav>
             <p:commandLink action="#{alunoBean.listarTodos}" update="tabelaAluno" process="@this" ajax="true"
                            value="Recarregar a listagem!">
                 <p:graphicImage name="/images/refresh.png" alt="Recarregar listagem!" width="24"/>
