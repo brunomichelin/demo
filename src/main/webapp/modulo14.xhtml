@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xml:lang="pt-BR" lang="pt-BR">
+<h:head>
+    <title>Módulo 14 | Seres vivos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <h:outputStylesheet library="css" name="app.css"/>
+    <h:outputStylesheet library="css" name="modulo14.css"/>
+</h:head>
+<h:body styleClass="module14-page">
+    <div class="module14-sprites" aria-hidden="true">
+        <h:graphicImage library="images" name="biologia/leao.svg" styleClass="module14-sprite module14-sprite-lion"/>
+        <h:graphicImage library="images" name="biologia/aguia.svg" styleClass="module14-sprite module14-sprite-eagle"/>
+        <h:graphicImage library="images" name="biologia/ornitorrinco.svg" styleClass="module14-sprite module14-sprite-platypus"/>
+        <h:graphicImage library="images" name="biologia/sapo.svg" styleClass="module14-sprite module14-sprite-frog"/>
+        <h:graphicImage library="images" name="biologia/peixe-palhaco.svg" styleClass="module14-sprite module14-sprite-fish"/>
+        <h:graphicImage library="images" name="biologia/tartaruga.svg" styleClass="module14-sprite module14-sprite-turtle"/>
+        <h:graphicImage library="images" name="biologia/araucaria.svg" styleClass="module14-sprite module14-sprite-tree"/>
+        <h:graphicImage library="images" name="biologia/cogumelo.svg" styleClass="module14-sprite module14-sprite-mushroom"/>
+        <h:graphicImage library="images" name="biologia/aranha.svg" styleClass="module14-sprite module14-sprite-spider"/>
+        <h:graphicImage library="images" name="biologia/borboleta.svg" styleClass="module14-sprite module14-sprite-butterfly"/>
+        <h:graphicImage library="images" name="biologia/lactobacilo.svg" styleClass="module14-sprite module14-sprite-bacteria"/>
+        <h:graphicImage library="images" name="biologia/cianobacteria.svg" styleClass="module14-sprite module14-sprite-cyanobacteria"/>
+        <h:graphicImage library="images" name="biologia/arquea.svg" styleClass="module14-sprite module14-sprite-archaea"/>
+        <h:graphicImage library="images" name="biologia/ameba.svg" styleClass="module14-sprite module14-sprite-amoeba"/>
+        <h:graphicImage library="images" name="biologia/paramecio.svg" styleClass="module14-sprite module14-sprite-paramecium"/>
+        <h:graphicImage library="images" name="biologia/virus.svg" styleClass="module14-sprite module14-sprite-virus"/>
+    </div>
+    <main class="module14-shell">
+        <nav class="module14-nav" aria-label="Navegação principal">
+            <h:link outcome="index.xhtml">Início</h:link>
+            <span aria-hidden="true">/</span>
+            <span>Módulo 14</span>
+        </nav>
+
+        <header class="module14-hero">
+            <div class="module14-hero-copy">
+                <p class="module14-eyebrow">Módulo 14 · Programação orientada a objetos</p>
+                <h1>Seres vivos,<br/><span>comportamentos diferentes.</span></h1>
+                <p>
+                    Modele espécies com uma base comum, especialize suas características por herança
+                    e deixe cada ser vivo responder à sua maneira.
+                </p>
+                <a class="module14-cta" href="#especies">Explorar as espécies <span aria-hidden="true">↓</span></a>
+            </div>
+            <div class="module14-hero-art" aria-hidden="true">
+                <span class="module14-orbit module14-orbit-one"></span>
+                <span class="module14-orbit module14-orbit-two"></span>
+                <span class="module14-creature">◉</span>
+                <span class="module14-art-label">BIO</span>
+            </div>
+        </header>
+
+        <section class="module14-section" aria-labelledby="especies">
+            <div class="module14-section-heading">
+                <div>
+                    <p class="module14-eyebrow">Instâncias da hierarquia</p>
+                    <h2 id="especies">Conheça as espécies</h2>
+                </div>
+                <p>Quinze espécies vivas em <code>SerVivo</code>, além de um agente acelular.</p>
+            </div>
+            <div class="module14-species-grid">
+                <article class="module14-species-card">
+                    <div class="module14-species-top">
+                        <span class="module14-species-icon" aria-hidden="true">LE</span>
+                        <span class="module14-tag">Mamífero</span>
+                    </div>
+                    <p class="module14-scientific-name">Panthera leo</p>
+                    <h3>Leão</h3>
+                    <dl>
+                        <div><dt>Habitat</dt><dd>Savana africana</dd></div>
+                        <div><dt>Som</dt><dd>Ruge</dd></div>
+                        <div><dt>Locomoção</dt><dd>Caminha e corre sobre quatro patas</dd></div>
+                    </dl>
+                    <code class="module14-class-name">new Leao()</code>
+                </article>
+                <article class="module14-species-card">
+                    <div class="module14-species-top">
+                        <span class="module14-species-icon module14-icon-sky" aria-hidden="true">AG</span>
+                        <span class="module14-tag module14-tag-sky">Ovíparo</span>
+                    </div>
+                    <p class="module14-scientific-name">Aquila chrysaetos</p>
+                    <h3>Águia</h3>
+                    <dl>
+                        <div><dt>Habitat</dt><dd>Montanhas e campos abertos</dd></div>
+                        <div><dt>Som</dt><dd>Emite um chamado agudo</dd></div>
+                        <div><dt>Locomoção</dt><dd>Voa e caminha com as patas</dd></div>
+                    </dl>
+                    <code class="module14-class-name">new Aguia()</code>
+                </article>
+                <article class="module14-species-card">
+                    <div class="module14-species-top">
+                        <span class="module14-species-icon module14-icon-green" aria-hidden="true">OR</span>
+                        <span class="module14-tag module14-tag-green">Mamífero · ovíparo</span>
+                    </div>
+                    <p class="module14-scientific-name">Ornithorhynchus anatinus</p>
+                    <h3>Ornitorrinco</h3>
+                    <dl>
+                        <div><dt>Habitat</dt><dd>Rios e lagos da Austrália</dd></div>
+                        <div><dt>Som</dt><dd>Vocalizações suaves e grunhidos</dd></div>
+                        <div><dt>Locomoção</dt><dd>Nada usando as patas como remos</dd></div>
+                    </dl>
+                    <code class="module14-class-name">new Ornitorrinco()</code>
+                </article>
+                <article class="module14-species-card">
+                    <div class="module14-species-top">
+                        <span class="module14-species-icon module14-icon-green" aria-hidden="true">SC</span>
+                        <span class="module14-tag module14-tag-green">Anfíbio · ovíparo</span>
+                    </div>
+                    <p class="module14-scientific-name">Rhinella marina</p>
+                    <h3>Sapo-cururu</h3>
+                    <dl>
+                        <div><dt>Habitat</dt><dd>Áreas úmidas e margens de lagoas</dd></div>
+                        <div><dt>Som</dt><dd>Coaxar grave</dd></div>
+                        <div><dt>Locomoção</dt><dd>Salta e caminha pelo solo</dd></div>
+                    </dl>
+                    <code class="module14-class-name">new SapoCururu()</code>
+                </article>
+                <article class="module14-species-card">
+                    <div class="module14-species-top">
+                        <span class="module14-species-icon module14-icon-sky" aria-hidden="true">PP</span>
+                        <span class="module14-tag module14-tag-sky">Peixe</span>
+                    </div>
+                    <p class="module14-scientific-name">Amphiprion ocellaris</p>
+                    <h3>Peixe-palhaço</h3>
+                    <dl>
+                        <div><dt>Habitat</dt><dd>Recifes do Indo-Pacífico</dd></div>
+                        <div><dt>Som</dt><dd>Pequenos estalos e cliques</dd></div>
+                        <div><dt>Locomoção</dt><dd>Nada usando as nadadeiras</dd></div>
+                    </dl>
+                    <code class="module14-class-name">new PeixePalhaco()</code>
+                </article>
+                <article class="module14-species-card">
+                    <div class="module14-species-top">
+                        <span class="module14-species-icon" aria-hidden="true">TM</span>
+                        <span class="module14-tag">Réptil · ovíparo</span>
+                    </div>
+                    <p class="module14-scientific-name">Chelonia mydas</p>
+                    <h3>Tartaruga-marinha</h3>
+                    <dl>
+                        <div><dt>Habitat</dt><dd>Mares tropicais e praias costeiras</dd></div>
+                        <div><dt>Som</dt><dd>Sons de baixa frequência</dd></div>
+                        <div><dt>Locomoção</dt><dd>Nada e se desloca na areia</dd></div>
+                    </dl>
+                    <code class="module14-class-name">new TartarugaMarinha()</code>
+                </article>
+                <article class="module14-species-card">
+                    <div class="module14-species-top">
+                        <span class="module14-species-icon module14-icon-green" aria-hidden="true">AR</span>
+                        <span class="module14-tag module14-tag-green">Planta · árvore</span>
+                    </div>
+                    <p class="module14-scientific-name">Araucaria angustifolia</p>
+                    <h3>Araucária</h3>
+                    <dl>
+                        <div><dt>Habitat</dt><dd>Florestas e campos do sul do Brasil</dd></div>
+                        <div><dt>Som</dt><dd>Não emite sons audíveis</dd></div>
+                        <div><dt>Movimento</dt><dd>Fixa ao solo; crescimento lento</dd></div>
+                    </dl>
+                    <code class="module14-class-name">new Araucaria()</code>
+                </article>
+                <article class="module14-species-card">
+                    <div class="module14-species-top">
+                        <span class="module14-species-icon" aria-hidden="true">CV</span>
+                        <span class="module14-tag">Fungo</span>
+                    </div>
+                    <p class="module14-scientific-name">Amanita muscaria</p>
+                    <h3>Cogumelo-vermelho</h3>
+                    <dl>
+                        <div><dt>Habitat</dt><dd>Florestas temperadas, junto a árvores</dd></div>
+                        <div><dt>Som</dt><dd>Não emite sons audíveis</dd></div>
+                        <div><dt>Movimento</dt><dd>Sem locomoção própria; libera esporos</dd></div>
+                    </dl>
+                    <code class="module14-class-name">new CogumeloVermelho()</code>
+                </article>
+                <article class="module14-species-card">
+                    <div class="module14-species-top">
+                        <span class="module14-species-icon" aria-hidden="true">AC</span>
+                        <span class="module14-tag">Aracnídeo</span>
+                    </div>
+                    <p class="module14-scientific-name">Grammostola pulchra</p>
+                    <h3>Aranha-caranguejeira</h3>
+                    <dl>
+                        <div><dt>Habitat</dt><dd>Campos e áreas de vegetação do Brasil</dd></div>
+                        <div><dt>Som</dt><dd>Não emite sons audíveis</dd></div>
+                        <div><dt>Movimento</dt><dd>Caminha sobre oito patas</dd></div>
+                    </dl>
+                    <code class="module14-class-name">new AranhaCaranguejeira()</code>
+                </article>
+                <article class="module14-species-card">
+                    <div class="module14-species-top">
+                        <span class="module14-species-icon module14-icon-sky" aria-hidden="true">BM</span>
+                        <span class="module14-tag module14-tag-sky">Inseto</span>
+                    </div>
+                    <p class="module14-scientific-name">Danaus plexippus</p>
+                    <h3>Borboleta-monarca</h3>
+                    <dl>
+                        <div><dt>Habitat</dt><dd>Jardins, campos e áreas com plantas hospedeiras</dd></div>
+                        <div><dt>Som</dt><dd>Não emite sons audíveis para humanos</dd></div>
+                        <div><dt>Movimento</dt><dd>Voa com dois pares de asas</dd></div>
+                    </dl>
+                    <code class="module14-class-name">new BorboletaMonarca()</code>
+                </article>
+                <article class="module14-species-card">
+                    <div class="module14-species-top">
+                        <span class="module14-species-icon module14-icon-green" aria-hidden="true">LA</span>
+                        <span class="module14-tag module14-tag-green">Bactéria</span>
+                    </div>
+                    <p class="module14-scientific-name">Lactobacillus acidophilus</p>
+                    <h3>Lactobacilo</h3>
+                    <dl>
+                        <div><dt>Habitat</dt><dd>Intestino humano e alimentos fermentados</dd></div>
+                        <div><dt>Som</dt><dd>Não emite sons audíveis</dd></div>
+                        <div><dt>Movimento</dt><dd>Algumas cepas se deslocam com flagelos</dd></div>
+                    </dl>
+                    <code class="module14-class-name">new Lactobacilo()</code>
+                </article>
+                <article class="module14-species-card">
+                    <div class="module14-species-top">
+                        <span class="module14-species-icon module14-icon-green" aria-hidden="true">CI</span>
+                        <span class="module14-tag module14-tag-green">Bactéria fotossintética</span>
+                    </div>
+                    <p class="module14-scientific-name">Anabaena variabilis</p>
+                    <h3>Cianobactéria</h3>
+                    <dl>
+                        <div><dt>Habitat</dt><dd>Água doce e ambientes úmidos</dd></div>
+                        <div><dt>Som</dt><dd>Não emite sons audíveis</dd></div>
+                        <div><dt>Característica</dt><dd>Fotossíntese com liberação de oxigênio</dd></div>
+                    </dl>
+                    <code class="module14-class-name">new Cianobacteria()</code>
+                </article>
+                <article class="module14-species-card">
+                    <div class="module14-species-top">
+                        <span class="module14-species-icon" aria-hidden="true">AH</span>
+                        <span class="module14-tag">Arqueia</span>
+                    </div>
+                    <p class="module14-scientific-name">Haloferax volcanii</p>
+                    <h3>Arqueia halófila</h3>
+                    <dl>
+                        <div><dt>Habitat</dt><dd>Lagos salgados e ambientes de alta salinidade</dd></div>
+                        <div><dt>Som</dt><dd>Não emite sons audíveis</dd></div>
+                        <div><dt>Característica</dt><dd>Adaptada a concentrações elevadas de sal</dd></div>
+                    </dl>
+                    <code class="module14-class-name">new ArqueaHalofila()</code>
+                </article>
+                <article class="module14-species-card">
+                    <div class="module14-species-top">
+                        <span class="module14-species-icon module14-icon-sky" aria-hidden="true">AM</span>
+                        <span class="module14-tag module14-tag-sky">Protozoário</span>
+                    </div>
+                    <p class="module14-scientific-name">Amoeba proteus</p>
+                    <h3>Ameba</h3>
+                    <dl>
+                        <div><dt>Habitat</dt><dd>Água doce e ambientes aquáticos</dd></div>
+                        <div><dt>Som</dt><dd>Não emite sons audíveis</dd></div>
+                        <div><dt>Movimento</dt><dd>Desloca-se por pseudópodes</dd></div>
+                    </dl>
+                    <code class="module14-class-name">new AmebaProteus()</code>
+                </article>
+                <article class="module14-species-card">
+                    <div class="module14-species-top">
+                        <span class="module14-species-icon module14-icon-sky" aria-hidden="true">PA</span>
+                        <span class="module14-tag module14-tag-sky">Protozoário</span>
+                    </div>
+                    <p class="module14-scientific-name">Paramecium caudatum</p>
+                    <h3>Paramécio</h3>
+                    <dl>
+                        <div><dt>Habitat</dt><dd>Poças e lagoas com matéria orgânica</dd></div>
+                        <div><dt>Som</dt><dd>Não emite sons audíveis</dd></div>
+                        <div><dt>Movimento</dt><dd>Nada usando cílios celulares</dd></div>
+                    </dl>
+                    <code class="module14-class-name">new Paramecio()</code>
+                </article>
+                <article class="module14-species-card module14-agent-card">
+                    <div class="module14-species-top">
+                        <span class="module14-species-icon" aria-hidden="true">V</span>
+                        <span class="module14-tag">Agente acelular · não é ser vivo</span>
+                    </div>
+                    <p class="module14-scientific-name">Bacteriófago lambda</p>
+                    <h3>Vírus</h3>
+                    <dl>
+                        <div><dt>Hospedeiro</dt><dd>Bactéria Escherichia coli</dd></div>
+                        <div><dt>Estrutura</dt><dd>Material genético envolto por cápside</dd></div>
+                        <div><dt>Replicação</dt><dd>Depende da célula hospedeira</dd></div>
+                    </dl>
+                    <code class="module14-class-name">new BacteriofagoLambda()</code>
+                </article>
+            </div>
+        </section>
+
+        <section class="module14-concepts" aria-label="Conceitos de orientação a objetos">
+            <article class="module14-concept-card">
+                <span class="module14-concept-number">01</span>
+                <p class="module14-eyebrow">Herança</p>
+                <h2>Compartilhe o que é comum</h2>
+                <p><code>SerVivo</code> centraliza nome científico, reino, habitat e os comportamentos que cada espécie deve definir.</p>
+                <div class="module14-tree" aria-label="Hierarquia de classes">
+                    <span>SerVivo</span>
+                    <div><span>Mamifero</span><span>Oviparo</span><span>Anfibio</span><span>Peixe</span><span>Reptil</span><span>Planta</span><span>Fungo</span><span>Aracnideo</span><span>Inseto</span><span>Bacteria</span><span>Arquea</span><span>Protozoario</span></div>
+                    <div><span>Leao / Ornitorrinco</span><span>Aguia</span><span>SapoCururu</span><span>PeixePalhaco</span><span>TartarugaMarinha</span><span>Araucaria</span><span>CogumeloVermelho</span><span>AranhaCaranguejeira</span><span>BorboletaMonarca</span><span>Lactobacilo / Cianobacteria</span><span>ArqueaHalofila</span><span>AmebaProteus / Paramecio</span></div>
+                </div>
+            </article>
+            <article class="module14-concept-card module14-concept-dark">
+                <span class="module14-concept-number">02</span>
+                <p class="module14-eyebrow">Polimorfismo</p>
+                <h2>Uma chamada, muitas respostas</h2>
+                <p>Os seres vivos, inclusive microrganismos, são tratados como <code>SerVivo</code>. Vírus fica separado: é um agente acelular e depende de uma célula para se replicar.</p>
+                <pre><code>List&lt;SerVivo&gt; especies = List.of(
+    new Leao(), new Aguia(), new Ornitorrinco(),
+    new SapoCururu(), new PeixePalhaco(), new TartarugaMarinha(),
+    new Araucaria(), new CogumeloVermelho(),
+    new AranhaCaranguejeira(), new BorboletaMonarca(),
+    new Lactobacilo(), new Cianobacteria(), new ArqueaHalofila(),
+    new AmebaProteus(), new Paramecio()
+);
+
+for (SerVivo especie : especies) {
+    especie.emitirSom();
+    especie.seMover();
+}</code></pre>
+            </article>
+            <article class="module14-concept-card">
+                <span class="module14-concept-number">03</span>
+                <p class="module14-eyebrow">Interface contratada</p>
+                <h2>Defina capacidades</h2>
+                <p><code>ReproducaoOvipara</code> estabelece o contrato de incubação. Aves, anfíbios, répteis e até o ornitorrinco podem implementá-lo.</p>
+                <div class="module14-contract">
+                    <code>ReproducaoOvipara</code>
+                    <span aria-hidden="true">↓</span>
+                    <div><span>Oviparo</span><span>SapoCururu</span><span>TartarugaMarinha</span><span>Ornitorrinco</span></div>
+                    <small>getTempoIncubacaoDias() · botarOvo()</small>
+                </div>
+            </article>
+        </section>
+
+        <section class="module14-creation" aria-labelledby="creationTitle">
+            <div>
+                <p class="module14-eyebrow">Criação e uso</p>
+                <h2 id="creationTitle">Monte uma coleção de seres vivos</h2>
+                <p>Instancie cada espécie concreta e percorra a coleção pela abstração comum. A implementação escolhida em tempo de execução determina cada resposta.</p>
+            </div>
+            <pre><code>List&lt;SerVivo&gt; especies = List.of(
+    new Leao(),
+    new Aguia(),
+    new Ornitorrinco(),
+    new SapoCururu(),
+    new PeixePalhaco(),
+    new TartarugaMarinha(),
+    new Araucaria(),
+    new CogumeloVermelho(),
+    new AranhaCaranguejeira(),
+    new BorboletaMonarca(),
+    new Lactobacilo(),
+    new Cianobacteria(),
+    new ArqueaHalofila(),
+    new AmebaProteus(),
+    new Paramecio()
+);
+
+for (SerVivo especie : especies) {
+    System.out.println(especie.getNomeCientifico());
+    System.out.println(especie.emitirSom());
+    System.out.println(especie.seMover());
+}</code></pre>
+        </section>
+
+        <section class="module14-virus-note" aria-labelledby="virusTitle">
+            <div class="module14-virus-mark" aria-hidden="true">V</div>
+            <div>
+                <p class="module14-eyebrow">Distinção biológica</p>
+                <h2 id="virusTitle">Vírus não entra na hierarquia de seres vivos</h2>
+                <p>Como agentes acelulares, vírus não são considerados seres vivos por muitos critérios biológicos. Por isso, o bacteriófago é modelado separadamente em <code>Virus</code>, fora da classe <code>SerVivo</code>; sua replicação depende de uma célula hospedeira.</p>
+            </div>
+        </section>
+
+        <footer class="module14-footer">
+            <span>Módulo 14</span>
+            <span>Herança · Polimorfismo · Interfaces</span>
+            <h:link outcome="index.xhtml">Voltar aos módulos <span aria-hidden="true">→</span></h:link>
+        </footer>
+    </main>
+</h:body>
+</html>

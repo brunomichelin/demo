@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 20" shape-rendering="crispEdges">
+  <path fill="#2f8269" d="M4 3h6v2h5v2h5v2h5v2h4v4h-6v-2h-5v-2h-5v-2H8V7H4z"/>
+  <path fill="#70c69a" d="M6 4h3v3h5v2h5v2h5v2h4v2h-4v-1h-5v-2h-5v-2H9V8H6z"/>
+  <path fill="#b9e8a4" d="M4 2h2v2H4zm9 3h2v2h-2zm10 4h2v2h-2zM2 15h4v2H2zm22 1h5v2h-5z"/>
+</svg>
