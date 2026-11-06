@@ -123,10 +123,13 @@ public class LivroApiController {
         if ("LIDO".equals(status)) {
             return LivroStatus.LIDO;
         }
+        if ("LENDO".equals(status)) {
+            return LivroStatus.LENDO;
+        }
         if ("DESEJADO".equals(status)) {
             return LivroStatus.DESEJADO;
         }
-        throw new ResponseStatusException(BAD_REQUEST, "Selecione se o livro foi lido ou é desejado.");
+        throw new ResponseStatusException(BAD_REQUEST, "Selecione se o livro foi lido, está sendo lido ou é desejado.");
     }
 
     private void validarIsbnUnico(String dono, String isbn) {

@@ -26,6 +26,7 @@
         <section class="books-stats" aria-label="Resumo da biblioteca">
             <article><span>Na biblioteca</span><strong id="totalLivros">0</strong></article>
             <article><span>Já lidos</span><strong id="totalLidos">0</strong></article>
+            <article><span>Lendo</span><strong id="totalLendo">0</strong></article>
             <article><span>Quero ler</span><strong id="totalDesejados">0</strong></article>
         </section>
 
@@ -71,6 +72,7 @@
                     <select id="filtroStatus">
                         <option value="TODOS">Todos</option>
                         <option value="LIDO">Já li</option>
+                        <option value="LENDO">Lendo</option>
                         <option value="DESEJADO">Quero ler</option>
                     </select>
                 </label>
@@ -126,7 +128,9 @@
             }
 
             function statusLegivel(status) {
-                return status === 'LIDO' ? 'Já li' : 'Quero ler';
+                if (status === 'LIDO') return 'Já li';
+                if (status === 'LENDO') return 'Lendo';
+                return 'Quero ler';
             }
 
             function compararTexto(primeiro, segundo) {
@@ -151,6 +155,8 @@
                 document.getElementById('totalLivros').textContent = livros.length;
                 document.getElementById('totalLidos').textContent =
                     livros.filter(livro => livro.status === 'LIDO').length;
+                document.getElementById('totalLendo').textContent =
+                    livros.filter(livro => livro.status === 'LENDO').length;
                 document.getElementById('totalDesejados').textContent =
                     livros.filter(livro => livro.status === 'DESEJADO').length;
             }
@@ -197,7 +203,7 @@
                     const seletor = document.createElement('select');
                     seletor.className = 'books-status-select';
                     seletor.setAttribute('aria-label', 'Status de leitura de ' + livro.titulo);
-                    [['LIDO', 'Já li'], ['DESEJADO', 'Quero ler']].forEach(([valor, rotulo]) => {
+                    [['LIDO', 'Já li'], ['LENDO', 'Lendo'], ['DESEJADO', 'Quero ler']].forEach(([valor, rotulo]) => {
                         const opcao = document.createElement('option');
                         opcao.value = valor;
                         opcao.textContent = rotulo;
@@ -275,7 +281,7 @@
                     const acoes = document.createElement('div');
                     acoes.className = 'books-result-actions';
                     const salvo = livroJaSalvo(livro);
-                    [['LIDO', 'Já li'], ['DESEJADO', 'Quero ler']].forEach(([status, rotulo]) => {
+                    [['LIDO', 'Já li'], ['LENDO', 'Lendo'], ['DESEJADO', 'Quero ler']].forEach(([status, rotulo]) => {
                         const botao = textoElemento('button',
                             (status === 'LIDO' ? 'books-primary-button' : 'books-secondary-button')
                                 + ' books-small-button', salvo && salvo.status === status ? '✓ ' + rotulo : rotulo);

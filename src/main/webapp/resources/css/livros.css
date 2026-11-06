@@ -113,7 +113,7 @@
 
 .books-stats {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 14px;
     margin-bottom: 18px;
 }
@@ -272,6 +272,11 @@
 .books-status.lido {
     color: #416749;
     background: #e7f1e7;
+}
+
+.books-status.lendo {
+    color: #406b8c;
+    background: #e8f1fb;
 }
 
 .books-status.desejado {
