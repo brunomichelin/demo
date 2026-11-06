@@ -14,21 +14,26 @@
 <h:body styleClass="wine-page">
     <main class="wine-shell">
         <nav class="wine-nav" aria-label="Navegação principal">
-            <h:link outcome="index.xhtml" styleClass="wine-brand"><span class="wine-brand-mark" aria-hidden="true">V</span> VINHO<span class="wine-brand-light">·CADERNO</span></h:link>
+            <h:link outcome="index.xhtml" styleClass="wine-brand">
+                <span class="wine-brand-mark" aria-hidden="true">V</span> Início
+            </h:link>
             <div class="wine-nav-links">
                 <h:link outcome="index.xhtml">Módulos</h:link>
                 <span aria-hidden="true">/</span>
-                <span>Módulo 15</span>
+                <span>Adega Pessoal</span>
             </div>
             <span class="wine-private"><span aria-hidden="true">●</span> SUA COLEÇÃO</span>
         </nav>
 
         <header class="wine-hero">
             <div class="wine-hero-copy">
-                <p class="wine-eyebrow"><span></span> MÓDULO 15 <span class="wine-eyebrow-divider">/</span> MEMÓRIA DE GRANDES TAÇAS</p>
+                <p class="wine-eyebrow"><span></span> ADEGA PESSOAL <span class="wine-eyebrow-divider">/</span> MEMÓRIA
+                    DE GRANDES TAÇAS</p>
                 <h1>Uma adega feita<br/>de <em>boas histórias.</em></h1>
-                <p>Guarde cada descoberta, relembre suas degustações e encontre os sabores que mais combinam com você.</p>
-                <button class="wine-button wine-button-light" id="openWineForm" type="button">＋ <span>Adicionar vinho</span></button>
+                <p>Guarde cada descoberta, relembre suas degustações e encontre os sabores que mais combinam com
+                    você.</p>
+                <button class="wine-button wine-button-light" id="openWineForm" type="button">＋
+                    <span>Adicionar vinho</span></button>
             </div>
             <div class="wine-hero-art" aria-hidden="true">
                 <span class="wine-art-orbit wine-art-orbit-one"></span>
@@ -46,58 +51,109 @@
         </header>
 
         <section class="wine-stats" aria-label="Resumo da sua adega">
-            <article class="wine-stat"><span class="wine-stat-icon">◉</span><div><span>RÓTULOS PROVADOS</span><strong id="statTasted">0</strong><small>na sua coleção</small></div></article>
-            <article class="wine-stat"><span class="wine-stat-icon wine-stat-gold">✳</span><div><span>SUA NOTA MÉDIA</span><strong id="statRating">—<small> / 5</small></strong><small>entre suas avaliações</small></div></article>
-            <article class="wine-stat"><span class="wine-stat-icon wine-stat-rose">♡</span><div><span>PARA A PRÓXIMA TAÇA</span><strong id="statWishlist">0</strong><small>na lista quero beber</small></div></article>
-            <article class="wine-stat"><span class="wine-stat-icon wine-stat-olive">R$</span><div><span>INVESTIDO EM DESCOBERTAS</span><strong id="statSpent">R$ 0</strong><small>valor dos rótulos provados</small></div></article>
+            <article class="wine-stat"><span class="wine-stat-icon">◉</span>
+                <div><span>RÓTULOS PROVADOS</span><strong id="statTasted">0</strong><small>na sua coleção</small></div>
+            </article>
+            <article class="wine-stat"><span class="wine-stat-icon wine-stat-gold">✳</span>
+                <div><span>SUA NOTA MÉDIA</span><strong id="statRating">—<small> / 5</small></strong><small>entre suas
+                    avaliações</small></div>
+            </article>
+            <article class="wine-stat"><span class="wine-stat-icon wine-stat-rose">♡</span>
+                <div><span>PARA A PRÓXIMA TAÇA</span><strong id="statWishlist">0</strong><small>na lista quero
+                    beber</small></div>
+            </article>
+            <article class="wine-stat"><span class="wine-stat-icon wine-stat-olive">R$</span>
+                <div><span>INVESTIDO EM DESCOBERTAS</span><strong id="statSpent">R$ 0</strong><small>valor dos rótulos
+                    provados</small></div>
+            </article>
         </section>
 
         <div class="wine-content-layout">
             <section class="wine-collection" aria-labelledby="collectionTitle">
                 <div class="wine-section-heading">
-                    <div><p class="wine-eyebrow wine-eyebrow-dark">A SUA COLEÇÃO</p><h2 id="collectionTitle">Rótulos com história</h2></div>
+                    <div><p class="wine-eyebrow wine-eyebrow-dark">A SUA COLEÇÃO</p>
+                        <h2 id="collectionTitle">Rótulos com história</h2></div>
                     <span class="wine-count" id="wineCount">0 vinhos</span>
                 </div>
 
                 <div class="wine-toolbar">
-                    <label class="wine-search"><span aria-hidden="true">⌕</span><input id="wineSearch" type="search" placeholder="Buscar vinho, uva, região..." aria-label="Buscar vinhos"/></label>
+                    <label class="wine-search"><span aria-hidden="true">⌕</span><input id="wineSearch" type="search"
+                                                                                       placeholder="Buscar vinho, uva, região..."
+                                                                                       aria-label="Buscar vinhos"/></label>
                     <div class="wine-views" role="group" aria-label="Exibir vinhos">
                         <button class="wine-view is-active" type="button" data-view="all">Todos</button>
                         <button class="wine-view" type="button" data-view="favorites">♡ Favoritos</button>
-                        <button class="wine-view" type="button" data-view="wishlist">Quero beber <span id="wishlistTabCount">0</span></button>
+                        <button class="wine-view" type="button" data-view="wishlist">Quero beber <span
+                                id="wishlistTabCount">0</span></button>
                     </div>
                 </div>
 
                 <div class="wine-filters" aria-label="Filtros">
-                    <label><span>PAÍS</span><select id="filterCountry"><option value="">Todos</option></select></label>
-                    <label><span>UVA</span><select id="filterGrape"><option value="">Todas</option></select></label>
-                    <label><span>TIPO</span><select id="filterType"><option value="">Todos</option><option>Tinto</option><option>Branco</option><option>Rosé</option><option>Espumante</option><option>Fortificado</option><option>Sobremesa</option></select></label>
-                    <label><span>SAFRA</span><select id="filterVintage"><option value="">Todas</option></select></label>
-                    <label><span>NOTA MÍNIMA</span><select id="filterRating"><option value="">Qualquer</option><option value="4">4 estrelas</option><option value="3">3 estrelas</option><option value="2">2 estrelas</option></select></label>
-                    <label class="wine-price-filter"><span>FAIXA DE PREÇO</span><select id="filterPrice"><option value="">Qualquer valor</option><option value="0-100">Até R$ 100</option><option value="100-250">R$ 100–250</option><option value="250-500">R$ 250–500</option><option value="500+">Acima de R$ 500</option></select></label>
+                    <label><span>PAÍS</span><select id="filterCountry">
+                        <option value="">Todos</option>
+                    </select></label>
+                    <label><span>UVA</span><select id="filterGrape">
+                        <option value="">Todas</option>
+                    </select></label>
+                    <label><span>TIPO</span><select id="filterType">
+                        <option value="">Todos</option>
+                        <option>Tinto</option>
+                        <option>Branco</option>
+                        <option>Rosé</option>
+                        <option>Espumante</option>
+                        <option>Fortificado</option>
+                        <option>Sobremesa</option>
+                    </select></label>
+                    <label><span>SAFRA</span><select id="filterVintage">
+                        <option value="">Todas</option>
+                    </select></label>
+                    <label><span>NOTA MÍNIMA</span><select id="filterRating">
+                        <option value="">Qualquer</option>
+                        <option value="4">4 estrelas</option>
+                        <option value="3">3 estrelas</option>
+                        <option value="2">2 estrelas</option>
+                    </select></label>
+                    <label class="wine-price-filter"><span>FAIXA DE PREÇO</span><select id="filterPrice">
+                        <option value="">Qualquer valor</option>
+                        <option value="0-100">Até R$ 100</option>
+                        <option value="100-250">R$ 100–250</option>
+                        <option value="250-500">R$ 250–500</option>
+                        <option value="500+">Acima de R$ 500</option>
+                    </select></label>
                     <button class="wine-clear-filters" id="clearFilters" type="button">Limpar filtros</button>
                 </div>
 
                 <div id="storageNotice" class="wine-notice" role="status" hidden="hidden"></div>
                 <div id="wineGrid" class="wine-grid" aria-live="polite"></div>
                 <div id="emptyState" class="wine-empty" hidden="hidden">
-                    <span aria-hidden="true">⌕</span><h3>Nenhum rótulo por aqui</h3><p>Tente mudar os filtros ou adicione um novo vinho à sua adega.</p>
-                    <button class="wine-button wine-button-dark" id="emptyAddWine" type="button">Adicionar primeiro vinho</button>
+                    <span aria-hidden="true">⌕</span>
+                    <h3>Nenhum rótulo por aqui</h3>
+                    <p>Tente mudar os filtros ou adicione um novo vinho à sua adega.</p>
+                    <button class="wine-button wine-button-dark" id="emptyAddWine" type="button">Adicionar primeiro
+                        vinho
+                    </button>
                 </div>
             </section>
 
             <aside class="wine-insights" aria-label="Descobertas da sua adega">
                 <section class="wine-insight-card wine-preference">
                     <p class="wine-eyebrow wine-eyebrow-dark">FEITO PARA O SEU PALADAR</p>
-                    <div class="wine-insight-heading"><span class="wine-insight-icon">✳</span><h2>Uma descoberta<br/>sobre você</h2></div>
-                    <p id="preferenceInsight" class="wine-insight-copy">Suas próximas descobertas começam com a primeira taça.</p>
+                    <div class="wine-insight-heading"><span class="wine-insight-icon">✳</span>
+                        <h2>Uma descoberta<br/>sobre você</h2></div>
+                    <p id="preferenceInsight" class="wine-insight-copy">Suas próximas descobertas começam com a primeira
+                        taça.</p>
                     <div class="wine-insight-rule"></div>
                     <p class="wine-insight-foot">UMA PREFERÊNCIA, DESCOBERTA A CADA GARRAFA</p>
                 </section>
                 <section class="wine-insight-card wine-origins">
-                    <div class="wine-aside-heading"><div><p class="wine-eyebrow wine-eyebrow-dark">PASSAPORTE DO VINHO</p><h2>Origens provadas</h2></div><span class="wine-globe" aria-hidden="true">◎</span></div>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="wine-world-map" viewBox="0 0 360 180" role="img" aria-label="Mapa esquemático dos países de origem dos vinhos degustados">
-                        <path class="wine-map-land" d="M22 42 39 29 59 32 67 22 88 25 99 39 118 42 125 55 113 67 103 77 98 92 88 101 80 96 77 81 67 73 56 70 48 60 36 58 29 51ZM91 103 107 99 121 105 127 119 122 131 115 147 106 164 98 154 94 138 87 126ZM148 38 160 31 173 35 179 45 172 51 157 49ZM177 46 192 42 205 47 214 57 208 67 197 72 192 84 182 91 174 81 176 69 168 60ZM198 91 212 91 218 101 214 111 206 108ZM220 44 244 35 267 37 281 46 302 48 315 59 310 70 292 69 284 79 269 78 258 88 246 82 239 70 226 66 217 56ZM244 95 264 90 282 95 294 107 288 121 275 125 267 138 253 134 247 121 236 114ZM301 127 315 123 327 129 324 139 310 142 300 136Z"/>
+                    <div class="wine-aside-heading">
+                        <div><p class="wine-eyebrow wine-eyebrow-dark">PASSAPORTE DO VINHO</p>
+                            <h2>Origens provadas</h2></div>
+                        <span class="wine-globe" aria-hidden="true">◎</span></div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="wine-world-map" viewBox="0 0 360 180" role="img"
+                         aria-label="Mapa esquemático dos países de origem dos vinhos degustados">
+                        <path class="wine-map-land"
+                              d="M22 42 39 29 59 32 67 22 88 25 99 39 118 42 125 55 113 67 103 77 98 92 88 101 80 96 77 81 67 73 56 70 48 60 36 58 29 51ZM91 103 107 99 121 105 127 119 122 131 115 147 106 164 98 154 94 138 87 126ZM148 38 160 31 173 35 179 45 172 51 157 49ZM177 46 192 42 205 47 214 57 208 67 197 72 192 84 182 91 174 81 176 69 168 60ZM198 91 212 91 218 101 214 111 206 108ZM220 44 244 35 267 37 281 46 302 48 315 59 310 70 292 69 284 79 269 78 258 88 246 82 239 70 226 66 217 56ZM244 95 264 90 282 95 294 107 288 121 275 125 267 138 253 134 247 121 236 114ZM301 127 315 123 327 129 324 139 310 142 300 136Z"/>
                         <g id="wineMapMarkers"></g>
                     </svg>
                     <div id="countryList" class="wine-country-list"></div>
@@ -106,50 +162,113 @@
                     <p class="wine-insight-foot"><span id="countryCount">0</span> PAÍSES DESCOBERTOS</p>
                 </section>
                 <section class="wine-cellar-tip">
-                    <span aria-hidden="true">⌁</span><div><b>Um brinde ao próximo capítulo</b><p>Registre também o lugar, a companhia e o prato. Os melhores detalhes moram nas histórias.</p></div>
+                    <span aria-hidden="true">⌁</span>
+                    <div><b>Um brinde ao próximo capítulo</b>
+                        <p>Registre também o lugar, a companhia e o prato. Os melhores detalhes moram nas histórias.</p>
+                    </div>
                 </section>
             </aside>
         </div>
 
-        <footer class="wine-footer"><span><b>V</b> VINHO·CADERNO</span><span>O seu gosto, em boa companhia.</span><h:link outcome="index.xhtml">Voltar aos módulos <span aria-hidden="true">→</span></h:link></footer>
+        <footer class="wine-footer"><span><b>V</b> VINHO·CADERNO</span><span>O seu gosto, em boa companhia.</span>
+            <h:link outcome="index.xhtml">Voltar aos módulos <span aria-hidden="true">→</span></h:link>
+        </footer>
     </main>
 
     <dialog id="wineDialog" class="wine-dialog" aria-labelledby="dialogTitle">
         <form id="wineForm" class="wine-form">
             <input name="wineId" type="hidden"/>
-            <div class="wine-dialog-heading"><div><p class="wine-eyebrow wine-eyebrow-dark">UM NOVO CAPÍTULO</p><h2 id="dialogTitle">Adicionar vinho</h2></div><button id="closeWineForm" class="wine-dialog-close" type="button" aria-label="Fechar">×</button></div>
+            <div class="wine-dialog-heading">
+                <div><p class="wine-eyebrow wine-eyebrow-dark">UM NOVO CAPÍTULO</p>
+                    <h2 id="dialogTitle">Adicionar vinho</h2></div>
+                <button id="closeWineForm" class="wine-dialog-close" type="button" aria-label="Fechar">×</button>
+            </div>
             <p class="wine-form-intro">Guarde os detalhes do rótulo e o que tornou essa taça especial.</p>
             <div class="wine-form-grid">
-                <label class="wine-field wine-field-wide"><span>VINHO *</span><input name="name" required="required" maxlength="100" placeholder="Ex.: Malbec de Altura"/></label>
-                <label class="wine-field"><span>PRODUTOR / VINÍCOLA</span><input name="producer" maxlength="100" placeholder="Ex.: Bodega Norton"/></label>
-                <label class="wine-field"><span>SAFRA</span><input name="vintage" type="number" min="1900" max="2100" placeholder="2021"/></label>
-                <label class="wine-field"><span>PAÍS</span><input name="country" maxlength="60" placeholder="Argentina"/></label>
-                <label class="wine-field"><span>REGIÃO</span><input name="region" maxlength="80" placeholder="Mendoza · Vale do Uco"/></label>
-                <label class="wine-field"><span>DENOMINAÇÃO</span><input name="denomination" maxlength="60" placeholder="DOC, AOC, DO, IG..."/></label>
-                <label class="wine-field"><span>TIPO</span><select name="type"><option>Tinto</option><option>Branco</option><option>Rosé</option><option>Espumante</option><option>Fortificado</option><option>Sobremesa</option></select></label>
-                <label class="wine-field"><span>UVAS / CASTAS</span><input name="grapes" maxlength="120" placeholder="Malbec, Cabernet Sauvignon..."/></label>
-                <label class="wine-field"><span>VARIETAL OU CORTE</span><input name="blend" maxlength="100" placeholder="100% Malbec ou blend"/></label>
-                <label class="wine-field"><span>TEOR ALCOÓLICO (%)</span><input name="alcohol" type="number" min="0" max="100" step="0.1" placeholder="14.5"/></label>
-                <label class="wine-field"><span>CORPO</span><select name="body"><option>Leve</option><option selected="selected">Médio</option><option>Encorpado</option></select></label>
-                <label class="wine-field"><span>PASSAGEM POR MADEIRA</span><input name="oak" maxlength="80" placeholder="Não, carvalho francês..."/></label>
+                <label class="wine-field wine-field-wide"><span>VINHO *</span><input name="name" required="required"
+                                                                                     maxlength="100"
+                                                                                     placeholder="Ex.: Malbec de Altura"/></label>
+                <label class="wine-field"><span>PRODUTOR / VINÍCOLA</span><input name="producer" maxlength="100"
+                                                                                 placeholder="Ex.: Bodega Norton"/></label>
+                <label class="wine-field"><span>SAFRA</span><input name="vintage" type="number" min="1900" max="2100"
+                                                                   placeholder="2021"/></label>
+                <label class="wine-field"><span>PAÍS</span><input name="country" maxlength="60"
+                                                                  placeholder="Argentina"/></label>
+                <label class="wine-field"><span>REGIÃO</span><input name="region" maxlength="80"
+                                                                    placeholder="Mendoza · Vale do Uco"/></label>
+                <label class="wine-field"><span>DENOMINAÇÃO</span><input name="denomination" maxlength="60"
+                                                                         placeholder="DOC, AOC, DO, IG..."/></label>
+                <label class="wine-field"><span>TIPO</span><select name="type">
+                    <option>Tinto</option>
+                    <option>Branco</option>
+                    <option>Rosé</option>
+                    <option>Espumante</option>
+                    <option>Fortificado</option>
+                    <option>Sobremesa</option>
+                </select></label>
+                <label class="wine-field"><span>UVAS / CASTAS</span><input name="grapes" maxlength="120"
+                                                                           placeholder="Malbec, Cabernet Sauvignon..."/></label>
+                <label class="wine-field"><span>VARIETAL OU CORTE</span><input name="blend" maxlength="100"
+                                                                               placeholder="100% Malbec ou blend"/></label>
+                <label class="wine-field"><span>TEOR ALCOÓLICO (%)</span><input name="alcohol" type="number" min="0"
+                                                                                max="100" step="0.1"
+                                                                                placeholder="14.5"/></label>
+                <label class="wine-field"><span>CORPO</span><select name="body">
+                    <option>Leve</option>
+                    <option selected="selected">Médio</option>
+                    <option>Encorpado</option>
+                </select></label>
+                <label class="wine-field"><span>PASSAGEM POR MADEIRA</span><input name="oak" maxlength="80"
+                                                                                  placeholder="Não, carvalho francês..."/></label>
                 <label class="wine-field"><span>DATA DA DEGUSTAÇÃO</span><input name="tastedAt" type="date"/></label>
-                <label class="wine-field"><span>ONDE / OCASIÃO</span><input name="occasion" maxlength="120" placeholder="Jantar em família, Mendoza..."/></label>
-                <label class="wine-field"><span>COM QUEM</span><input name="company" maxlength="100" placeholder="Amigos, família..."/></label>
-                <label class="wine-field"><span>NOTA PESSOAL</span><select name="rating"><option value="">Ainda não avaliado</option><option value="5">5 — memorável</option><option value="4">4 — adorei</option><option value="3">3 — gostei</option><option value="2">2 — interessante</option><option value="1">1 — não repetiria</option></select></label>
-                <label class="wine-field"><span>PREÇO PAGO (R$)</span><input name="price" type="number" min="0" step="0.01" placeholder="189,90"/></label>
-                <label class="wine-field"><span>ONDE COMPROU</span><input name="retailer" maxlength="100" placeholder="Loja, restaurante..."/></label>
-                <label class="wine-field"><span>TEMPERATURA DE SERVIÇO</span><input name="temperature" maxlength="30" placeholder="16–18 °C"/></label>
-                <label class="wine-field"><span>DECANTOU?</span><select name="decanted"><option>Não</option><option>Sim</option></select></label>
-                <label class="wine-field"><span>POTENCIAL DE GUARDA</span><input name="cellaring" maxlength="60" placeholder="Até 2030"/></label>
-                <label class="wine-field"><span>COMPRARIA DE NOVO?</span><select name="buyAgain"><option>Talvez</option><option>Sim</option><option>Não</option></select></label>
-                <label class="wine-field wine-field-wide"><span>HARMONIZAÇÃO</span><input name="pairing" maxlength="160" placeholder="O que você comeu junto?"/></label>
-                <label class="wine-field wine-field-wide"><span>APARÊNCIA</span><input name="appearance" maxlength="160" placeholder="Cor, brilho, lágrimas..."/></label>
-                <label class="wine-field"><span>AROMA</span><textarea name="aroma" rows="2" maxlength="240" placeholder="Frutas, especiarias, notas..."></textarea></label>
-                <label class="wine-field"><span>SABOR E FINAL</span><textarea name="palate" rows="2" maxlength="240" placeholder="Textura, equilíbrio, persistência..."></textarea></label>
-                <label class="wine-field wine-field-wide"><span>FOTO DO RÓTULO OU DA GARRAFA</span><input name="photo" type="file" accept="image/png,image/jpeg,image/webp,image/gif"/><small>PNG, JPEG, WebP ou GIF de até 2 MB; a foto é salva no banco da sua adega.</small></label>
+                <label class="wine-field"><span>ONDE / OCASIÃO</span><input name="occasion" maxlength="120"
+                                                                            placeholder="Jantar em família, Mendoza..."/></label>
+                <label class="wine-field"><span>COM QUEM</span><input name="company" maxlength="100"
+                                                                      placeholder="Amigos, família..."/></label>
+                <label class="wine-field"><span>NOTA PESSOAL</span><select name="rating">
+                    <option value="">Ainda não avaliado</option>
+                    <option value="5">5 — memorável</option>
+                    <option value="4">4 — adorei</option>
+                    <option value="3">3 — gostei</option>
+                    <option value="2">2 — interessante</option>
+                    <option value="1">1 — não repetiria</option>
+                </select></label>
+                <label class="wine-field"><span>PREÇO PAGO (R$)</span><input name="price" type="number" min="0"
+                                                                             step="0.01" placeholder="189,90"/></label>
+                <label class="wine-field"><span>ONDE COMPROU</span><input name="retailer" maxlength="100"
+                                                                          placeholder="Loja, restaurante..."/></label>
+                <label class="wine-field"><span>TEMPERATURA DE SERVIÇO</span><input name="temperature" maxlength="30"
+                                                                                    placeholder="16–18 °C"/></label>
+                <label class="wine-field"><span>DECANTOU?</span><select name="decanted">
+                    <option>Não</option>
+                    <option>Sim</option>
+                </select></label>
+                <label class="wine-field"><span>POTENCIAL DE GUARDA</span><input name="cellaring" maxlength="60"
+                                                                                 placeholder="Até 2030"/></label>
+                <label class="wine-field"><span>COMPRARIA DE NOVO?</span><select name="buyAgain">
+                    <option>Talvez</option>
+                    <option>Sim</option>
+                    <option>Não</option>
+                </select></label>
+                <label class="wine-field wine-field-wide"><span>HARMONIZAÇÃO</span><input name="pairing" maxlength="160"
+                                                                                          placeholder="O que você comeu junto?"/></label>
+                <label class="wine-field wine-field-wide"><span>APARÊNCIA</span><input name="appearance" maxlength="160"
+                                                                                       placeholder="Cor, brilho, lágrimas..."/></label>
+                <label class="wine-field"><span>AROMA</span><textarea name="aroma" rows="2" maxlength="240"
+                                                                      placeholder="Frutas, especiarias, notas..."></textarea></label>
+                <label class="wine-field"><span>SABOR E FINAL</span><textarea name="palate" rows="2" maxlength="240"
+                                                                              placeholder="Textura, equilíbrio, persistência..."></textarea></label>
+                <label class="wine-field wine-field-wide"><span>FOTO DO RÓTULO OU DA GARRAFA</span><input name="photo"
+                                                                                                          type="file"
+                                                                                                          accept="image/png,image/jpeg,image/webp,image/gif"/><small>PNG,
+                    JPEG, WebP ou GIF de até 2 MB; a foto é salva no banco da sua adega.</small></label>
             </div>
             <div id="formError" class="wine-form-error" role="alert"></div>
-            <div class="wine-form-actions"><button class="wine-button wine-button-quiet" id="cancelWineForm" type="button">Cancelar</button><button class="wine-button wine-button-dark" type="submit">Guardar na adega <span aria-hidden="true">→</span></button></div>
+            <div class="wine-form-actions">
+                <button class="wine-button wine-button-quiet" id="cancelWineForm" type="button">Cancelar</button>
+                <button class="wine-button wine-button-dark" type="submit">Guardar na adega <span
+                        aria-hidden="true">→</span></button>
+            </div>
         </form>
     </dialog>
 </h:body>
