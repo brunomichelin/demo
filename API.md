@@ -39,6 +39,7 @@ aceitam `formato=json|pdf|xlsx`; para PDF/XLSX, a resposta é um arquivo para do
 | GET | `/api/v1/auditoria` | ADMIN |
 | GET/POST/PUT/DELETE | `/api/v1/livros[/{id}]` | Usuário autenticado; cada usuário acessa apenas sua própria biblioteca |
 | PATCH | `/api/v1/livros/{id}/status` | Atualiza o status de leitura na biblioteca do usuário autenticado |
+| PATCH | `/api/v1/livros/{id}/compra` | Atualiza `comprado` com um booleano para indicar se o livro já foi adquirido |
 | POST | `/api/v1/livros/catalogo` | Usuário autenticado; consulta o catálogo ISBN da CBL |
 
 O preço unitário de um item de orçamento usa o preço de referência do insumo se
@@ -68,7 +69,7 @@ informe `versaoId` para selecionar outra.
 - `desempenho.xhtml?obraId={id}`: gráficos de avanço e cronograma, além de orçamento versus custos validados por etapa e tarefa; usa a versão mais recente do orçamento.
 - `financiamento.xhtml`: simulação comparativa SAC/PRICE com gráficos de pagamentos acumulados, variação das prestações, saldo devedor, juros, correção acumulada pela TR, seguros e taxa administrativa, e saldo FGTS projetado; inclui TR, MIP estimado por idade, DFI e taxa administrativa, depósitos mensais estimados de FGTS (8% do salário bruto, com rendimento de 3% a.a.), amortização bienal e modalidade que acumula FGTS por 12 meses para dividir o saldo em 12 abatimentos nas prestações seguintes; cronogramas exportáveis. Clique em calcular para aplicar alterações; os valores ficam salvos somente no navegador.
 - `usuarios.xhtml` e `auditoria.xhtml`: administração, disponíveis somente para ADMIN.
-- `livros.xhtml`: busca no catálogo da CBL e gerenciamento da biblioteca pessoal (lidos e desejados).
+- `livros.xhtml`: busca no catálogo da CBL e gerenciamento da biblioteca pessoal, com status de leitura e indicador de compra.
 
 As telas operacionais usam os endpoints protegidos de `/api/v1` e, portanto,
 respeitam os papéis e os vínculos do usuário autenticado.

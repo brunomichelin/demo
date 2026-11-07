@@ -77,6 +77,14 @@
                     </select>
                 </label>
                 <label class="books-filter">
+                    <span>Compra</span>
+                    <select id="filtroCompra">
+                        <option value="TODOS">Todos</option>
+                        <option value="COMPRADO">Comprados</option>
+                        <option value="NAO_COMPRADO">Não comprados</option>
+                    </select>
+                </label>
+                <label class="books-filter">
                     <span>Ordenar por</span>
                     <select id="ordenarLivros">
                         <option value="titulo">Título (A–Z)</option>
@@ -163,9 +171,13 @@
 
             function renderizarLivros() {
                 const filtro = document.getElementById('filtroStatus').value;
+                const filtroCompra = document.getElementById('filtroCompra').value;
                 const ordenacao = document.getElementById('ordenarLivros').value;
                 const exibidos = livros
                     .filter(livro => filtro === 'TODOS' || livro.status === filtro)
+                    .filter(livro => filtroCompra === 'TODOS'
+                        || (filtroCompra === 'COMPRADO' && livro.comprado === true)
+                        || (filtroCompra === 'NAO_COMPRADO' && livro.comprado !== true))
                     .sort((a, b) => {
                         if (ordenacao === 'anoLancamento') {
                             const anoA = Number.parseInt(a.anoLancamento, 10);
@@ -200,6 +212,20 @@
                     const acoes = document.createElement('div');
                     acoes.className = 'books-list-actions';
                     acoes.append(selo);
+                    const compra = document.createElement('label');
+                    compra.className = 'books-purchase-toggle';
+                    const compraSeletor = document.createElement('input');
+                    compraSeletor.type = 'checkbox';
+                    compraSeletor.checked = livro.comprado === true;
+                    compraSeletor.setAttribute('aria-label', 'Adquirido ' + livro.titulo);
+                    const compraRotulo = textoElemento('span', '',
+                        livro.comprado ? 'Adquirido' : 'Comprar');
+                    compraSeletor.addEventListener('change', () => {
+                        compraRotulo.textContent = compraSeletor.checked ? 'Adquirido' : 'Comprar';
+                        alterarCompra(livro, compraSeletor.checked);
+                    });
+                    compra.append(compraSeletor, compraRotulo);
+                    acoes.append(compra);
                     const seletor = document.createElement('select');
                     seletor.className = 'books-status-select';
                     seletor.setAttribute('aria-label', 'Status de leitura de ' + livro.titulo);
@@ -283,8 +309,8 @@
                     const salvo = livroJaSalvo(livro);
                     [['LIDO', 'Já li'], ['LENDO', 'Lendo'], ['DESEJADO', 'Quero ler']].forEach(([status, rotulo]) => {
                         const botao = textoElemento('button',
-                            (status === 'LIDO' ? 'books-primary-button' : 'books-secondary-button')
-                                + ' books-small-button', salvo && salvo.status === status ? '✓ ' + rotulo : rotulo);
+                            (status === 'LIDO' ? 'books-primary-button' : (status === 'LENDO' ? 'books-tertiary-button' : 'books-secondary-button'))
+                            + ' books-small-button', salvo && salvo.status === status ? '✓ ' + rotulo : rotulo);
                         botao.type = 'button';
                         botao.disabled = Boolean(salvo && salvo.status === status);
                         botao.addEventListener('click', async () => {
@@ -339,6 +365,20 @@
                 }
             }
 
+            async function alterarCompra(livro, comprado) {
+                try {
+                    await requisicao(api + '/' + livro.id + '/compra', {
+                        method: 'PATCH',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({comprado: comprado})
+                    });
+                    await carregarLivros();
+                } catch (erro) {
+                    document.getElementById('mensagemLista').textContent = erro.message;
+                    renderizarLivros();
+                }
+            }
+
             document.getElementById('formBusca').addEventListener('submit', event => {
                 event.preventDefault();
                 ultimoTermo = document.getElementById('termoBusca').value.trim();
@@ -360,6 +400,7 @@
             document.getElementById('maisResultados').addEventListener('click', () =>
                 buscarCatalogo(paginaBusca + 1, true));
             document.getElementById('filtroStatus').addEventListener('change', renderizarLivros);
+            document.getElementById('filtroCompra').addEventListener('change', renderizarLivros);
             document.getElementById('ordenarLivros').addEventListener('change', renderizarLivros);
             document.getElementById('maisResultados').hidden = true;
             carregarLivros();

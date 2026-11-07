@@ -6,6 +6,7 @@ public record LivroRequest(
         String isbn,
         String editora,
         String anoLancamento,
-        String status
+        String status,
+        Boolean comprado
 ) {
 }

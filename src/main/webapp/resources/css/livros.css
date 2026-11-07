@@ -59,6 +59,7 @@
 
 .books-primary-button,
 .books-secondary-button,
+.books-tertiary-button,
 .books-cancel-button {
     min-height: 44px;
     padding: 0 18px;
@@ -76,7 +77,8 @@
 }
 
 .books-primary-button:hover,
-.books-secondary-button:hover {
+.books-secondary-button:hover,
+.books-tertiary-button:hover {
     transform: translateY(-1px);
 }
 
@@ -88,6 +90,11 @@
 .books-secondary-button {
     color: #3e6047;
     background: #e7eee5;
+}
+
+.books-tertiary-button {
+    color: #406b8c;
+    background: #e8f1fb;
 }
 
 .books-clear-button {
@@ -253,6 +260,20 @@
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
+}
+
+.books-purchase-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #637168;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.books-purchase-toggle input {
+    accent-color: #526e54;
 }
 
 .books-small-button {

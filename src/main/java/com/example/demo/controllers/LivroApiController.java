@@ -1,6 +1,7 @@
 package com.example.demo.controllers;
 
 import com.example.demo.dtos.LivroBuscaRequest;
+import com.example.demo.dtos.LivroCompraRequest;
 import com.example.demo.dtos.LivroCatalogoResponse;
 import com.example.demo.dtos.LivroRequest;
 import com.example.demo.models.Livro;
@@ -85,6 +86,21 @@ public class LivroApiController {
         return livroRepository.save(livro);
     }
 
+    @PatchMapping("/{id}/compra")
+    public Livro atualizarCompra(
+            @PathVariable Long id,
+            @RequestBody LivroCompraRequest request,
+            Authentication authentication
+    ) {
+        if (request == null || request.comprado() == null) {
+            throw new ResponseStatusException(BAD_REQUEST, "Informe se o livro já foi comprado.");
+        }
+        Livro livro = obterLivro(id, authentication.getName());
+        livro.setComprado(request.comprado());
+        livro.setDataAtualizacao(LocalDateTime.now());
+        return livroRepository.save(livro);
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Transactional
@@ -116,6 +132,9 @@ public class LivroApiController {
         livro.setEditora(limpar(request.editora()));
         livro.setAnoLancamento(limpar(request.anoLancamento()));
         livro.setStatus(converterStatus(request.status()));
+        if (request.comprado() != null) {
+            livro.setComprado(request.comprado());
+        }
         livro.setDonoUsuario(dono);
     }
 

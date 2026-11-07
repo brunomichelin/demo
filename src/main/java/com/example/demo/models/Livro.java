@@ -35,4 +35,7 @@ public class Livro extends AbstractModel {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private LivroStatus status;
+
+    @Column(nullable = true)
+    private boolean comprado;
 }
