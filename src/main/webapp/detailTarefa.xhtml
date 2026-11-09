@@ -36,7 +36,7 @@
                                  update=":formDetailTarefa:detalhesTarefa :formDetailTarefa:statusActions :formDetailTarefa:mensagens"/>
             </h:panelGroup>
             <div class="application-timeline" aria-label="Navegação da tarefa">
-                <p:button value="Início" icon="ui-icon-home" outcome="index.xhtml"
+                <p:button value="Início" icon="ui-icon-home" outcome="indexObra.xhtml"
                           styleClass="application-timeline-step"/>
                 <p:button value="Painel de obras" icon="ui-icon-dashboard" outcome="gestao.xhtml"
                           styleClass="application-timeline-step"/>
@@ -49,9 +49,11 @@
                     <h:outputText value="Código"/>
                     <h:outputText value="#{tarefaDetailBean.tarefa.id}"/>
                     <h:outputText value="Obra"/>
-                    <h:outputText value="#{tarefaDetailBean.tarefa.etapa == null or tarefaDetailBean.tarefa.etapa.obra == null ? '' : tarefaDetailBean.tarefa.etapa.obra.nome}"/>
+                    <h:outputText
+                            value="#{tarefaDetailBean.tarefa.etapa == null or tarefaDetailBean.tarefa.etapa.obra == null ? '' : tarefaDetailBean.tarefa.etapa.obra.nome}"/>
                     <h:outputText value="Etapa"/>
-                    <h:outputText value="#{tarefaDetailBean.tarefa.etapa == null ? '' : tarefaDetailBean.tarefa.etapa.nome}"/>
+                    <h:outputText
+                            value="#{tarefaDetailBean.tarefa.etapa == null ? '' : tarefaDetailBean.tarefa.etapa.nome}"/>
                     <h:outputText value="Prioridade"/>
                     <h:outputText value="#{tarefaDetailBean.tarefa.prioridade}"/>
                     <h:outputText value="Título"/>
@@ -59,9 +61,11 @@
                     <h:outputText value="Descrição"/>
                     <h:outputText value="#{tarefaDetailBean.tarefa.descricao}"/>
                     <h:outputText value="Responsável"/>
-                    <h:outputText value="#{tarefaDetailBean.tarefa.responsavel == null ? '' : tarefaDetailBean.tarefa.responsavel.nome}"/>
+                    <h:outputText
+                            value="#{tarefaDetailBean.tarefa.responsavel == null ? '' : tarefaDetailBean.tarefa.responsavel.nome}"/>
                     <h:outputText value="E-mail do responsável"/>
-                    <h:outputText value="#{tarefaDetailBean.tarefa.responsavel == null ? '' : tarefaDetailBean.tarefa.responsavel.email}"/>
+                    <h:outputText
+                            value="#{tarefaDetailBean.tarefa.responsavel == null ? '' : tarefaDetailBean.tarefa.responsavel.email}"/>
                     <h:outputText value="Início previsto"/>
                     <h:outputText value="#{tarefaDetailBean.tarefa.dataInicioPrevista}">
                         <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
@@ -71,7 +75,8 @@
                         <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
                     </h:outputText>
                     <h:outputText value="Status"/>
-                    <h:outputText value="#{tarefaDetailBean.tarefa.status == null ? '' : tarefaDetailBean.tarefa.status.descricao}"/>
+                    <h:outputText
+                            value="#{tarefaDetailBean.tarefa.status == null ? '' : tarefaDetailBean.tarefa.status.descricao}"/>
                     <h:outputText value="Criado por"/>
                     <h:outputText value="#{tarefaDetailBean.tarefa.criadoPor}"/>
                     <h:outputText value="Data de criação"/>

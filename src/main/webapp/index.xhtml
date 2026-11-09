@@ -2,9 +2,10 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xml:lang="pt-BR" lang="pt-BR">
 <h:head>
-    <title>Gestão de Obras</title>
+    <title>Sistemas de Bruno Michelin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <h:outputStylesheet library="css" name="app.css"/>
 </h:head>
@@ -14,136 +15,179 @@
             <div class="home-hero-copy">
                 <span class="home-brand">
                     <span class="home-brand-mark" aria-hidden="true">
-                        <span class="pi pi-building" aria-hidden="true"></span>
+                        <span class="pi pi-th-large" aria-hidden="true"></span>
                     </span>
-                    OBRAS
+                    SISTEMAS
                     <span>•</span>
-                    GESTÃO
+                    BRUNO MICHELIN
                 </span>
-                <p class="home-eyebrow">Plataforma de gestão</p>
-                <h1>Gestão de obras,<br/>
-                    <span>do planejamento à entrega.</span>
+                <p class="home-eyebrow">Portal de sistemas</p>
+                <h1>Sistemas de<br/>
+                    <span>Bruno Michelin.</span>
                 </h1>
                 <p class="home-intro">
-                    Acompanhe projetos, equipes e custos em um só lugar. Escolha um módulo para começar.
+                    Um só lugar para acessar seus sistemas, projetos e ferramentas.
+                    Escolha por onde deseja começar.
                 </p>
-                <h:link styleClass="home-primary-link" outcome="gestao.xhtml">
-                    <span>Painel de obras</span>
-                    <span aria-hidden="true">→</span>
-                </h:link>
             </div>
             <div class="home-hero-art" aria-hidden="true">
-                <div class="home-art-sun"></div>
-                <div class="home-art-building home-art-building-back"></div>
-                <div class="home-art-building home-art-building-front">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-                <div class="home-art-ground"></div>
+                <svg class="systems-art" viewBox="0 0 520 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="hubGradient" x1="174" y1="90" x2="351" y2="270"
+                                        gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#FFFDF9"/>
+                            <stop offset="1" stop-color="#FFE7CE"/>
+                        </linearGradient>
+                        <linearGradient id="accentGradient" x1="207" y1="121" x2="317" y2="239"
+                                        gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#FB923C"/>
+                            <stop offset="1" stop-color="#EA580C"/>
+                        </linearGradient>
+                        <filter id="softShadow" x="30" y="35" width="460" height="300"
+                                color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+                            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+                            <feColorMatrix in="SourceAlpha" type="matrix"
+                                           values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                            <feOffset dy="9"/>
+                            <feGaussianBlur stdDeviation="9"/>
+                            <feComposite in2="hardAlpha" operator="out"/>
+                            <feColorMatrix type="matrix"
+                                           values="0 0 0 0 0.486 0 0 0 0 0.176 0 0 0 0 0.071 0 0 0 0.16 0"/>
+                            <feBlend in2="BackgroundImageFix" result="effect1_dropShadow"/>
+                            <feBlend in="SourceGraphic" in2="effect1_dropShadow" result="shape"/>
+                        </filter>
+                    </defs>
+                    <circle cx="270" cy="177" r="141" fill="#FDBA74" fill-opacity=".2"/>
+                    <circle cx="270" cy="177" r="113" stroke="#C2410C" stroke-opacity=".16" stroke-dasharray="3 9"/>
+                    <path d="M135 105C165 105 170 130 197 139M382 103C350 103 347 128 324 139M129 254C164 254 174 228 198 217M389 254C356 254 346 228 324 217"
+                          stroke="#C2410C" stroke-opacity=".42" stroke-width="2" stroke-linecap="round"
+                          stroke-dasharray="4 7"/>
+                    <circle cx="164" cy="116" r="4" fill="#EA580C"/>
+                    <circle cx="356" cy="115" r="4" fill="#0F766E"/>
+                    <circle cx="165" cy="243" r="4" fill="#7C3AED"/>
+                    <circle cx="354" cy="243" r="4" fill="#2563EB"/>
+                    <g filter="url(#softShadow)">
+                        <rect x="177" y="84" width="186" height="186" rx="38" fill="url(#hubGradient)"/>
+                        <rect x="178" y="84.5" width="185" height="185" rx="37.5" stroke="white" stroke-opacity=".9"/>
+                    </g>
+                    <rect x="212" y="119" width="116" height="116" rx="31" fill="url(#accentGradient)"/>
+                    <path d="M259 147L238 177L259 207M281 147L302 177L281 207M273 143L267 211"
+                          stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                    <g filter="url(#softShadow)">
+                        <rect x="40" y="70" width="112" height="72" rx="16" fill="#FFFCF7"/>
+                        <rect x="40.5" y="70.5" width="111" height="71" rx="15.5" stroke="#FED7AA"/>
+                    </g>
+                    <circle cx="58" cy="88" r="3" fill="#FB923C"/>
+                    <circle cx="68" cy="88" r="3" fill="#FDBA74"/>
+                    <circle cx="78" cy="88" r="3" fill="#FED7AA"/>
+                    <path d="M56 119L68 106L79 114L96 98L112 110L133 96" stroke="#C2410C" stroke-width="3"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                    <g filter="url(#softShadow)">
+                        <rect x="374" y="65" width="104" height="76" rx="17" fill="#FFFCF7"/>
+                        <rect x="374.5" y="65.5" width="103" height="75" rx="16.5" stroke="#FED7AA"/>
+                    </g>
+                    <rect x="393" y="85" width="25" height="25" rx="8" fill="#EDE9FE"/>
+                    <path d="M405.5 90V105M398 97.5H413" stroke="#7C3AED" stroke-width="3" stroke-linecap="round"/>
+                    <rect x="427" y="87" width="34" height="5" rx="2.5" fill="#E5E7EB"/>
+                    <rect x="427" y="98" width="26" height="5" rx="2.5" fill="#E5E7EB"/>
+                    <rect x="393" y="119" width="68" height="6" rx="3" fill="#FFEDD5"/>
+                    <g filter="url(#softShadow)">
+                        <rect x="44" y="218" width="122" height="76" rx="17" fill="#FFFCF7"/>
+                        <rect x="44.5" y="218.5" width="121" height="75" rx="16.5" stroke="#FED7AA"/>
+                    </g>
+                    <rect x="61" y="236" width="34" height="38" rx="10" fill="#CCFBF1"/>
+                    <path d="M77 244L68 255L77 266M81 244L90 255L81 266" stroke="#0F766E" stroke-width="2.5"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                    <rect x="105" y="238" width="43" height="6" rx="3" fill="#D1D5DB"/>
+                    <rect x="105" y="250" width="34" height="6" rx="3" fill="#E5E7EB"/>
+                    <rect x="105" y="262" width="39" height="6" rx="3" fill="#E5E7EB"/>
+                    <g filter="url(#softShadow)">
+                        <rect x="357" y="218" width="119" height="78" rx="17" fill="#FFFCF7"/>
+                        <rect x="357.5" y="218.5" width="118" height="77" rx="16.5" stroke="#FED7AA"/>
+                    </g>
+                    <rect x="375" y="238" width="9" height="40" rx="4.5" fill="#FDBA74"/>
+                    <rect x="390" y="253" width="9" height="25" rx="4.5" fill="#FB923C"/>
+                    <rect x="405" y="245" width="9" height="33" rx="4.5" fill="#C2410C"/>
+                    <rect x="429" y="239" width="29" height="5" rx="2.5" fill="#D1D5DB"/>
+                    <rect x="429" y="250" width="23" height="5" rx="2.5" fill="#E5E7EB"/>
+                    <path d="M429 274L438 265L445 269L458 257" stroke="#0F766E" stroke-width="2.5"
+                          stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="273" cy="67" r="5" fill="#FB923C"/>
+                    <circle cx="286" cy="283" r="5" fill="#0F766E"/>
+                </svg>
             </div>
         </header>
 
-        <section class="home-modules" aria-labelledby="homeModulesTitle">
+        <section class="home-modules" aria-labelledby="systemsTitle">
             <div class="home-section-heading">
                 <div>
                     <p class="home-eyebrow">Acesso rápido</p>
-                    <h2 id="homeModulesTitle">Módulos do sistema</h2>
+                    <h2 id="systemsTitle">Seus sistemas</h2>
                 </div>
-                <span>Disponíveis conforme seu perfil</span>
+                <span>Selecione um sistema para continuar</span>
             </div>
             <div class="home-module-grid">
-                <h:link styleClass="home-module-card" outcome="obras.xhtml"
-                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR')}">
-                    <span class="home-module-icon" aria-hidden="true">01</span><span><strong>Obras</strong><small>Projetos, status e equipes</small></span>
-                    <span class="home-card-arrow pi pi-building" aria-hidden="true"></span>
-                </h:link>
-                <h:link styleClass="home-module-card" outcome="Etapa.xhtml"
-                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA')}">
-                    <span class="home-module-icon" aria-hidden="true">02</span><span><strong>Etapas</strong><small>Fases e cronograma</small></span>
-                    <span class="home-card-arrow pi pi-list" aria-hidden="true"></span>
-                </h:link>
-                <h:link styleClass="home-module-card" outcome="Tarefa.xhtml"
-                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA')}">
-                    <span class="home-module-icon" aria-hidden="true">03</span><span><strong>Tarefas</strong><small>Atividades e responsáveis</small></span>
-                    <span class="home-card-arrow pi pi-check-square" aria-hidden="true"></span>
-                </h:link>
-                <h:link styleClass="home-module-card" outcome="Insumo.xhtml"
-                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('ORCAMENTISTA')}">
-                    <span class="home-module-icon" aria-hidden="true">04</span><span><strong>Insumos</strong><small>Materiais e referências</small></span>
-                    <span class="home-card-arrow pi pi-box" aria-hidden="true"></span>
-                </h:link>
-                <h:link styleClass="home-module-card" outcome="Fornecedor.xhtml"
-                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('ORCAMENTISTA') or facesContext.externalContext.isUserInRole('FINANCEIRO')}">
-                    <span class="home-module-icon"
-                          aria-hidden="true">05</span><span><strong>Fornecedores</strong><small>Cadastro e contatos</small></span>
-                    <span class="home-card-arrow pi pi-truck" aria-hidden="true"></span>
-                </h:link>
-                <h:link styleClass="home-module-card" outcome="orcamento.xhtml"
-                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('ORCAMENTISTA')}">
-                    <span class="home-module-icon" aria-hidden="true">06</span><span><strong>Orçamento</strong><small>Versões e itens da obra</small></span>
-                    <span class="home-card-arrow pi pi-money-bill" aria-hidden="true"></span>
-                </h:link>
-                <h:link styleClass="home-module-card" outcome="custos.xhtml"
-                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('FINANCEIRO')}">
-                    <span class="home-module-icon" aria-hidden="true">07</span><span><strong>Custos</strong><small>Despesas e validações</small></span>
-                    <span class="home-card-arrow pi pi-wallet" aria-hidden="true"></span>
-                </h:link>
-                <h:link styleClass="home-module-card" outcome="entregas.xhtml"
-                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('CLIENTE')}">
-                    <span class="home-module-icon" aria-hidden="true">08</span><span><strong>Entregas</strong><small>Status e aprovação da obra</small></span>
-                    <span class="home-card-arrow pi pi-check-circle" aria-hidden="true"></span>
-                </h:link>
-                <h:link styleClass="home-module-card" outcome="usuarios.xhtml"
-                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN')}">
-                    <span class="home-module-icon" aria-hidden="true">09</span><span><strong>Usuários</strong><small>Contas e permissões</small></span>
-                    <span class="home-card-arrow pi pi-user" aria-hidden="true"></span>
-                </h:link>
-                <h:link styleClass="home-module-card" outcome="auditoria.xhtml"
-                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN')}">
-                    <span class="home-module-icon" aria-hidden="true">10</span><span><strong>Auditoria</strong><small>Histórico de alterações</small></span>
-                    <span class="home-card-arrow pi pi-history" aria-hidden="true"></span>
-                </h:link>
-                <h:link styleClass="home-module-card" outcome="desempenho.xhtml"
-                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('CLIENTE')}">
-                    <span class="home-module-icon" aria-hidden="true">11</span><span><strong>Desempenho</strong><small>Gráficos de etapas e tarefas</small></span>
-                    <span class="home-card-arrow pi pi-chart-bar" aria-hidden="true"></span>
-                </h:link>
-                <h:link styleClass="home-module-card" outcome="relatorios.xhtml"
-                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('FINANCEIRO') or facesContext.externalContext.isUserInRole('ORCAMENTISTA') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('CLIENTE')}">
-                    <span class="home-module-icon" aria-hidden="true">12</span><span><strong>Relatórios</strong><small>Custos, tarefas, prazos e etc</small></span>
-                    <span class="home-card-arrow pi pi-file" aria-hidden="true"></span>
+                <h:link styleClass="home-module-card" outcome="indexObra.xhtml">
+                    <span class="home-module-icon pi pi-building" aria-hidden="true"></span>
+                    <span><strong>Gestão de Obras</strong><small>Projetos, equipes e acompanhamento</small></span>
+                    <span class="home-card-arrow pi pi-arrow-up-right" aria-hidden="true"></span>
                 </h:link>
                 <h:link styleClass="home-module-card" outcome="livros.xhtml">
-                    <span class="home-module-icon"
-                          aria-hidden="true">13</span><span><strong>Minha biblioteca</strong><small>Livros lidos e próximos da lista</small></span>
-                    <span class="home-card-arrow pi pi-book" aria-hidden="true"></span>
+                    <span class="home-module-icon pi pi-book" aria-hidden="true"></span>
+                    <span><strong>Minha Biblioteca</strong><small>Livros lidos e próximos da lista</small></span>
+                    <span class="home-card-arrow pi pi-arrow-up-right" aria-hidden="true"></span>
                 </h:link>
                 <h:link styleClass="home-module-card" outcome="financiamento.xhtml">
-                    <span class="home-module-icon"
-                          aria-hidden="true">14</span><span><strong>Financiamento Habitacional</strong><small>Simulação SAC, PRICE e abatimentos</small></span>
-                    <span class="home-card-arrow pi pi-chart-line" aria-hidden="true"></span>
+                    <span class="home-module-icon pi pi-chart-line" aria-hidden="true"></span>
+                    <span><strong>Financiamento Habitacional</strong><small>Simulações SAC, PRICE e abatimentos</small></span>
+                    <span class="home-card-arrow pi pi-arrow-up-right" aria-hidden="true"></span>
                 </h:link>
                 <h:link styleClass="home-module-card" outcome="seresVivos.xhtml">
-                    <span class="home-module-icon" aria-hidden="true">15</span><span><strong>Seres vivos</strong><small>Herança, polimorfismo e interfaces</small></span>
-                    <span class="home-card-arrow pi pi-sitemap" aria-hidden="true"></span>
+                    <span class="home-module-icon pi pi-sitemap" aria-hidden="true"></span>
+                    <span><strong>Seres Vivos</strong><small>Exploração de espécies e biodiversidade</small></span>
+                    <span class="home-card-arrow pi pi-arrow-up-right" aria-hidden="true"></span>
                 </h:link>
                 <h:link styleClass="home-module-card" outcome="vinhos.xhtml">
-                    <span class="home-module-icon"
-                          aria-hidden="true">16</span><span><strong>Adega pessoal</strong><small>Catálogo, degustações e descobertas</small></span>
-                    <span class="home-card-arrow pi pi-star" aria-hidden="true"></span>
+                    <span class="home-module-icon pi pi-star" aria-hidden="true"></span>
+                    <span><strong>Adega Pessoal</strong><small>Catálogo, degustações e descobertas</small></span>
+                    <span class="home-card-arrow pi pi-arrow-up-right" aria-hidden="true"></span>
                 </h:link>
                 <h:link styleClass="home-module-card" outcome="Chat.xhtml">
-                    <span class="home-module-icon" aria-hidden="true">17</span><span><strong>Mensagens</strong><small>Conversas e comunicação da equipe</small></span>
-                    <span class="home-card-arrow pi pi-comments" aria-hidden="true"></span>
+                    <span class="home-module-icon pi pi-comments" aria-hidden="true"></span>
+                    <span><strong>Mensagens</strong><small>Conversas e comunicação da equipe</small></span>
+                    <span class="home-card-arrow pi pi-arrow-up-right" aria-hidden="true"></span>
                 </h:link>
             </div>
         </section>
+
+        <ui:fragment rendered="#{facesContext.externalContext.isUserInRole('ADMIN')}">
+            <section class="home-modules home-admin-modules" aria-labelledby="adminTitle">
+                <div class="home-section-heading">
+                    <div>
+                        <p class="home-eyebrow">Acesso restrito</p>
+                        <h2 id="adminTitle">Administração</h2>
+                    </div>
+                    <span>Disponível para administradores</span>
+                </div>
+                <div class="home-module-grid">
+                    <h:link styleClass="home-module-card" outcome="usuarios.xhtml">
+                        <span class="home-module-icon pi pi-users" aria-hidden="true"></span>
+                        <span><strong>Usuários</strong><small>Contas, perfis e permissões</small></span>
+                        <span class="home-card-arrow pi pi-arrow-up-right" aria-hidden="true"></span>
+                    </h:link>
+                    <h:link styleClass="home-module-card" outcome="auditoria.xhtml">
+                        <span class="home-module-icon pi pi-history" aria-hidden="true"></span>
+                        <span><strong>Auditoria</strong><small>Histórico de alterações do sistema</small></span>
+                        <span class="home-card-arrow pi pi-arrow-up-right" aria-hidden="true"></span>
+                    </h:link>
+                </div>
+            </section>
+        </ui:fragment>
+
         <footer class="home-footer">
-            Sistema de Gestão de Obras
+            Sistemas de Bruno Michelin
             <span>•</span>
-            Planejamento, controle e transparência
+            Um portal para seus projetos e ferramentas
         </footer>
     </main>
 </h:body>

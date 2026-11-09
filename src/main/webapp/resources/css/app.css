@@ -3390,6 +3390,36 @@ body:not(.auth-page):not(.books-page) form[id^="form"] {
     box-shadow: 0 6px 15px rgba(194, 65, 12, .2);
 }
 
+.home-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.home-secondary-link {
+    display: inline-flex;
+    min-height: 45px;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 10px 15px;
+    border: 1px solid rgba(194, 65, 12, .28);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, .48);
+    color: #7c2d12;
+    font-size: .88rem;
+    font-weight: 750;
+    transition: background .16s ease, border-color .16s ease;
+}
+
+.home-secondary-link:hover {
+    border-color: var(--color-orange);
+    background: #fff7ed;
+    color: #7c2d12;
+    text-decoration: none;
+}
+
 .home-primary-link:hover {
     background: var(--color-orange-dark);
     color: #fff;
@@ -3407,11 +3437,26 @@ body:not(.auth-page):not(.books-page) form[id^="form"] {
 
 .home-hero-art {
     position: relative;
+    display: flex;
     min-height: 340px;
     align-self: stretch;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 18px;
 }
 
-.home-art-sun {
+.obra-home-page .home-hero-art {
+    padding: 0;
+}
+
+.systems-art {
+    display: block;
+    width: min(100%, 520px);
+    height: auto;
+    overflow: visible;
+}
+
+.obra-art-sun {
     position: absolute;
     top: 50px;
     right: 16%;
@@ -3421,7 +3466,7 @@ body:not(.auth-page):not(.books-page) form[id^="form"] {
     background: rgba(251, 146, 60, .36);
 }
 
-.home-art-building {
+.obra-art-building {
     position: absolute;
     bottom: 56px;
     border: 1px solid rgba(154, 52, 18, .22);
@@ -3429,7 +3474,7 @@ body:not(.auth-page):not(.books-page) form[id^="form"] {
     box-shadow: 0 15px 25px rgba(124, 45, 18, .12);
 }
 
-.home-art-building-back {
+.obra-art-building-back {
     right: 8%;
     width: 130px;
     height: 205px;
@@ -3437,7 +3482,7 @@ body:not(.auth-page):not(.books-page) form[id^="form"] {
     transform: skewY(-6deg);
 }
 
-.home-art-building-front {
+.obra-art-building-front {
     right: 34%;
     bottom: 56px;
     display: grid;
@@ -3449,13 +3494,13 @@ body:not(.auth-page):not(.books-page) form[id^="form"] {
     background: linear-gradient(155deg, #fff, #ffedd5);
 }
 
-.home-art-building-front span {
+.obra-art-building-front span {
     border: 1px solid rgba(194, 65, 12, .25);
     border-radius: 4px 4px 0 0;
     background: linear-gradient(180deg, #fed7aa, #fff7ed);
 }
 
-.home-art-ground {
+.obra-art-ground {
     position: absolute;
     right: 0;
     bottom: 0;
@@ -4008,11 +4053,11 @@ body:not(.auth-page):not(.books-page) form[id^="form"] {
         grid-template-columns: 1fr .75fr;
     }
 
-    .home-art-building-back {
+    .obra-art-building-back {
         right: 3%;
     }
 
-    .home-art-building-front {
+    .obra-art-building-front {
         right: 29%;
     }
 
@@ -4041,24 +4086,33 @@ body:not(.auth-page):not(.books-page) form[id^="form"] {
     }
 
     .home-hero-art {
+        min-height: 230px;
+        padding: 0 12px 14px;
+    }
+
+    .obra-home-page .home-hero-art {
         min-height: 210px;
     }
 
-    .home-art-sun {
+    .systems-art {
+        width: min(100%, 390px);
+    }
+
+    .obra-art-sun {
         top: 6px;
         right: 20%;
         width: 120px;
         height: 120px;
     }
 
-    .home-art-building-back {
+    .obra-art-building-back {
         right: 12%;
         bottom: 32px;
         width: 100px;
         height: 140px;
     }
 
-    .home-art-building-front {
+    .obra-art-building-front {
         right: 39%;
         bottom: 32px;
         width: 115px;
@@ -4067,7 +4121,7 @@ body:not(.auth-page):not(.books-page) form[id^="form"] {
         padding: 20px 16px;
     }
 
-    .home-art-ground {
+    .obra-art-ground {
         height: 36px;
     }
 

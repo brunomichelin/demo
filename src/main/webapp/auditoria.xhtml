@@ -12,8 +12,7 @@
     <main class="audit-shell">
         <header class="audit-header">
             <div>
-                <a class="audit-back-link" href="index.xhtml">Início</a><span> / </span>
-                <a class="audit-back-link" href="gestao.xhtml">Painel de obras</a>
+                <a class="audit-back-link" href="index.xhtml">Início</a>
                 <p class="audit-eyebrow">Administração e segurança</p>
                 <h1>Auditoria do sistema</h1>
                 <p class="audit-subtitle">Histórico de atividades e alterações registradas na aplicação.</p>
@@ -73,9 +72,13 @@
                     let body = {}; try {body = await response.json();} catch (_) {}
                     throw new Error(body.detail || body.message || `
 
-                                Falha na solicitação (#{'$
-                                    {
-                                        '}response.status}).
+
+
+                                                                Falha na solicitação (#{'$
+                                                                    {
+                                                                        '}response.status}).
+
+
                     `);
                     }
 
@@ -97,22 +100,26 @@
                     });
                     document.getElementById('pagina').textContent =
                     `
-                Página #{'$
-                    {
-                        '}pageNumber + 1} de #{'
-                        $
-                        {
-                            '}Math.max(totalPages, 1)}`
-                            ;
-                            document.getElementById('anterior').disabled = pageNumber <= 0;
-                            document.getElementById('proxima').disabled = pageNumber + 1 >= totalPages;
-                            message.textContent = '';
-                        }
+
+
+                                                Página #{'$
+                                                    {
+                                                        '}pageNumber + 1} de #{'
+                                                        $
+                                                        {
+                                                            '}Math.max(totalPages, 1)}
+
+                    `
+                    ;
+                    document.getElementById('anterior').disabled = pageNumber <= 0;
+                    document.getElementById('proxima').disabled = pageNumber + 1 >= totalPages;
+                    message.textContent = '';
+                    }
                     catch
-                        (error)
-                        {
-                            message.textContent = error.message;
-                        }
+                    (error)
+                    {
+                    message.textContent = error.message;
+                    }
                     }
 
                                             document.getElementById('anterior').addEventListener('click', () => { if (pageNumber > 0) { pageNumber--; load(); } });

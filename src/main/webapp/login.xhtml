@@ -4,23 +4,23 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       lang="pt-BR">
 <h:head>
-    <title>Entrar</title>
+    <title>Entrar | Sistemas de Bruno Michelin</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <h:outputStylesheet library="css" name="app.css"/>
 </h:head>
 <h:body styleClass="auth-page login-page">
     <main class="login-shell">
-        <a class="login-brand" href="index.xhtml" aria-label="Obras Gestão - início">
+        <a class="login-brand" href="index.xhtml" aria-label="Sistemas de Bruno Michelin - início">
             <span class="login-brand-mark" aria-hidden="true">
                 <span class="pi pi-building" aria-hidden="true"></span>
             </span>
-            <span>OBRAS <strong>GESTÃO</strong></span>
+            <span>SISTEMAS <strong>BRUNO MICHELIN</strong></span>
         </a>
         <section class="login-card">
             <header class="login-heading">
                 <p class="login-eyebrow">Acesso à plataforma</p>
                 <h1>Bem-vindo</h1>
-                <p>Entre com suas credenciais para acessar a gestão de obras.</p>
+                <p>Entre com suas credenciais para acessar seus sistemas.</p>
             </header>
             <form id="loginForm" class="login-form">
                 <label for="email">E-mail</label>
@@ -70,7 +70,7 @@
                 const requested = new URLSearchParams(window.location.search).get('redirect');
                 const destination = requested && requested.startsWith('/') && !requested.startsWith('//')
                     ? requested
-                    : `#{'${'}window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'))}/gestao.xhtml`;
+                    : `#{'${'}window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'))}/index.xhtml`;
                 window.location.assign(destination);
             } catch (e) {
                 error.textContent = 'Não foi possível conectar ao servidor.';

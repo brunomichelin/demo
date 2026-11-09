@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xml:lang="pt-BR" lang="pt-BR">
+<h:head>
+    <title>Gestão de Obras</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <h:outputStylesheet library="css" name="app.css"/>
+</h:head>
+<h:body styleClass="works-page home-page obra-home-page">
+    <main class="home-shell">
+        <header class="home-hero">
+            <div class="home-hero-copy">
+                <span class="home-brand">
+                    <span class="home-brand-mark" aria-hidden="true">
+                        <span class="pi pi-building" aria-hidden="true"></span>
+                    </span>
+                    OBRAS
+                    <span>•</span>
+                    GESTÃO
+                </span>
+                <p class="home-eyebrow">Plataforma de gestão</p>
+                <h1>Gestão de obras,<br/>
+                    <span>do planejamento à entrega.</span>
+                </h1>
+                <p class="home-intro">
+                    Acompanhe projetos, equipes e custos em um só lugar. Escolha um módulo para começar.
+                </p>
+                <div class="home-hero-actions">
+                    <h:link styleClass="home-primary-link" outcome="gestao.xhtml">
+                        <span>Painel de obras</span>
+                        <span aria-hidden="true">→</span>
+                    </h:link>
+                    <h:link styleClass="home-secondary-link" outcome="index.xhtml">
+                        <span class="pi pi-th-large" aria-hidden="true"></span>
+                        <span>Selecionar outro sistema</span>
+                    </h:link>
+                </div>
+            </div>
+            <div class="home-hero-art" aria-hidden="true">
+                <div class="obra-art-sun"></div>
+                <div class="obra-art-building obra-art-building-back"></div>
+                <div class="obra-art-building obra-art-building-front">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <div class="obra-art-ground"></div>
+            </div>
+        </header>
+
+        <section class="home-modules" aria-labelledby="homeModulesTitle">
+            <div class="home-section-heading">
+                <div>
+                    <p class="home-eyebrow">Acesso rápido</p>
+                    <h2 id="homeModulesTitle">Módulos do sistema</h2>
+                </div>
+                <span>Disponíveis conforme seu perfil</span>
+            </div>
+            <div class="home-module-grid">
+                <h:link styleClass="home-module-card" outcome="obras.xhtml"
+                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR')}">
+                    <span class="home-module-icon" aria-hidden="true">01</span><span><strong>Obras</strong><small>Projetos, status e equipes</small></span>
+                    <span class="home-card-arrow pi pi-building" aria-hidden="true"></span>
+                </h:link>
+                <h:link styleClass="home-module-card" outcome="Etapa.xhtml"
+                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA')}">
+                    <span class="home-module-icon" aria-hidden="true">02</span><span><strong>Etapas</strong><small>Fases e cronograma</small></span>
+                    <span class="home-card-arrow pi pi-list" aria-hidden="true"></span>
+                </h:link>
+                <h:link styleClass="home-module-card" outcome="Tarefa.xhtml"
+                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA')}">
+                    <span class="home-module-icon" aria-hidden="true">03</span><span><strong>Tarefas</strong><small>Atividades e responsáveis</small></span>
+                    <span class="home-card-arrow pi pi-check-square" aria-hidden="true"></span>
+                </h:link>
+                <h:link styleClass="home-module-card" outcome="Insumo.xhtml"
+                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('ORCAMENTISTA')}">
+                    <span class="home-module-icon" aria-hidden="true">04</span><span><strong>Insumos</strong><small>Materiais e referências</small></span>
+                    <span class="home-card-arrow pi pi-box" aria-hidden="true"></span>
+                </h:link>
+                <h:link styleClass="home-module-card" outcome="Fornecedor.xhtml"
+                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('ORCAMENTISTA') or facesContext.externalContext.isUserInRole('FINANCEIRO')}">
+                    <span class="home-module-icon"
+                          aria-hidden="true">05</span><span><strong>Fornecedores</strong><small>Cadastro e contatos</small></span>
+                    <span class="home-card-arrow pi pi-truck" aria-hidden="true"></span>
+                </h:link>
+                <h:link styleClass="home-module-card" outcome="orcamento.xhtml"
+                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('ORCAMENTISTA')}">
+                    <span class="home-module-icon" aria-hidden="true">06</span><span><strong>Orçamento</strong><small>Versões e itens da obra</small></span>
+                    <span class="home-card-arrow pi pi-money-bill" aria-hidden="true"></span>
+                </h:link>
+                <h:link styleClass="home-module-card" outcome="custos.xhtml"
+                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('FINANCEIRO')}">
+                    <span class="home-module-icon" aria-hidden="true">07</span><span><strong>Custos</strong><small>Despesas e validações</small></span>
+                    <span class="home-card-arrow pi pi-wallet" aria-hidden="true"></span>
+                </h:link>
+                <h:link styleClass="home-module-card" outcome="entregas.xhtml"
+                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('CLIENTE')}">
+                    <span class="home-module-icon" aria-hidden="true">08</span><span><strong>Entregas</strong><small>Status e aprovação da obra</small></span>
+                    <span class="home-card-arrow pi pi-check-circle" aria-hidden="true"></span>
+                </h:link>
+                <h:link styleClass="home-module-card" outcome="desempenho.xhtml"
+                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('CLIENTE')}">
+                    <span class="home-module-icon" aria-hidden="true">09</span><span><strong>Desempenho</strong><small>Gráficos de etapas e tarefas</small></span>
+                    <span class="home-card-arrow pi pi-chart-bar" aria-hidden="true"></span>
+                </h:link>
+                <h:link styleClass="home-module-card" outcome="relatorios.xhtml"
+                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('FINANCEIRO') or facesContext.externalContext.isUserInRole('ORCAMENTISTA') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('CLIENTE')}">
+                    <span class="home-module-icon" aria-hidden="true">10</span><span><strong>Relatórios</strong><small>Custos, tarefas, prazos e etc</small></span>
+                    <span class="home-card-arrow pi pi-file" aria-hidden="true"></span>
+                </h:link>
+            </div>
+        </section>
+        <footer class="home-footer">
+            Sistema de Gestão de Obras
+            <span>•</span>
+            Planejamento, controle e transparência
+        </footer>
+    </main>
+</h:body>
+</html>
