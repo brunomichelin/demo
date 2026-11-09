@@ -28,6 +28,16 @@
         </header>
         <section class="reports-card">
             <div class="reports-section-heading">
+                <span class="reports-section-icon" aria-hidden="true">00</span>
+                <div><p class="reports-eyebrow">Seleção</p><h2>Obra em análise</h2></div>
+            </div>
+            <div class="reports-field">
+                <label for="obraSelect">Obra</label>
+                <select id="obraSelect"></select>
+            </div>
+        </section>
+        <section class="reports-card">
+            <div class="reports-section-heading">
                 <span class="reports-section-icon" aria-hidden="true">01</span>
                 <div><p class="reports-eyebrow">Configuração</p><h2>Gerar relatório</h2></div>
             </div>
@@ -71,8 +81,10 @@
         //<![CDATA[
         (() => {
             const root = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+            const api = `#{'${'}root}/api/v1`;
             const params = new URLSearchParams(window.location.search);
-            const obraId = params.get('obraId');
+            let obraId = params.get('obraId');
+            const obraSelect = document.getElementById('obraSelect');
             const message = document.getElementById('mensagem');
             const flags = document.getElementById('pagina').dataset;
             const permissaoPorRelatorio = {
@@ -90,15 +102,48 @@
                 if (primeiraOpcaoPermitida) document.getElementById('tipo').value = primeiraOpcaoPermitida.value;
             }
             document.getElementById('obraLink').href = 'gestao.xhtml';
+            async function carregarObras() {
+                try {
+                    const response = await fetch(`#{'${'}api}/obras?size=100&sort=nome,asc`,
+                        {credentials: 'same-origin'});
+                    if (!response.ok) {
+                        let error = {}; try { error = await response.json(); } catch (_) {}
+                        throw new Error(error.detail || error.message
+                            || `Falha ao carregar obras (#{'${'}response.status}).`);
+                    }
+                    const page = await response.json();
+                    obraSelect.replaceChildren();
+                    page.content.forEach(obra => obraSelect.add(new Option(obra.nome, obra.id)));
+                    if (!page.content.length) throw new Error('Você não está vinculado a nenhuma obra.');
+                    if (!obraId || !page.content.some(obra => String(obra.id) === String(obraId))) {
+                        obraId = String(page.content[0].id);
+                    }
+                    obraSelect.value = obraId;
+                    params.set('obraId', obraId);
+                    window.history.replaceState(null, '', `${window.location.pathname}?${params}`);
+                } catch (error) {
+                    message.textContent = error.message;
+                    document.getElementById('gerar').disabled = true;
+                }
+            }
+            obraSelect.addEventListener('change', () => {
+                obraId = obraSelect.value;
+                params.set('obraId', obraId);
+                window.history.replaceState(null, '', `${window.location.pathname}?${params}`);
+                document.getElementById('resultado').textContent =
+                    'Selecione um relatório e escolha “Visualizar na tela” para ver os dados aqui.';
+                message.textContent = '';
+            });
             document.getElementById('gerar').addEventListener('click', async () => {
                 try {
-                    if (!obraId) throw new Error('Identificador da obra não informado.');
+                    if (!obraSelect.value) throw new Error('Selecione uma obra.');
+                    obraId = obraSelect.value;
                     const tipo = document.getElementById('tipo').value;
                     const formato = document.getElementById('formato').value;
                     const versao = document.getElementById('versao').value;
                     const query = new URLSearchParams({formato});
                     if (versao && (tipo === 'custo-por-etapa' || tipo === 'insumos-por-etapa')) query.set('versaoId', versao);
-                    const url = `#{'${'}root}/api/v1/obras/#{'${'}obraId}/relatorios/#{'${'}tipo}?#{'${'}query}`;
+                    const url = `#{'${'}api}/obras/#{'${'}obraId}/relatorios/#{'${'}tipo}?#{'${'}query}`;
                     if (formato !== 'json') {
                         window.location.assign(url);
                         return;
@@ -113,6 +158,7 @@
                     message.textContent = 'Relatório gerado.';
                 } catch (error) { message.textContent = error.message; }
             });
+            carregarObras();
         })();
         //]]>
     </script>

@@ -110,22 +110,28 @@
                     <span class="home-module-icon" aria-hidden="true">11</span><span><strong>Desempenho</strong><small>Gráficos de etapas e tarefas</small></span>
                     <span class="home-card-arrow pi pi-chart-bar" aria-hidden="true"></span>
                 </h:link>
+                <h:link styleClass="home-module-card" outcome="relatorios.xhtml"
+                        rendered="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('FINANCEIRO') or facesContext.externalContext.isUserInRole('ORCAMENTISTA') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('CLIENTE')}">
+                    <span class="home-module-icon" aria-hidden="true">12</span><span><strong>Relatórios</strong><small>Custos, tarefas, prazos e etc</small></span>
+                    <span class="home-card-arrow pi pi-file" aria-hidden="true"></span>
+                </h:link>
                 <h:link styleClass="home-module-card" outcome="livros.xhtml">
                     <span class="home-module-icon"
-                          aria-hidden="true">12</span><span><strong>Minha biblioteca</strong><small>Livros lidos e próximos da lista</small></span>
+                          aria-hidden="true">13</span><span><strong>Minha biblioteca</strong><small>Livros lidos e próximos da lista</small></span>
                     <span class="home-card-arrow pi pi-book" aria-hidden="true"></span>
                 </h:link>
                 <h:link styleClass="home-module-card" outcome="financiamento.xhtml">
                     <span class="home-module-icon"
-                          aria-hidden="true">13</span><span><strong>Financiamento Habitacional</strong><small>Simulação SAC, PRICE e abatimentos</small></span>
+                          aria-hidden="true">14</span><span><strong>Financiamento Habitacional</strong><small>Simulação SAC, PRICE e abatimentos</small></span>
                     <span class="home-card-arrow pi pi-chart-line" aria-hidden="true"></span>
                 </h:link>
                 <h:link styleClass="home-module-card" outcome="modulo14.xhtml">
-                    <span class="home-module-icon" aria-hidden="true">14</span><span><strong>Seres vivos</strong><small>Herança, polimorfismo e interfaces</small></span>
+                    <span class="home-module-icon" aria-hidden="true">15</span><span><strong>Seres vivos</strong><small>Herança, polimorfismo e interfaces</small></span>
                     <span class="home-card-arrow pi pi-sitemap" aria-hidden="true"></span>
                 </h:link>
                 <h:link styleClass="home-module-card" outcome="modulo15.xhtml">
-                    <span class="home-module-icon" aria-hidden="true">15</span><span><strong>Adega pessoal</strong><small>Catálogo, degustações e descobertas</small></span>
+                    <span class="home-module-icon"
+                          aria-hidden="true">16</span><span><strong>Adega pessoal</strong><small>Catálogo, degustações e descobertas</small></span>
                     <span class="home-card-arrow pi pi-star" aria-hidden="true"></span>
                 </h:link>
             </div>

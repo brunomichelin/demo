@@ -22,7 +22,8 @@
                 <p class="dashboard-eyebrow">Visão geral</p>
                 <h1>Suas obras</h1>
                 <p class="dashboard-subtitle">Acesse projetos e acompanhe cada etapa do trabalho.</p>
-                <a class="dashboard-financing-link" href="financiamento.xhtml">Simulador de financiamento <span aria-hidden="true">→</span></a>
+                <a class="dashboard-financing-link" href="financiamento.xhtml">Simulador de financiamento <span
+                        aria-hidden="true">→</span></a>
             </div>
             <div class="dashboard-header-mark" aria-hidden="true">
                 <span class="home-card-arrow pi pi-building" aria-hidden="true"></span>
@@ -37,62 +38,68 @@
             const root = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
             const flags = document.getElementById('painel').dataset;
             const message = document.getElementById('mensagem');
+
             async function carregar() {
                 try {
                     const response = await fetch(`#{'${'}root}/api/v1/obras?size=100&sort=nome,asc`,
-                        {credentials: 'same-origin'});
+                    {credentials: 'same-origin'});
                     if (!response.ok) {
-                        let error = {}; try { error = await response.json(); } catch (_) {}
-                        throw new Error(error.detail || error.message || `Falha ao carregar obras (#{'${'}response.status}).`);
+                    let error = {}; try {error = await response.json();} catch (_) {}
+                    throw new Error(error.detail || error.message || `
+                Falha ao carregar obras (#{'$
+                    {
+                        '}response.status}).`);
                     }
-                    const page = await response.json();
-                    const container = document.getElementById('obras');
-                    container.replaceChildren();
-                    if (!page.content.length) {
-                        message.className = 'dashboard-message dashboard-empty';
-                        message.textContent = 'Você ainda não está vinculado a nenhuma obra.';
-                        return;
-                    }
-                    page.content.forEach(obra => {
-                        const card = document.createElement('section');
-                        card.className = 'dashboard-card';
-                        const cardTop = document.createElement('div');
-                        cardTop.className = 'dashboard-card-top';
-                        const icon = document.createElement('span');
-                        icon.className = 'dashboard-card-icon pi pi-home';
-                        icon.setAttribute('aria-hidden', 'true');
-                        const title = document.createElement('h2'); title.textContent = obra.nome;
-                        const status = document.createElement('span');
-                        status.className = 'dashboard-status';
-                        status.textContent = obra.status || 'Sem status';
-                        cardTop.append(icon, status);
-                        const details = document.createElement('div');
-                        details.className = 'dashboard-card-heading';
-                        details.append(title);
-                        card.append(cardTop, details);
-                        const divider = document.createElement('div');
-                        divider.className = 'dashboard-card-divider';
-                        card.append(divider);
-                        const linkGroup = document.createElement('div');
-                        linkGroup.className = 'dashboard-card-links';
-                        const links = [
-                            ['Detalhes', 'detailObra.xhtml', flags.detail === 'true'],
-                            ['Orçamento', 'orcamento.xhtml', flags.budget === 'true'],
-                            ['Custos', 'custos.xhtml', flags.costs === 'true'],
-                            ['Entregas', 'entregas.xhtml', flags.deliveries === 'true'],
-                            ['Relatórios', 'relatorios.xhtml', flags.reports === 'true'],
-                            ['Desempenho', 'desempenho.xhtml', flags.performance === 'true']
-                        ];
-                        links.forEach(([label, pageName, enabled]) => {
-                            if (!enabled) return;
-                            const link = document.createElement('a');
-                            link.textContent = label;
-                            link.className = 'dashboard-link';
-                            const query = new URLSearchParams(
-                                pageName === 'detailObra.xhtml' ? {id: obra.id} : {obraId: obra.id});
-                            link.href = `#{'${'}root}/#{'${'}pageName}?#{'${'}query}`;
-                            linkGroup.append(link);
-                        });
+
+                                    const page = await response.json();
+                                    const container = document.getElementById('obras');
+                                    container.replaceChildren();
+                                    if (!page.content.length) {
+                                        message.className = 'dashboard-message dashboard-empty';
+                                        message.textContent = 'Você ainda não está vinculado a nenhuma obra.';
+                                        return;
+                                    }
+                                    page.content.forEach(obra => {
+                                        const card = document.createElement('section');
+                                        card.className = 'dashboard-card';
+                                        const cardTop = document.createElement('div');
+                                        cardTop.className = 'dashboard-card-top';
+                                        const icon = document.createElement('span');
+                                        icon.className = 'dashboard-card-icon pi pi-home';
+                                        icon.setAttribute('aria-hidden', 'true');
+                                        const title = document.createElement('h2'); title.textContent = obra.nome;
+                                        const status = document.createElement('span');
+                                        status.className = 'dashboard-status';
+                                        status.textContent = obra.status || 'Sem status';
+                                        cardTop.append(icon, status);
+                                        const details = document.createElement('div');
+                                        details.className = 'dashboard-card-heading';
+                                        details.append(title);
+                                        card.append(cardTop, details);
+                                        const divider = document.createElement('div');
+                                        divider.className = 'dashboard-card-divider';
+                                        card.append(divider);
+                                        const linkGroup = document.createElement('div');
+                                        linkGroup.className = 'dashboard-card-links';
+                                        const links = [
+                                            ['Detalhes', 'detailObra.xhtml', flags.detail === 'true'],
+                                            ['Orçamento', 'orcamento.xhtml', flags.budget === 'true'],
+                                            ['Custos', 'custos.xhtml', flags.costs === 'true'],
+                                            ['Entregas', 'entregas.xhtml', flags.deliveries === 'true'],
+                                            ['Relatórios', 'relatorios.xhtml', flags.reports === 'true'],
+                                            ['Desempenho', 'desempenho.xhtml', flags.performance === 'true']
+                                        ];
+                                        links.forEach(([label, pageName, enabled]) => {
+                                            if (!enabled) return;
+                                            const link = document.createElement('a');
+                                            link.textContent = label;
+                                            link.className = 'dashboard-link';
+                                            const query = new URLSearchParams(
+                                                pageName === 'detailObra.xhtml' ? {id: obra.id} : {obraId: obra.id});
+                                            link.href =
+                    `#{'${'}root}/#{'${'}pageName}?#{'${'}query}`;
+                    linkGroup.append(link);
+                    });
                         card.append(linkGroup);
                         container.append(card);
                     });
