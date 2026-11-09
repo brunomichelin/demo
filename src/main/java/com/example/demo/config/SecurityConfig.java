@@ -63,6 +63,9 @@ public class SecurityConfig {
                         .requestMatchers("/Insumo.xhtml").hasAnyRole("ADMIN", "ORCAMENTISTA")
                         .requestMatchers("/Fornecedor.xhtml").hasAnyRole("ADMIN", "ORCAMENTISTA", "FINANCEIRO")
                         .requestMatchers("/alunos.xhtml").hasRole("ADMIN")
+                        .requestMatchers("/Chat.xhtml", "/api/v1/chats/**")
+                        .hasAnyRole("ADMIN", "GESTOR", "ENGENHEIRO", "ORCAMENTISTA", "MESTRE_OBRA",
+                                "TECNICO_OBRA", "FINANCEIRO", "CLIENTE")
                         .requestMatchers("/login.xhtml", "/cadastro.xhtml", "/jakarta.faces.resource/**", "/javax.faces.resource/**").permitAll()
                         .anyRequest().authenticated()
                 )

@@ -1,6 +1,7 @@
 package com.example.demo.repositories;
 
 import com.example.demo.models.Usuario;
+import com.example.demo.models.StatusRegEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,17 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     @Query("select u from Usuario u where lower(u.email) = lower(:email) and u.dataDelecao is null")
     Optional<Usuario> findByEmailIgnoreCase(@Param("email") String email);
+
+    @Query("""
+            select u from Usuario u
+            where u.dataDelecao is null and u.statusRegistro = :status
+              and lower(u.email) <> lower(:email)
+            order by u.nome
+            """)
+    List<Usuario> findUsuariosAtivosParaChat(
+            @Param("email") String email,
+            @Param("status") StatusRegEnum status
+    );
 
     @Override
     @Query("select u from Usuario u where u.dataDelecao is null")

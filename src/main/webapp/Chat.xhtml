@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xml:lang="pt-BR" lang="pt-BR">
+<h:head>
+    <title>Conversas | Gestão de Obras</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <h:outputStylesheet library="css" name="app.css"/>
+    <h:outputStylesheet library="css" name="chat.css"/>
+    <h:outputScript library="js" name="chat.js" target="body"/>
+</h:head>
+<h:body styleClass="works-page chat-page">
+    <main class="chat-shell">
+        <header class="chat-header">
+            <div>
+                <a class="chat-back-link" href="index.xhtml">Início</a>
+                <p class="chat-eyebrow">Comunicação da equipe</p>
+                <h1>Mensagens</h1>
+                <p class="chat-subtitle">Retome suas conversas ou inicie uma nova.</p>
+            </div>
+            <span class="chat-header-mark pi pi-comments" aria-hidden="true"></span>
+        </header>
+
+        <p id="chatStatus" class="chat-status" role="status" aria-live="polite"></p>
+
+        <section class="chat-layout" aria-label="Mensagens e conversas">
+            <aside class="chat-sidebar">
+                <div class="chat-sidebar-heading">
+                    <div>
+                        <p class="chat-eyebrow">Histórico</p>
+                        <h2>Conversas</h2>
+                    </div>
+                    <span id="chatCount" class="chat-count">0</span>
+                </div>
+                <div id="chatList" class="chat-list" aria-label="Conversas abertas"></div>
+                <form id="newChatForm" class="new-chat-form">
+                    <label for="chatUser">Nova conversa</label>
+                    <select id="chatUser" required="required">
+                        <option value="">Carregando usuários...</option>
+                    </select>
+                    <button class="chat-button chat-button-secondary" type="submit">Iniciar conversa</button>
+                </form>
+            </aside>
+
+            <section class="chat-conversation" aria-label="Conversa selecionada">
+                <div id="chatEmpty" class="chat-empty">
+                    <span class="pi pi-comments" aria-hidden="true"></span>
+                    <h2>Suas conversas começam aqui</h2>
+                    <p>Selecione uma conversa existente ou escolha um usuário para enviar uma mensagem.</p>
+                </div>
+                <div id="chatActive" class="chat-active" hidden="hidden">
+                    <header class="chat-contact">
+                        <span id="contactAvatar" class="chat-avatar" aria-hidden="true"></span>
+                        <div>
+                            <h2 id="contactName"></h2>
+                            <p id="contactEmail"></p>
+                        </div>
+                    </header>
+                    <div id="messageList" class="message-list" role="log" aria-live="polite"
+                         aria-relevant="additions text"></div>
+                    <form id="messageForm" class="message-form">
+                        <label class="visually-hidden" for="messageInput">Escreva sua mensagem</label>
+                        <textarea id="messageInput" maxlength="2000" rows="1" required="required"
+                                  placeholder="Escreva uma mensagem..."></textarea>
+                        <button class="chat-button chat-button-primary" type="submit">
+                            Enviar <span class="pi pi-send" aria-hidden="true"></span>
+                        </button>
+                    </form>
+                </div>
+            </section>
+        </section>
+    </main>
+</h:body>
+</html>
