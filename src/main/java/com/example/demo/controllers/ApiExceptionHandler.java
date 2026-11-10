@@ -6,6 +6,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
@@ -34,5 +35,13 @@ public class ApiExceptionHandler {
                 exception.getMessage() == null ? "Parâmetro inválido." : exception.getMessage());
         problema.setTitle("Parâmetro inválido");
         return ResponseEntity.badRequest().body(problema);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ProblemDetail> tratarArquivoMuitoGrande(MaxUploadSizeExceededException exception) {
+        ProblemDetail problema = ProblemDetail.forStatusAndDetail(HttpStatus.PAYLOAD_TOO_LARGE,
+                "O envio excede o limite permitido. Fotos podem ter até 10 MB e vídeos até 50 MB cada.");
+        problema.setTitle("Arquivos muito grandes");
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(problema);
     }
 }

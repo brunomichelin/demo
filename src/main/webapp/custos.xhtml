@@ -1,232 +1,274 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xml:lang="pt-BR" lang="pt-BR">
-<h:head>
-    <title>Lançamentos de custo</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <h:outputStylesheet library="css" name="app.css"/>
-</h:head>
-<h:body styleClass="works-page costs-page">
-    <main id="pagina" class="costs-shell"
-          data-can-register="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('FINANCEIRO')}"
-          data-can-validate="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('FINANCEIRO')}">
-        <header class="costs-header">
-            <div>
-                <nav class="system-return-links" aria-label="Navegação principal">
-                    <a href="indexObra.xhtml">Início</a><span> / </span>
-                    <a class="costs-back-link" id="obraLink" href="gestao.xhtml">Painel de obras</a>
-                </nav>
-                <p class="costs-eyebrow">Controle financeiro</p>
-                <h1>Lançamentos de custo</h1>
-                <p class="costs-subtitle">Registre despesas e acompanhe as validações da obra.</p>
+<f:view>
+    <h:head>
+        <title>Lançamentos de custo</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <h:outputStylesheet library="css" name="app.css"/>
+    </h:head>
+    <h:body styleClass="works-page costs-page">
+        <h:form id="formCustos">
+            <p:growl id="mensagens" showDetail="true" autoUpdate="true" closable="true"/>
+
+            <div class="application-timeline" aria-label="Navegação dos módulos">
+                <p:button value="Início" icon="ui-icon-home" outcome="indexObra.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Painel de obras" icon="ui-icon-arrowthick-1-w" outcome="gestao.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Etapas" icon="pi pi-list" outcome="Etapa.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Custos" icon="pi pi-wallet" outcome="custos.xhtml"
+                          styleClass="application-timeline-step application-timeline-action"/>
             </div>
-            <span class="costs-header-icon" aria-hidden="true">R$</span>
-        </header>
-        <section class="costs-card costs-table-card">
-            <div class="costs-section-heading">
-                <span class="costs-section-icon" aria-hidden="true">00</span>
-                <div><p class="costs-eyebrow">Seleção</p><h2>Obra em análise</h2></div>
-            </div>
-            <div class="costs-field costs-field-wide">
-                <label for="obraSelect">Obra</label>
-                <select id="obraSelect"></select>
-            </div>
-        </section>
-        <p id="mensagem" class="costs-message" role="status"></p>
-        <section id="formLancamento" class="costs-card">
-            <div class="costs-section-heading">
-                <span class="costs-section-icon" aria-hidden="true">01</span>
-                <div><p class="costs-eyebrow">Novo registro</p><h2>Dados do lançamento</h2></div>
-            </div>
-            <div class="costs-form">
-                <div class="costs-field">
-                    <label for="etapa">Etapa da obra</label><select id="etapa"></select>
+
+            <header class="costs-header">
+                <div>
+                    <p class="costs-eyebrow">Controle financeiro</p>
+                    <h1>Lançamentos de custo</h1>
+                    <p class="costs-subtitle">Registre despesas e acompanhe as validações da obra.</p>
                 </div>
-                <div class="costs-field">
-                    <label for="tarefa">Tarefa <span>(opcional)</span></label><select id="tarefa"></select>
-                </div>
-                <div class="costs-field">
-                    <label for="insumo">Insumo</label><select id="insumo"></select>
-                </div>
-                <div class="costs-field">
-                    <label for="quantidade">Quantidade</label><input id="quantidade" type="number" min="0.001" step="0.001" placeholder="0,000"/>
-                </div>
-                <div class="costs-field">
-                    <label for="valor">Preço unitário</label><input id="valor" type="number" min="0.01" step="0.01" placeholder="R$ 0,00"/>
-                </div>
-                <div class="costs-field">
-                    <label for="data">Data do lançamento</label><input id="data" type="date"/>
-                </div>
-                <div class="costs-field">
-                    <label for="documento">Número do comprovante</label><input id="documento" type="text" maxlength="120" placeholder="Número ou referência"/>
+                <span class="costs-header-icon" aria-hidden="true">R$</span>
+            </header>
+
+            <section class="costs-card">
+                <div class="costs-section-heading">
+                    <span class="costs-section-icon" aria-hidden="true">00</span>
+                    <div><p class="costs-eyebrow">Seleção</p><h2>Obra em análise</h2></div>
                 </div>
                 <div class="costs-field costs-field-wide">
-                    <label for="justificativa">Justificativa <span>(se necessário)</span></label>
-                    <textarea id="justificativa" rows="2" placeholder="Adicione uma observação sobre este lançamento"></textarea>
+                    <p:outputLabel for="obra" value="Obra"/>
+                    <p:selectOneMenu id="obra" value="#{custosBean.obraSelecionadaId}"
+                                     styleClass="cost-select"
+                                     disabled="#{empty custosBean.obras}">
+                        <f:selectItem itemLabel="Selecione uma obra" itemValue="#{null}"
+                                      noSelectionOption="true"/>
+                        <f:selectItems value="#{custosBean.obras}" var="obra"
+                                       itemValue="#{obra.id}" itemLabel="#{obra.nome}"/>
+                        <p:ajax listener="#{custosBean.carregarObra}"
+                                update=":formCustos:novoLancamento :formCustos:lancamentos"/>
+                    </p:selectOneMenu>
                 </div>
-            </div>
-            <div class="costs-form-actions">
-                <button class="costs-button costs-button-primary" type="button" id="registrar">
-                    <span aria-hidden="true">＋</span> Registrar lançamento
-                </button>
-            </div>
-        </section>
-        <section class="costs-card costs-table-card">
-            <div class="costs-section-heading">
-                <span class="costs-section-icon" aria-hidden="true">02</span>
-                <div><p class="costs-eyebrow">Acompanhamento</p><h2>Custos da etapa</h2></div>
-            </div>
-            <div class="costs-table-wrap">
-                <table class="costs-table">
-                <thead><tr><th>Data</th><th>Tarefa</th><th>Insumo</th><th>Quantidade</th><th>Valor unitário</th><th>Status</th><th>Ações</th></tr></thead>
-                    <tbody id="lancamentos"></tbody>
-                </table>
-            </div>
-        </section>
-    </main>
-    <script type="text/javascript">
-        //<![CDATA[
-        (() => {
-            const root = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
-            const api = `#{'${'}root}/api/v1`;
-            const params = new URLSearchParams(window.location.search);
-            let obraId = params.get('obraId');
-            const podeTrocarObra = !obraId || params.get('origem') === 'index';
-            const obraSelect = document.getElementById('obraSelect');
-            const etapa = document.getElementById('etapa');
-            const tarefaSelect = document.getElementById('tarefa');
-            const mensagem = document.getElementById('mensagem');
-            const canRegister = document.getElementById('pagina').dataset.canRegister === 'true';
-            const canValidate = document.getElementById('pagina').dataset.canValidate === 'true';
-            document.getElementById('formLancamento').hidden = !canRegister;
-            document.getElementById('obraLink').href = 'gestao.xhtml';
-            async function call(url, options = {}) {
-                const response = await fetch(url, {credentials: 'same-origin', ...options,
-                    headers: {'Content-Type': 'application/json', ...(options.headers || {})}});
-                if (!response.ok) {
-                    let error = {}; try { error = await response.json(); } catch (_) {}
-                    throw new Error(error.detail || error.message || `Falha na solicitação (#{'${'}response.status}).`);
-                }
-                return response.status === 204 ? null : response.json();
-            }
-            function erro(error) { mensagem.textContent = error.message; }
-            async function carregarObras() {
-                const response = await fetch(`#{'${'}root}/api/v1/obras?size=100&sort=nome,asc`, {credentials: 'same-origin'});
-                if (!response.ok) {
-                    let error = {}; try { error = await response.json(); } catch (_) {}
-                    throw new Error(error.detail || error.message || `Falha ao carregar obras (#{'${'}response.status}).`);
-                }
-                const page = await response.json();
-                obraSelect.replaceChildren();
-                page.content.forEach(obra => obraSelect.add(new Option(obra.nome, obra.id)));
-                if (!obraId && page.content[0]) {
-                    obraId = String(page.content[0].id);
-                    params.set('obraId', obraId);
-                    params.set('origem', 'index');
-                    window.history.replaceState(null, '', `${window.location.pathname}?${params}`);
-                } else if (!page.content.length) {
-                    throw new Error('Você não está vinculado a nenhuma obra.');
-                } else if (obraId) {
-                    obraSelect.value = String(obraId);
-                }
-                obraSelect.disabled = !podeTrocarObra;
-                await init();
-            }
-            async function carregarLancamentos() {
-                const tbody = document.getElementById('lancamentos');
-                tbody.replaceChildren();
-                if (!etapa.value) {
-                    const row = tbody.insertRow(); row.insertCell().textContent = 'Nenhum lançamento.';
-                    row.cells[0].colSpan = 7;
-                    return;
-                }
-                const page = await call(`#{'${'}api}/etapas/#{'${'}etapa.value}/lancamentos?size=100`);
-                page.content.forEach(item => {
-                    const row = tbody.insertRow();
-                    [item.dataLancamento, item.tarefa?.titulo || 'Sem tarefa',
-                        item.insumo?.descricao, item.quantidade, item.valorUnitario]
-                        .forEach(value => row.insertCell().textContent = value == null ? '-' : String(value));
-                    const statusCell = row.insertCell();
-                    const statusBadge = document.createElement('span');
-                    statusBadge.className = `costs-status costs-status-${String(item.status || '').toLowerCase()}`;
-                    statusBadge.textContent = item.status || '-';
-                    statusCell.append(statusBadge);
-                    const action = row.insertCell();
-                    if (item.status === 'PENDENTE' && canValidate) {
-                        ['VALIDADO', 'REJEITADO'].forEach(status => {
-                            const button = document.createElement('button'); button.type = 'button';
-                            button.textContent = status === 'VALIDADO' ? 'Validar' : 'Rejeitar';
-                            button.className = status === 'VALIDADO'
-                                ? 'costs-button costs-button-validate'
-                                : 'costs-button costs-button-reject';
-                            button.addEventListener('click', async () => {
-                                try {
-                                    await call(`#{'${'}api}/lancamentos/#{'${'}item.id}/validacao`,
-                                        {method: 'PATCH', body: JSON.stringify({status})});
-                                    mensagem.textContent = `Lançamento #{'${'}status.toLowerCase()}.`; await carregarLancamentos();
-                                } catch (error) { erro(error); }
-                            });
-                            action.append(button);
-                        });
-                    }
-                });
-                if (!page.content.length) { const row = tbody.insertRow(); row.insertCell().textContent = 'Nenhum lançamento.'; row.cells[0].colSpan = 7; }
-            }
-            async function carregarTarefas() {
-                tarefaSelect.replaceChildren(new Option('Sem tarefa', ''));
-                if (!etapa.value) return;
-                const page = await call(`#{'${'}api}/etapas/#{'${'}etapa.value}/tarefas?size=100`);
-                page.content.forEach(tarefa => tarefaSelect.add(new Option(tarefa.titulo, tarefa.id)));
-            }
-            async function init() {
-                try {
-                    if (!obraId) throw new Error('Identificador da obra não informado.');
-                    const [stages, supplies] = await Promise.all([
-                        call(`#{'${'}api}/obras/#{'${'}obraId}/etapas?size=100`), call(`#{'${'}api}/insumos?size=100`)
-                    ]);
-                    const etapaId = params.get('etapaId');
-                    etapa.replaceChildren();
-                    stages.content.forEach(item => etapa.add(new Option(`#{'${'}item.ordem} - #{'${'}item.nome}`, item.id)));
-                    if (etapaId) etapa.value = etapaId;
-                    await carregarTarefas();
-                    const insumos = document.getElementById('insumo');
-                    insumos.replaceChildren();
-                    supplies.content.forEach(item => insumos.add(new Option(`#{'${'}item.codigo || ''} #{'${'}item.descricao}`, item.id)));
-                    await carregarLancamentos();
-                } catch (error) { erro(error); }
-            }
-            obraSelect.addEventListener('change', () => {
-                if (!podeTrocarObra || !obraSelect.value) return;
-                obraId = obraSelect.value;
-                params.set('obraId', obraId);
-                params.set('origem', 'index');
-                params.delete('etapaId');
-                window.history.replaceState(null, '', `${window.location.pathname}?${params}`);
-                init();
-            });
-            document.getElementById('registrar').addEventListener('click', async () => {
-                try {
-                    const body = {insumoId: Number(document.getElementById('insumo').value),
-                        tarefaId: tarefaSelect.value ? Number(tarefaSelect.value) : null,
-                        quantidade: Number(document.getElementById('quantidade').value),
-                        valorUnitario: Number(document.getElementById('valor').value),
-                        dataLancamento: document.getElementById('data').value || null,
-                        numeroDocumento: document.getElementById('documento').value || null,
-                        justificativa: document.getElementById('justificativa').value || null};
-                    await call(`#{'${'}api}/etapas/#{'${'}etapa.value}/lancamentos`, {method: 'POST', body: JSON.stringify(body)});
-                    mensagem.textContent = 'Lançamento registrado para validação.';
-                    await carregarLancamentos();
-                } catch (error) { erro(error); }
-            });
-            etapa.addEventListener('change', async () => {
-                try { await carregarTarefas(); await carregarLancamentos(); }
-                catch (error) { erro(error); }
-            });
-            carregarObras().catch(erro);
-        })();
-        //]]>
-    </script>
-</h:body>
+            </section>
+
+            <section class="costs-card">
+                <div class="costs-section-heading">
+                    <span class="costs-section-icon" aria-hidden="true">01</span>
+                    <div><p class="costs-eyebrow">Novo registro</p><h2>Dados do lançamento</h2></div>
+                </div>
+                <p:outputPanel id="novoLancamento">
+                    <div class="costs-form">
+                        <div class="costs-field">
+                            <p:outputLabel for="etapa" value="Etapa da obra"/>
+                            <p:selectOneMenu id="etapa" value="#{custosBean.etapaSelecionadaId}"
+                                             styleClass="cost-select"
+                                             disabled="#{empty custosBean.etapas}">
+                                <f:selectItem itemLabel="Selecione uma etapa" itemValue="#{null}"
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{custosBean.etapas}" var="etapa"
+                                               itemValue="#{etapa.id}"
+                                               itemLabel="#{etapa.ordem} - #{etapa.nome}"/>
+                                <p:ajax listener="#{custosBean.carregarEtapa}"
+                                        update=":formCustos:novoLancamento :formCustos:lancamentos"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="costs-field">
+                            <p:outputLabel for="tarefa" value="Tarefa (opcional)"/>
+                            <p:selectOneMenu id="tarefa" value="#{custosBean.tarefaSelecionadaId}"
+                                             styleClass="cost-select"
+                                             disabled="#{empty custosBean.tarefas}">
+                                <f:selectItem itemLabel="Sem tarefa" itemValue="#{null}"
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{custosBean.tarefas}" var="tarefa"
+                                               itemValue="#{tarefa.id}" itemLabel="#{tarefa.titulo}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="costs-field">
+                            <p:outputLabel for="insumo" value="Insumo"/>
+                            <p:selectOneMenu id="insumo" value="#{custosBean.insumoSelecionadoId}"
+                                             styleClass="cost-select" required="true"
+                                             requiredMessage="Selecione um insumo."
+                                             disabled="#{empty custosBean.insumos}">
+                                <f:selectItem itemLabel="Selecione um insumo" itemValue="#{null}"
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{custosBean.insumos}" var="insumo"
+                                               itemValue="#{insumo.id}"
+                                               itemLabel="#{insumo.codigo} - #{insumo.descricao}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="costs-field">
+                            <p:outputLabel for="quantidade" value="Quantidade"/>
+                            <p:inputNumber id="quantidade" value="#{custosBean.quantidade}"
+                                           minValue="0.001" decimalPlaces="3" required="true"
+                                           requiredMessage="Informe a quantidade."
+                                           placeholder="0,000"/>
+                        </div>
+                        <div class="costs-field">
+                            <p:outputLabel for="valor" value="Preço unitário"/>
+                            <p:inputNumber id="valor" value="#{custosBean.valorUnitario}"
+                                           minValue="0.01" decimalPlaces="2" required="true"
+                                           requiredMessage="Informe o preço unitário."
+                                           symbol="R$ " symbolPosition="p" placeholder="0,00"/>
+                        </div>
+                        <div class="costs-field">
+                            <p:outputLabel for="data" value="Data do lançamento"/>
+                            <p:datePicker id="data" value="#{custosBean.dataLancamento}"
+                                          pattern="dd/MM/yyyy" showIcon="true" required="true"
+                                          requiredMessage="Informe a data do lançamento."/>
+                        </div>
+                        <div class="costs-field">
+                            <p:outputLabel for="documento" value="Número do comprovante"/>
+                            <p:inputText id="documento" value="#{custosBean.numeroDocumento}"
+                                         maxlength="120" placeholder="Número ou referência"/>
+                        </div>
+                        <div class="costs-field costs-field-wide">
+                            <p:outputLabel for="justificativa" value="Justificativa (se necessário)"/>
+                            <p:inputTextarea id="justificativa" value="#{custosBean.justificativa}"
+                                             rows="2" autoResize="false"
+                                             placeholder="Adicione uma observação sobre este lançamento"/>
+                        </div>
+                    </div>
+                    <div class="costs-form-actions">
+                        <p:commandButton value="Registrar lançamento" icon="pi pi-plus"
+                                         styleClass="costs-pf-button costs-pf-button-primary"
+                                         action="#{custosBean.registrar}" process="novoLancamento"
+                                         rendered="#{custosBean.podeRegistrar}"
+                                         update=":formCustos:lancamentos :formCustos:novoLancamento :formCustos:mensagens"/>
+                    </div>
+                </p:outputPanel>
+            </section>
+
+            <section class="costs-card">
+                <div class="costs-section-heading">
+                    <span class="costs-section-icon" aria-hidden="true">02</span>
+                    <div>
+                        <p class="costs-eyebrow">Acompanhamento</p>
+                        <h2>Custos da etapa</h2>
+                        <p class="costs-evidence-hint">Anexe até 10 fotos JPEG, PNG ou WebP por envio, com até 10 MB cada.</p>
+                    </div>
+                </div>
+                <p:dataTable id="lancamentos" var="item" value="#{custosBean.lancamentos}"
+                             rowKey="#{item.id}" paginator="true" rows="10"
+                             paginatorPosition="bottom" responsiveLayout="scroll"
+                             emptyMessage="Não há lançamentos para esta etapa."
+                             styleClass="costs-pf-table">
+                    <p:column headerText="Data" sortBy="#{item.dataLancamento}">
+                        <h:outputText value="#{item.dataLancamento}">
+                            <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Tarefa" sortBy="#{item.tarefa.titulo}">
+                        <h:outputText value="#{item.tarefa == null ? 'Sem tarefa' : item.tarefa.titulo}"/>
+                    </p:column>
+                    <p:column headerText="Insumo" sortBy="#{item.insumo.descricao}">
+                        <h:outputText value="#{item.insumo == null ? '-' : item.insumo.descricao}"/>
+                    </p:column>
+                    <p:column headerText="Quantidade" sortBy="#{item.quantidade}">
+                        <h:outputText value="#{item.quantidade}">
+                            <f:convertNumber minFractionDigits="3" maxFractionDigits="3"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Valor unitário" sortBy="#{item.valorUnitario}">
+                        <h:outputText value="#{item.valorUnitario}">
+                            <f:convertNumber type="currency" currencySymbol="R$ " locale="pt_BR"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Status" sortBy="#{item.status}">
+                        <h:outputText value="#{item.status == null ? 'Pendente' : item.status.descricao}"
+                                      styleClass="costs-status #{custosBean.classeStatus(item)}"/>
+                    </p:column>
+                    <p:column headerText="Comprovantes" styleClass="costs-evidence-column">
+                        <p:commandButton value="Ver fotos" icon="pi pi-images"
+                                         styleClass="costs-pf-button costs-pf-button-view"
+                                         action="#{custosBean.selecionarLancamento(item)}"
+                                         process="@this"
+                                         update=":formCustos:evidenceDialog :formCustos:mensagens"
+                                         oncomplete="PF('evidenceDialog').show()"/>
+                    </p:column>
+                    <p:column headerText="Ações" styleClass="costs-actions-column">
+                        <p:commandButton value="Validar" icon="pi pi-check"
+                                         styleClass="costs-pf-button costs-pf-button-validate"
+                                         action="#{custosBean.validarLancamento(item)}"
+                                         process="@this" rendered="#{custosBean.podeValidar}"
+                                         disabled="#{not custosBean.pendente(item)}"
+                                         update=":formCustos:lancamentos :formCustos:mensagens"/>
+                        <p:commandButton value="Rejeitar" icon="pi pi-times"
+                                         styleClass="costs-pf-button costs-pf-button-reject"
+                                         action="#{custosBean.rejeitarLancamento(item)}"
+                                         process="@this" rendered="#{custosBean.podeValidar}"
+                                         disabled="#{not custosBean.pendente(item)}"
+                                         update=":formCustos:lancamentos :formCustos:mensagens">
+                            <p:confirm header="Confirmar rejeição"
+                                       message="Deseja rejeitar este lançamento de custo?"
+                                       icon="pi pi-exclamation-triangle"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </section>
+
+            <p:dialog id="evidenceDialog" widgetVar="evidenceDialog"
+                      header="Fotos da evidência de pagamento" modal="true"
+                      responsive="true" width="900" styleClass="costs-evidence-dialog">
+                <p:outputPanel id="evidenceContent">
+                    <p:outputPanel rendered="#{custosBean.lancamentoSelecionado == null}">
+                        <h:outputText value="Selecione um lançamento para consultar as evidências."/>
+                    </p:outputPanel>
+                    <p:outputPanel rendered="#{custosBean.lancamentoSelecionado != null}">
+                        <p class="costs-evidence-hint">
+                            Lançamento ##{custosBean.lancamentoSelecionado.id} ·
+                            #{custosBean.lancamentoSelecionado.insumo.descricao}
+                        </p>
+                        <p:fileUpload id="uploadEvidence" mode="advanced" multiple="true" auto="true"
+                                      styleClass="costs-file-upload delivery-file-upload"
+                                      listener="#{custosBean.enviarEvidencia}"
+                                      update=":formCustos:evidenceContent :formCustos:mensagens"
+                                      allowTypes="/(\.|\/)(jpe?g|png|webp)$/"
+                                      accept="image/jpeg,image/png,image/webp"
+                                      maxFileSize="10485760" fileLimit="10"
+                                      rendered="#{custosBean.podeRegistrar}"
+                                      label="Selecionar novas fotos" uploadLabel="Enviar" cancelLabel="Cancelar"/>
+                        <p:outputPanel id="evidenceGallery" styleClass="costs-evidence-gallery">
+                            <p:outputPanel rendered="#{empty custosBean.evidencias}">
+                                <h:outputText value="Nenhuma foto anexada a este lançamento."/>
+                            </p:outputPanel>
+                            <ui:repeat value="#{custosBean.evidencias}" var="evidencia">
+                                <div class="costs-evidence-card">
+                                    <a class="costs-evidence-image-link" target="_blank" rel="noopener"
+                                       href="#{request.contextPath}/api/v1/lancamentos/#{custosBean.lancamentoSelecionado.id}/evidencias/#{evidencia.id}">
+                                        <h:graphicImage
+                                                value="#{request.contextPath}/api/v1/lancamentos/#{custosBean.lancamentoSelecionado.id}/evidencias/#{evidencia.id}"
+                                                alt="#{evidencia.nomeArquivo}"/>
+                                    </a>
+                                    <span><h:outputText value="#{evidencia.nomeArquivo}"/></span>
+                                    <p:commandButton value="Excluir foto" icon="pi pi-trash"
+                                                     styleClass="costs-evidence-delete"
+                                                     action="#{custosBean.excluirEvidencia(evidencia)}"
+                                                     process="@this"
+                                                     update=":formCustos:evidenceGallery :formCustos:mensagens"
+                                                     rendered="#{custosBean.podeRegistrar}">
+                                        <p:confirm header="Excluir foto"
+                                                   message="Deseja excluir esta foto de evidência?"
+                                                   icon="pi pi-exclamation-triangle"/>
+                                    </p:commandButton>
+                                </div>
+                            </ui:repeat>
+                        </p:outputPanel>
+                    </p:outputPanel>
+                </p:outputPanel>
+            </p:dialog>
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes"
+                                 icon="pi pi-check"/>
+                <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no"
+                                 icon="pi pi-times"/>
+            </p:confirmDialog>
+        </h:form>
+    </h:body>
+</f:view>
 </html>

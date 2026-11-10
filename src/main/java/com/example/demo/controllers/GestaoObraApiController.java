@@ -12,9 +12,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ContentDisposition;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -176,6 +179,51 @@ public class GestaoObraApiController {
         return lancamentoService.validar(id, request);
     }
 
+    @GetMapping("/lancamentos/{id}/evidencias")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR','MESTRE_OBRA','TECNICO_OBRA','FINANCEIRO') and @obraAuthorization.podeAcessarLancamento(#id, authentication)")
+    public List<EvidenciaPagamentoResponse> listarEvidencias(@PathVariable Long id) {
+        return lancamentoService.listarEvidencias(id);
+    }
+
+    @PostMapping(value = "/lancamentos/{id}/evidencias", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyRole('ADMIN','MESTRE_OBRA','TECNICO_OBRA','FINANCEIRO') and @obraAuthorization.podeAcessarLancamento(#id, authentication)")
+    public ResponseEntity<List<EvidenciaPagamentoResponse>> adicionarEvidencias(
+            @PathVariable Long id,
+            @RequestParam("arquivos") List<MultipartFile> arquivos,
+            org.springframework.security.core.Authentication authentication
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(lancamentoService.adicionarEvidencias(id, arquivos, authentication.getName()));
+    }
+
+    @GetMapping("/lancamentos/{lancamentoId}/evidencias/{evidenciaId}")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR','MESTRE_OBRA','TECNICO_OBRA','FINANCEIRO') and @obraAuthorization.podeAcessarLancamento(#lancamentoId, authentication)")
+    public ResponseEntity<byte[]> obterEvidencia(
+            @PathVariable Long lancamentoId,
+            @PathVariable Long evidenciaId
+    ) {
+        EvidenciaPagamento evidencia = lancamentoService.buscarArquivoEvidencia(lancamentoId, evidenciaId);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(evidencia.getTipo()))
+                .contentLength(evidencia.getTamanho())
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.inline()
+                                .filename(evidencia.getNomeArquivo(), StandardCharsets.UTF_8)
+                                .build()
+                                .toString())
+                .body(evidencia.getArquivo());
+    }
+
+    @DeleteMapping("/lancamentos/{lancamentoId}/evidencias/{evidenciaId}")
+    @PreAuthorize("hasAnyRole('ADMIN','MESTRE_OBRA','TECNICO_OBRA','FINANCEIRO') and @obraAuthorization.podeAcessarLancamento(#lancamentoId, authentication)")
+    public ResponseEntity<Void> excluirEvidencia(
+            @PathVariable Long lancamentoId,
+            @PathVariable Long evidenciaId
+    ) {
+        lancamentoService.excluirEvidencia(lancamentoId, evidenciaId);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/etapas/{etapaId}/entrega")
     @PreAuthorize("hasAnyRole('ADMIN','GESTOR','MESTRE_OBRA','TECNICO_OBRA') and @obraAuthorization.podeAcessarEtapa(#etapaId, authentication)")
     public ResponseEntity<Entrega> registrarEntrega(
@@ -185,11 +233,72 @@ public class GestaoObraApiController {
         return ResponseEntity.status(201).body(entregaService.registrar(etapaId, request));
     }
 
+    @PutMapping("/etapas/{etapaId}/entrega")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR','MESTRE_OBRA','TECNICO_OBRA') and @obraAuthorization.podeAcessarEtapa(#etapaId, authentication)")
+    public Entrega atualizarEntrega(
+            @PathVariable Long etapaId,
+            @RequestBody EntregaRequest request
+    ) {
+        return entregaService.registrar(etapaId, request);
+    }
+
     @GetMapping("/etapas/{etapaId}/entrega")
     @PreAuthorize("hasAnyRole('ADMIN','GESTOR','MESTRE_OBRA','TECNICO_OBRA','CLIENTE') and @obraAuthorization.podeAcessarEtapa(#etapaId, authentication)")
     public ResponseEntity<Entrega> obterEntrega(@PathVariable Long etapaId) {
         return entregaRepository.findByEtapaId(etapaId).map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/obras/{obraId}/entregas")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR','MESTRE_OBRA','TECNICO_OBRA','CLIENTE') and @obraAuthorization.podeAcessarObra(#obraId, authentication)")
+    public List<EntregaListaResponse> listarEntregas(@PathVariable Long obraId) {
+        return entregaService.listarPorObra(obraId);
+    }
+
+    @GetMapping("/etapas/{etapaId}/entrega/evidencias")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR','MESTRE_OBRA','TECNICO_OBRA','CLIENTE') and @obraAuthorization.podeAcessarEtapa(#etapaId, authentication)")
+    public List<EvidenciaEntregaResponse> listarEvidenciasEntrega(@PathVariable Long etapaId) {
+        return entregaService.listarEvidencias(etapaId);
+    }
+
+    @PostMapping(value = "/etapas/{etapaId}/entrega/evidencias",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR','MESTRE_OBRA','TECNICO_OBRA') and @obraAuthorization.podeAcessarEtapa(#etapaId, authentication)")
+    public ResponseEntity<List<EvidenciaEntregaResponse>> adicionarEvidenciasEntrega(
+            @PathVariable Long etapaId,
+            @RequestParam("arquivos") List<MultipartFile> arquivos,
+            org.springframework.security.core.Authentication authentication
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(entregaService.adicionarEvidencias(etapaId, arquivos, authentication.getName()));
+    }
+
+    @GetMapping("/etapas/{etapaId}/entrega/evidencias/{evidenciaId}")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR','MESTRE_OBRA','TECNICO_OBRA','CLIENTE') and @obraAuthorization.podeAcessarEtapa(#etapaId, authentication)")
+    public ResponseEntity<byte[]> obterEvidenciaEntrega(
+            @PathVariable Long etapaId,
+            @PathVariable Long evidenciaId
+    ) {
+        EvidenciaEntrega evidencia = entregaService.buscarArquivoEvidencia(etapaId, evidenciaId);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(evidencia.getTipo()))
+                .contentLength(evidencia.getTamanho())
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.inline()
+                                .filename(evidencia.getNomeArquivo(), StandardCharsets.UTF_8)
+                                .build()
+                                .toString())
+                .body(evidencia.getArquivo());
+    }
+
+    @DeleteMapping("/etapas/{etapaId}/entrega/evidencias/{evidenciaId}")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR','MESTRE_OBRA','TECNICO_OBRA') and @obraAuthorization.podeAcessarEtapa(#etapaId, authentication)")
+    public ResponseEntity<Void> excluirEvidenciaEntrega(
+            @PathVariable Long etapaId,
+            @PathVariable Long evidenciaId
+    ) {
+        entregaService.excluirEvidencia(etapaId, evidenciaId);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/etapas/{etapaId}/entrega/aprovacao")
@@ -199,6 +308,13 @@ public class GestaoObraApiController {
             @RequestBody AprovacaoEntregaRequest request
     ) {
         return entregaService.aprovar(etapaId, request);
+    }
+
+    @DeleteMapping("/etapas/{etapaId}/entrega")
+    @PreAuthorize("hasAnyRole('ADMIN','GESTOR') and @obraAuthorization.podeAcessarEtapa(#etapaId, authentication)")
+    public ResponseEntity<Void> excluirEntrega(@PathVariable Long etapaId) {
+        entregaService.excluir(etapaId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/etapas/{etapaId}/tarefas")

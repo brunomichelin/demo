@@ -1,190 +1,268 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xml:lang="pt-BR" lang="pt-BR">
-<h:head>
-    <title>Entregas das etapas</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <h:outputStylesheet library="css" name="app.css"/>
-</h:head>
-<h:body styleClass="works-page deliveries-page">
-    <main id="pagina" class="deliveries-shell"
-          data-can-register="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA')}"
-          data-can-decide="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR')}">
-        <header class="deliveries-header">
-            <div>
-                <nav class="system-return-links" aria-label="Navegação principal">
-                    <a href="indexObra.xhtml">Início</a><span> / </span>
-                    <a class="deliveries-back-link" id="obraLink" href="gestao.xhtml">Painel de obras</a>
-                </nav>
-                <p class="deliveries-eyebrow">Acompanhamento de obra</p>
-                <h1>Entregas das etapas</h1>
-                <p class="deliveries-subtitle">Registre entregas e acompanhe a validação de cada etapa.</p>
+<f:view>
+    <h:head>
+        <title>Entregas das etapas</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <h:outputStylesheet library="css" name="app.css"/>
+    </h:head>
+    <h:body styleClass="works-page deliveries-page">
+        <h:form id="formEntregas" styleClass="deliveries-shell">
+            <p:growl id="mensagens" showDetail="true" autoUpdate="true" closable="true"/>
+
+            <div class="application-timeline" aria-label="Navegação dos módulos">
+                <p:button value="Início" icon="ui-icon-home" outcome="indexObra.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Painel de obras" icon="ui-icon-arrowthick-1-w" outcome="gestao.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Etapas" icon="pi pi-list" outcome="Etapa.xhtml"
+                          styleClass="application-timeline-step"/>
+                <p:button value="Entregas" icon="pi pi-check-circle" outcome="entregas.xhtml"
+                          styleClass="application-timeline-step application-timeline-action"/>
             </div>
-            <span class="deliveries-header-icon" aria-hidden="true">✓</span>
-        </header>
-        <section class="deliveries-card">
-            <div class="deliveries-section-heading">
-                <span class="deliveries-section-icon" aria-hidden="true">00</span>
-                <div><p class="deliveries-eyebrow">Seleção</p><h2>Obra em análise</h2></div>
-            </div>
-            <div class="deliveries-field deliveries-field-wide">
-                <label for="obraSelect">Obra</label>
-                <select id="obraSelect"></select>
-            </div>
-        </section>
-        <p id="mensagem" class="deliveries-message" role="status"></p>
-        <section class="deliveries-card">
-            <div class="deliveries-section-heading">
-                <span class="deliveries-section-icon" aria-hidden="true">01</span>
-                <div><p class="deliveries-eyebrow">Etapa e registro</p><h2>Dados da entrega</h2></div>
-            </div>
-            <div class="deliveries-form">
-                <div class="deliveries-field deliveries-field-wide">
-                    <label for="etapa">Etapa da obra</label><select id="etapa"></select>
+            <header class="deliveries-header">
+                <div>
+                    <p class="deliveries-eyebrow">Acompanhamento de obra</p>
+                    <h1>Entregas das etapas</h1>
+                    <p class="deliveries-subtitle">Registre entregas e acompanhe a validação de cada etapa.</p>
                 </div>
-                <div class="deliveries-field">
-                    <label for="dataReal">Data real da entrega</label><input id="dataReal" type="date"/>
+                <span class="deliveries-header-icon" aria-hidden="true">✓</span>
+            </header>
+
+            <section class="deliveries-card">
+                <div class="deliveries-section-heading">
+                    <span class="deliveries-section-icon" aria-hidden="true">00</span>
+                    <div><p class="deliveries-eyebrow">Seleção</p><h2>Obra em análise</h2></div>
                 </div>
                 <div class="deliveries-field deliveries-field-wide">
-                    <label for="observacoes">Observações</label>
-                    <textarea id="observacoes" rows="3" placeholder="Registre detalhes relevantes sobre a entrega"></textarea>
+                    <p:outputLabel for="obra" value="Obra"/>
+                    <p:selectOneMenu id="obra" value="#{entregasBean.obraSelecionadaId}"
+                                     styleClass="delivery-select"
+                                     disabled="#{empty entregasBean.obras}">
+                        <f:selectItem itemLabel="Selecione uma obra" itemValue="#{null}"
+                                      noSelectionOption="true"/>
+                        <f:selectItems value="#{entregasBean.obras}" var="obra"
+                                       itemValue="#{obra.id}" itemLabel="#{obra.nome}"/>
+                        <p:ajax listener="#{entregasBean.carregarObra}"
+                                update=":formEntregas:etapas :formEntregas:tabelaEntregas :formEntregas:detalheEntrega :formEntregas:evidenceSection"/>
+                    </p:selectOneMenu>
                 </div>
-            </div>
-            <div class="deliveries-actions">
-                <button class="delivery-button delivery-button-primary" type="button" id="registrar">
-                    <span aria-hidden="true">＋</span> Registrar entrega
-                </button>
-                <span class="deliveries-actions-divider" aria-hidden="true"></span>
-                <button class="delivery-button delivery-button-approve" type="button" id="aprovar">
-                    <span aria-hidden="true">✓</span> Aprovar
-                </button>
-                <button class="delivery-button delivery-button-reject" type="button" id="reprovar">
-                    <span aria-hidden="true">×</span> Reprovar
-                </button>
-            </div>
-        </section>
-        <section class="deliveries-card deliveries-current-card">
-            <div class="deliveries-section-heading">
-                <span class="deliveries-section-icon" aria-hidden="true">02</span>
-                <div><p class="deliveries-eyebrow">Situação atual</p><h2>Resumo da entrega</h2></div>
-            </div>
-            <dl class="deliveries-summary">
-                <div><dt>Situação</dt><dd id="status">-</dd></div>
-                <div><dt>Data real</dt><dd id="data">-</dd></div>
-                <div><dt>Responsável</dt><dd id="responsavel">-</dd></div>
-                <div class="deliveries-summary-notes"><dt>Observações</dt><dd id="detalhes">-</dd></div>
-            </dl>
-        </section>
-    </main>
-    <script type="text/javascript">
-        //<![CDATA[
-        (() => {
-            const root = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
-            const api = `#{'${'}root}/api/v1`;
-            const params = new URLSearchParams(window.location.search);
-            let obraId = params.get('obraId');
-            const podeTrocarObra = !obraId || params.get('origem') === 'index';
-            const obraSelect = document.getElementById('obraSelect');
-            const select = document.getElementById('etapa');
-            const message = document.getElementById('mensagem');
-            const roleFlags = document.getElementById('pagina').dataset;
-            document.getElementById('registrar').hidden = roleFlags.canRegister !== 'true';
-            document.getElementById('aprovar').hidden = roleFlags.canDecide !== 'true';
-            document.getElementById('reprovar').hidden = roleFlags.canDecide !== 'true';
-            document.getElementById('obraLink').href = 'gestao.xhtml';
-            async function call(url, options = {}) {
-                const response = await fetch(url, {credentials: 'same-origin', ...options,
-                    headers: {'Content-Type': 'application/json', ...(options.headers || {})}});
-                if (!response.ok) {
-                    let body = {}; try { body = await response.json(); } catch (_) {}
-                    throw new Error(body.detail || body.message || `Falha na solicitação (#{'${'}response.status}).`);
-                }
-                return response.status === 204 ? null : response.json();
-            }
-            function erro(error) { message.textContent = error.message; }
-            async function carregarObras() {
-                const response = await fetch(`#{'${'}root}/api/v1/obras?size=100&sort=nome,asc`, {credentials: 'same-origin'});
-                if (!response.ok) {
-                    let error = {}; try { error = await response.json(); } catch (_) {}
-                    throw new Error(error.detail || error.message || `Falha ao carregar obras (#{'${'}response.status}).`);
-                }
-                const page = await response.json();
-                obraSelect.replaceChildren();
-                page.content.forEach(obra => obraSelect.add(new Option(obra.nome, obra.id)));
-                if (!obraId && page.content[0]) {
-                    obraId = String(page.content[0].id);
-                    params.set('obraId', obraId);
-                    params.set('origem', 'index');
-                    window.history.replaceState(null, '', `${window.location.pathname}?${params}`);
-                } else if (!page.content.length) {
-                    throw new Error('Você não está vinculado a nenhuma obra.');
-                } else if (obraId) {
-                    obraSelect.value = String(obraId);
-                }
-                obraSelect.disabled = !podeTrocarObra;
-                await init();
-            }
-            async function carregarEntrega() {
-                if (!select.value) {
-                    ['status', 'data', 'responsavel', 'detalhes'].forEach(id => document.getElementById(id).textContent = '-');
-                    return;
-                }
-                const response = await fetch(`#{'${'}api}/etapas/#{'${'}select.value}/entrega`, {credentials: 'same-origin'});
-                if (response.status === 404) {
-                    ['status', 'data', 'responsavel', 'detalhes'].forEach(id => document.getElementById(id).textContent = '-');
-                    return;
-                }
-                if (!response.ok) throw new Error(`Falha ao carregar entrega (#{'${'}response.status}).`);
-                const item = await response.json();
-                document.getElementById('status').textContent = item.status || '-';
-                document.getElementById('data').textContent = item.dataReal || '-';
-                document.getElementById('responsavel').textContent = item.responsavel?.nome || '-';
-                document.getElementById('detalhes').textContent = item.observacoes || '-';
-            }
-            async function init() {
-                try {
-                    if (!obraId) throw new Error('Identificador da obra não informado.');
-                    const stages = await call(`#{'${'}api}/obras/#{'${'}obraId}/etapas?size=100`);
-                    const selectedId = params.get('etapaId');
-                    select.replaceChildren();
-                    stages.content.forEach(item => select.add(new Option(`#{'${'}item.ordem} - #{'${'}item.nome}`, item.id)));
-                    if (selectedId) select.value = selectedId;
-                    await carregarEntrega();
-                } catch (error) { erro(error); }
-            }
-            obraSelect.addEventListener('change', () => {
-                if (!podeTrocarObra || !obraSelect.value) return;
-                obraId = obraSelect.value;
-                params.set('obraId', obraId);
-                params.set('origem', 'index');
-                params.delete('etapaId');
-                window.history.replaceState(null, '', `${window.location.pathname}?${params}`);
-                init();
-            });
-            document.getElementById('registrar').addEventListener('click', async () => {
-                try {
-                    const body = {dataReal: document.getElementById('dataReal').value || null,
-                        observacoes: document.getElementById('observacoes').value || null};
-                    await call(`#{'${'}api}/etapas/#{'${'}select.value}/entrega`, {method: 'POST', body: JSON.stringify(body)});
-                    message.textContent = 'Entrega registrada para aprovação.'; await carregarEntrega();
-                } catch (error) { erro(error); }
-            });
-            async function decidir(status) {
-                try {
-                    await call(`#{'${'}api}/etapas/#{'${'}select.value}/entrega/aprovacao`,
-                        {method: 'PATCH', body: JSON.stringify({status,
-                            observacoes: document.getElementById('observacoes').value || null})});
-                    message.textContent = `Entrega #{'${'}status.toLowerCase()}.`; await carregarEntrega();
-                } catch (error) { erro(error); }
-            }
-            document.getElementById('aprovar').addEventListener('click', () => decidir('APROVADA'));
-            document.getElementById('reprovar').addEventListener('click', () => decidir('REPROVADA'));
-            select.addEventListener('change', () => carregarEntrega().catch(erro));
-            carregarObras().catch(erro);
-        })();
-        //]]>
-    </script>
-</h:body>
+            </section>
+
+            <section class="deliveries-card">
+                <div class="deliveries-section-heading">
+                    <span class="deliveries-section-icon" aria-hidden="true">01</span>
+                    <div><p class="deliveries-eyebrow">Histórico</p><h2>Lista de entregas</h2></div>
+                </div>
+                <p:dataTable id="tabelaEntregas" var="item" value="#{entregasBean.entregas}"
+                             rowKey="#{item.id}" paginator="true" rows="10"
+                         paginatorPosition="bottom" responsiveLayout="scroll"
+                         emptyMessage="Ainda não há entregas registradas para esta obra."
+                         styleClass="deliveries-table">
+                    <p:column headerText="Etapa" sortBy="#{item.etapaOrdem}">
+                        <h:outputText value="#{item.etapaOrdem} - #{item.etapaNome}"/>
+                    </p:column>
+                    <p:column headerText="Situação" sortBy="#{item.status}">
+                        <h:outputText value="#{item.status}"
+                                      styleClass="costs-status #{item.status == 'APROVADA' ? 'costs-status-validado' : item.status == 'REPROVADA' ? 'costs-status-rejeitado' : 'costs-status-pendente'}"/>
+                    </p:column>
+                    <p:column headerText="Data real" sortBy="#{item.dataReal}">
+                        <h:outputText value="#{item.dataReal}">
+                            <f:convertDateTime type="localDate" pattern="dd/MM/yyyy"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Responsável" sortBy="#{item.responsavelNome}">
+                        <h:outputText value="#{item.responsavelNome}"/>
+                    </p:column>
+                    <p:column headerText="Ações" styleClass="delivery-actions-column">
+                        <p:commandButton value="Visualizar / editar" icon="pi pi-eye"
+                                         action="#{entregasBean.selecionarEntrega(item)}"
+                                         styleClass="delivery-pf-button delivery-pf-button-view"
+                                         process="@this"
+                                         update=":formEntregas:etapas :formEntregas:detalheEntrega :formEntregas:evidenceSection :formEntregas:mensagens"/>
+                        <p:commandButton value="Excluir" icon="pi pi-trash"
+                                         rendered="#{entregasBean.podeDecidir}"
+                                         styleClass="delivery-pf-button delivery-pf-button-delete"
+                                         action="#{entregasBean.excluir(item)}"
+                                         process="@this"
+                                         update=":formEntregas:tabelaEntregas :formEntregas:detalheEntrega :formEntregas:evidenceSection :formEntregas:mensagens">
+                            <p:confirm header="Confirmar exclusão"
+                                       message="Deseja excluir esta entrega e os anexos vinculados?"
+                                       icon="pi pi-exclamation-triangle"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </section>
+
+            <section class="deliveries-card">
+                <div class="deliveries-section-heading">
+                    <span class="deliveries-section-icon" aria-hidden="true">02</span>
+                    <div><p class="deliveries-eyebrow">Etapa e registro</p><h2>Dados da entrega</h2></div>
+                </div>
+                <p:outputPanel id="etapas">
+                    <div class="deliveries-form">
+                        <div class="deliveries-field deliveries-field-wide">
+                            <p:outputLabel for="etapa" value="Etapa da obra"/>
+                            <p:selectOneMenu id="etapa" value="#{entregasBean.etapaSelecionadaId}"
+                                             styleClass="delivery-select"
+                                             disabled="#{empty entregasBean.etapas}">
+                                <f:selectItem itemLabel="Selecione uma etapa" itemValue="#{null}"
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{entregasBean.etapas}" var="etapa"
+                                               itemValue="#{etapa.id}"
+                                               itemLabel="#{etapa.ordem} - #{etapa.nome}"/>
+                                <p:ajax listener="#{entregasBean.carregarEtapaSelecionada}"
+                                        update=":formEntregas:detalheEntrega :formEntregas:evidenceSection"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+                </p:outputPanel>
+
+                <p:outputPanel id="detalheEntrega">
+                    <div class="deliveries-form">
+                        <div class="deliveries-field">
+                            <p:outputLabel for="dataReal" value="Data real da entrega"/>
+                            <p:datePicker id="dataReal" value="#{entregasBean.dataReal}"
+                                          pattern="dd/MM/yyyy" showIcon="true"
+                                          disabled="#{not entregasBean.podeRegistrar}"
+                                          styleClass="delivery-date"/>
+                        </div>
+                        <div class="deliveries-field deliveries-field-wide">
+                            <p:outputLabel for="observacoes" value="Observações"/>
+                            <p:inputTextarea id="observacoes" value="#{entregasBean.observacoes}"
+                                             rows="3" autoResize="false"
+                                             placeholder="Registre detalhes relevantes sobre a entrega"
+                                             disabled="#{not entregasBean.podeRegistrar}"/>
+                        </div>
+                    </div>
+                    <div class="deliveries-actions">
+                        <p:commandButton value="#{entregasBean.entregaSelecionada == null ? 'Registrar entrega' : 'Salvar alterações'}"
+                                         icon="pi pi-save" styleClass="delivery-pf-button delivery-pf-button-primary"
+                                         action="#{entregasBean.salvar}" process="detalheEntrega"
+                                         rendered="#{entregasBean.podeRegistrar}"
+                                         update=":formEntregas:tabelaEntregas :formEntregas:detalheEntrega :formEntregas:evidenceSection :formEntregas:mensagens"/>
+                        <p:commandButton value="Aprovar" icon="pi pi-check"
+                                         action="#{entregasBean.aprovar}" process="detalheEntrega"
+                                         styleClass="delivery-pf-button delivery-pf-button-approve"
+                                         rendered="#{entregasBean.podeDecidir}"
+                                         disabled="#{entregasBean.entregaSelecionada == null}"
+                                         update=":formEntregas:tabelaEntregas :formEntregas:detalheEntrega :formEntregas:evidenceSection :formEntregas:mensagens"/>
+                        <p:commandButton value="Reprovar" icon="pi pi-times"
+                                         action="#{entregasBean.reprovar}" process="detalheEntrega"
+                                         styleClass="delivery-pf-button delivery-pf-button-reject"
+                                         rendered="#{entregasBean.podeDecidir}"
+                                         disabled="#{entregasBean.entregaSelecionada == null}"
+                                         update=":formEntregas:tabelaEntregas :formEntregas:detalheEntrega :formEntregas:evidenceSection :formEntregas:mensagens"/>
+                    </div>
+                    <dl class="deliveries-summary">
+                        <div>
+                            <dt>Situação</dt>
+                            <dd><h:outputText value="#{entregasBean.entregaSelecionada == null ? '-' : entregasBean.entregaSelecionada.status}"/></dd>
+                        </div>
+                        <div>
+                            <dt>Data real</dt>
+                            <dd><h:outputText value="#{entregasBean.entregaSelecionada == null ? '-' : entregasBean.entregaSelecionada.dataReal}"/></dd>
+                        </div>
+                        <div>
+                            <dt>Responsável</dt>
+                            <dd><h:outputText value="#{entregasBean.entregaSelecionada == null or entregasBean.entregaSelecionada.responsavel == null ? '-' : entregasBean.entregaSelecionada.responsavel.nome}"/></dd>
+                        </div>
+                        <div class="deliveries-summary-notes">
+                            <dt>Observações registradas</dt>
+                            <dd><h:outputText value="#{entregasBean.entregaSelecionada == null ? '-' : entregasBean.entregaSelecionada.observacoes}"/></dd>
+                        </div>
+                    </dl>
+                </p:outputPanel>
+            </section>
+
+            <p:outputPanel id="evidenceSection">
+                <p:outputPanel layout="block" styleClass="deliveries-card"
+                               rendered="#{entregasBean.entregaSelecionada != null}">
+                    <div class="deliveries-section-heading">
+                        <span class="deliveries-section-icon" aria-hidden="true">03</span>
+                        <div>
+                            <p class="deliveries-eyebrow">Registro visual</p>
+                            <h2>Fotos e vídeos da entrega</h2>
+                            <p class="deliveries-evidence-hint">
+                                Até 10 arquivos e 100 MB por envio. Fotos até 10 MB e vídeos até 50 MB cada.
+                            </p>
+                        </div>
+                    </div>
+                    <p:commandButton value="Ver anexos" icon="pi pi-images"
+                                     styleClass="delivery-pf-button delivery-pf-button-view"
+                                     process="@this" update=":formEntregas:evidenceDialog"
+                                     oncomplete="PF('evidenceDialog').show()"/>
+                </p:outputPanel>
+            </p:outputPanel>
+
+            <p:dialog id="evidenceDialog" widgetVar="evidenceDialog"
+                      header="Fotos e vídeos da entrega" modal="true"
+                      responsive="true" width="900" styleClass="costs-evidence-dialog">
+                <p:outputPanel id="evidenceContent">
+                    <p:outputPanel rendered="#{entregasBean.entregaSelecionada != null}">
+                        <p:fileUpload id="uploadEvidence" mode="advanced" multiple="true" auto="true"
+                                      styleClass="delivery-file-upload"
+                                      listener="#{entregasBean.enviarEvidencia}"
+                                      update=":formEntregas:evidenceGallery :formEntregas:mensagens"
+                                      allowTypes="/(\.|\/)(jpe?g|png|webp|mp4|mov|webm)$/"
+                                      accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime"
+                                      maxFileSize="52428800" fileLimit="10"
+                                      rendered="#{entregasBean.podeRegistrar}"
+                                      label="Selecionar novas fotos ou vídeos" uploadLabel="Enviar"
+                                      cancelLabel="Cancelar"/>
+                    </p:outputPanel>
+                    <p:outputPanel id="evidenceGallery" styleClass="costs-evidence-gallery">
+                        <p:outputPanel rendered="#{empty entregasBean.evidencias}">
+                            <h:outputText value="Nenhum arquivo anexado a esta entrega."/>
+                        </p:outputPanel>
+                        <ui:repeat value="#{entregasBean.evidencias}" var="evidencia">
+                            <article class="costs-evidence-card">
+                                <a class="costs-evidence-image-link" target="_blank" rel="noopener"
+                                   href="#{request.contextPath}/api/v1/etapas/#{entregasBean.etapaSelecionadaId}/entrega/evidencias/#{evidencia.id}">
+                                    <h:panelGroup layout="block" rendered="#{not evidencia.tipo.startsWith('video/')}">
+                                        <h:graphicImage
+                                                value="#{request.contextPath}/api/v1/etapas/#{entregasBean.etapaSelecionadaId}/entrega/evidencias/#{evidencia.id}"
+                                                alt="#{evidencia.nomeArquivo}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup layout="block" rendered="#{evidencia.tipo.startsWith('video/')}">
+                                        <video controls="controls" preload="metadata" playsinline="playsinline"
+                                               width="300" height="220">
+                                            <source
+                                                    src="#{request.contextPath}/api/v1/etapas/#{entregasBean.etapaSelecionadaId}/entrega/evidencias/#{evidencia.id}"
+                                                    type="#{evidencia.tipo}"/>
+                                        </video>
+                                    </h:panelGroup>
+                                </a>
+                                <span><h:outputText value="#{evidencia.nomeArquivo}"/></span>
+                                <p:commandButton value="Excluir foto" icon="pi pi-trash"
+                                                 styleClass="costs-evidence-delete"
+                                                 action="#{entregasBean.excluirEvidencia(evidencia)}"
+                                                 process="@this"
+                                                 update=":formEntregas:evidenceGallery :formEntregas:mensagens"
+                                                 rendered="#{entregasBean.podeRegistrar}">
+                                    <p:confirm header="Excluir evidência"
+                                               message="Deseja excluir este arquivo da entrega?"
+                                               icon="pi pi-exclamation-triangle"/>
+                                </p:commandButton>
+                            </article>
+                        </ui:repeat>
+                    </p:outputPanel>
+                </p:outputPanel>
+            </p:dialog>
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes"
+                                 icon="pi pi-check"/>
+                <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no"
+                                 icon="pi pi-times"/>
+            </p:confirmDialog>
+        </h:form>
+    </h:body>
+</f:view>
 </html>
