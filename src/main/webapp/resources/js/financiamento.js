@@ -23,24 +23,31 @@
         extraByMonth: {}
     };
     const state = {...defaults};
+    function control(id) {
+        return document.getElementById(`${id}_input`) || document.getElementById(id);
+    }
+
     const fields = {
-        amount: document.getElementById('loanAmount'),
-        annualRate: document.getElementById('annualRate'),
-        selicRate: document.getElementById('selicRate'),
-        ipcaRate: document.getElementById('ipcaRate'),
-        propertyAppreciationRate: document.getElementById('propertyAppreciationRate'),
-        trRate: document.getElementById('trRate'),
-        months: document.getElementById('termMonths'),
-        birthDate: document.getElementById('birthDate'),
-        propertyValue: document.getElementById('propertyValue'),
-        dfiRate: document.getElementById('dfiRate'),
-        monthlyExtra: document.getElementById('monthlyExtra'),
-        strategy: document.getElementById('extraStrategy'),
-        fgtsBalance: document.getElementById('fgtsBalance'),
-        grossSalary: document.getElementById('grossSalary'),
-        fgtsMode: document.getElementById('fgtsMode'),
-        fgtsStrategy: document.getElementById('fgtsStrategy')
+        amount: control('loanAmount'),
+        annualRate: control('annualRate'),
+        selicRate: control('selicRate'),
+        ipcaRate: control('ipcaRate'),
+        propertyAppreciationRate: control('propertyAppreciationRate'),
+        trRate: control('trRate'),
+        months: control('termMonths'),
+        birthDate: control('birthDate'),
+        propertyValue: control('propertyValue'),
+        dfiRate: control('dfiRate'),
+        monthlyExtra: control('monthlyExtra'),
+        strategy: control('extraStrategy'),
+        fgtsBalance: control('fgtsBalance'),
+        grossSalary: control('grossSalary'),
+        fgtsMode: control('fgtsMode'),
+        fgtsStrategy: control('fgtsStrategy')
     };
+    fields.strategy.dataset.widgetVar = 'financingExtraStrategy';
+    fields.fgtsMode.dataset.widgetVar = 'financingFgtsMode';
+    fields.fgtsStrategy.dataset.widgetVar = 'financingFgtsStrategy';
     const mipAgeLimits = [25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 120];
     const message = document.getElementById('financingMessage');
     const money = new Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'});
@@ -102,23 +109,35 @@
         } catch (error) {
             storageWarning = true;
         }
-        fields.amount.value = state.amount;
-        fields.annualRate.value = state.annualRate;
-        fields.selicRate.value = state.selicRate;
-        fields.ipcaRate.value = state.ipcaRate;
-        fields.propertyAppreciationRate.value = state.propertyAppreciationRate;
-        fields.trRate.value = state.trRate;
-        fields.months.value = state.months;
-        fields.birthDate.value = state.birthDate;
-        fields.propertyValue.value = state.propertyValue;
-        fields.dfiRate.value = state.dfiRate;
-        fields.monthlyExtra.value = state.monthlyExtra;
-        fields.strategy.value = state.strategy;
-        fields.fgtsBalance.value = state.fgtsBalance;
-        fields.grossSalary.value = state.grossSalary;
-        fields.fgtsMode.value = state.fgtsMode;
-        fields.fgtsStrategy.value = state.fgtsStrategy;
+        setFieldValue(fields.amount, state.amount);
+        setFieldValue(fields.annualRate, state.annualRate);
+        setFieldValue(fields.selicRate, state.selicRate);
+        setFieldValue(fields.ipcaRate, state.ipcaRate);
+        setFieldValue(fields.propertyAppreciationRate, state.propertyAppreciationRate);
+        setFieldValue(fields.trRate, state.trRate);
+        setFieldValue(fields.months, state.months);
+        setFieldValue(fields.birthDate, state.birthDate);
+        setFieldValue(fields.propertyValue, state.propertyValue);
+        setFieldValue(fields.dfiRate, state.dfiRate);
+        setFieldValue(fields.monthlyExtra, state.monthlyExtra);
+        setFieldValue(fields.strategy, state.strategy);
+        setFieldValue(fields.fgtsBalance, state.fgtsBalance);
+        setFieldValue(fields.grossSalary, state.grossSalary);
+        setFieldValue(fields.fgtsMode, state.fgtsMode);
+        setFieldValue(fields.fgtsStrategy, state.fgtsStrategy);
         renderMipRates();
+    }
+
+    function setFieldValue(field, value) {
+        const widgetVar = field.dataset.widgetVar;
+        if (widgetVar && typeof window.PF === 'function') {
+            const widget = window.PF(widgetVar);
+            if (widget && typeof widget.selectValue === 'function') {
+                widget.selectValue(String(value));
+                return;
+            }
+        }
+        field.value = value;
     }
 
     function saveState() {

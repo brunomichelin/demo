@@ -2,6 +2,9 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
       xml:lang="pt-BR" lang="pt-BR">
 <h:head>
     <title>Financiamento Habitacional</title>
@@ -14,8 +17,8 @@
         <header class="performance-header">
             <div>
                 <nav class="system-return-links" aria-label="Navegação principal">
-                    <a href="index.xhtml">Início</a><span> / </span>
-                    <a href="gestao.xhtml">Painel de obras</a>
+                    <p:link outcome="index.xhtml">Início</p:link><span> / </span>
+                    <p:link outcome="gestao.xhtml">Painel de obras</p:link>
                 </nav>
                 <p class="performance-eyebrow">Planejamento Habitacional</p>
                 <h1>Financiamento Habitacional</h1>
@@ -26,6 +29,7 @@
             </span>
         </header>
 
+        <h:form id="financingForm" prependId="false">
         <section class="performance-card financing-input-card" aria-labelledby="financingInputsTitle">
             <div class="performance-card-heading">
                 <div>
@@ -40,86 +44,89 @@
             <div class="financing-form-grid">
                 <div class="financing-field">
                     <label for="loanAmount">Valor financiado (R$)</label>
-                    <input id="loanAmount" type="number" min="1" max="1000000000" step="1000" value="350000"
-                           inputmode="decimal"/>
+                    <p:inputText id="loanAmount" type="number" pt:min="1" pt:max="1000000000" pt:step="1000"
+                                 value="350000" pt:inputmode="decimal"/>
                 </div>
                 <div class="financing-field">
                     <label for="annualRate">Taxa efetiva anual (%)</label>
-                    <input id="annualRate" type="number" min="0" max="100" step="0.01" value="10.5"
-                           inputmode="decimal"/>
+                    <p:inputText id="annualRate" type="number" pt:min="0" pt:max="100" pt:step="0.01"
+                                 value="10.5" pt:inputmode="decimal"/>
                 </div>
                 <div class="financing-field">
                     <label for="selicRate">SELIC média estimada (% a.a.)</label>
-                    <input id="selicRate" type="number" min="0" max="100" step="0.01" value="0"
-                           inputmode="decimal"/>
+                    <p:inputText id="selicRate" type="number" pt:min="0" pt:max="100" pt:step="0.01"
+                                 value="0" pt:inputmode="decimal"/>
                 </div>
                 <div class="financing-field">
                     <label for="ipcaRate">IPCA médio estimado (% a.a.)</label>
-                    <input id="ipcaRate" type="number" min="0" max="100" step="0.01" value="0"
-                           inputmode="decimal"/>
+                    <p:inputText id="ipcaRate" type="number" pt:min="0" pt:max="100" pt:step="0.01"
+                                 value="0" pt:inputmode="decimal"/>
                 </div>
                 <div class="financing-field">
                     <label for="trRate">TR anual estimada (%)</label>
-                    <input id="trRate" type="number" min="0" max="30" step="0.01" value="0" inputmode="decimal"/>
+                    <p:inputText id="trRate" type="number" pt:min="0" pt:max="30" pt:step="0.01"
+                                 value="0" pt:inputmode="decimal"/>
                 </div>
                 <div class="financing-field">
                     <label for="termMonths">Prazo (meses)</label>
-                    <input id="termMonths" type="number" min="1" max="600" step="1" value="360" inputmode="numeric"/>
+                    <p:inputText id="termMonths" type="number" pt:min="1" pt:max="600" pt:step="1"
+                                 value="360" pt:inputmode="numeric"/>
                 </div>
                 <div class="financing-field">
                     <label for="birthDate">Data de nascimento do mutuário</label>
-                    <input id="birthDate" type="date" required="required"/>
+                    <p:inputText id="birthDate" type="date" required="true"/>
                 </div>
                 <div class="financing-field">
                     <label for="propertyValue">Valor do imóvel para o DFI (R$)</label>
-                    <input id="propertyValue" type="number" min="1" max="1000000000" step="1000" value="450000"
-                           inputmode="decimal"/>
+                    <p:inputText id="propertyValue" type="number" pt:min="1" pt:max="1000000000" pt:step="1000"
+                                 value="450000" pt:inputmode="decimal"/>
                 </div>
                 <div class="financing-field">
                     <label for="propertyAppreciationRate">Valorização estimada (% a.a.)</label>
-                    <input id="propertyAppreciationRate" type="number" min="0" max="100" step="0.01" value="0"
-                           inputmode="decimal"/>
+                    <p:inputText id="propertyAppreciationRate" type="number" pt:min="0" pt:max="100" pt:step="0.01"
+                                 value="0" pt:inputmode="decimal"/>
                 </div>
                 <div class="financing-field">
                     <label for="dfiRate">Taxa DFI mensal (% do imóvel)</label>
-                    <input id="dfiRate" type="number" min="0" max="1" step="0.001" value="0.01" inputmode="decimal"/>
+                    <p:inputText id="dfiRate" type="number" pt:min="0" pt:max="1" pt:step="0.001"
+                                 value="0.01" pt:inputmode="decimal"/>
                 </div>
                 <div class="financing-field">
                     <label for="fgtsBalance">Saldo inicial do FGTS (R$)</label>
-                    <input id="fgtsBalance" type="number" min="0" max="1000000000" step="1000" value="0"
-                           inputmode="decimal"/>
+                    <p:inputText id="fgtsBalance" type="number" pt:min="0" pt:max="1000000000" pt:step="1000"
+                                 value="0" pt:inputmode="decimal"/>
                 </div>
                 <div class="financing-field">
                     <label for="grossSalary">Salário bruto mensal (R$)</label>
-                    <input id="grossSalary" type="number" min="0" max="1000000000" step="100" value="0"
-                           inputmode="decimal"/>
+                    <p:inputText id="grossSalary" type="number" pt:min="0" pt:max="1000000000" pt:step="100"
+                                 value="0" pt:inputmode="decimal"/>
                 </div>
                 <div class="financing-field">
                     <label for="monthlyExtra">Abatimento extra mensal (R$)</label>
-                    <input id="monthlyExtra" type="number" min="0" max="1000000000" step="100" value="0"
-                           inputmode="decimal"/>
+                    <p:inputText id="monthlyExtra" type="number" pt:min="0" pt:max="1000000000" pt:step="100"
+                                 value="0" pt:inputmode="decimal"/>
                 </div>
                 <div class="financing-field">
                     <label for="extraStrategy">Ao antecipar, prefiro</label>
-                    <select id="extraStrategy">
-                        <option value="term">Reduzir o prazo</option>
-                        <option value="payment">Reduzir o valor das parcelas</option>
-                    </select>
+                    <p:selectOneMenu id="extraStrategy" widgetVar="financingExtraStrategy" value="term">
+                        <f:selectItem itemValue="term" itemLabel="Reduzir o prazo"/>
+                        <f:selectItem itemValue="payment" itemLabel="Reduzir o valor das parcelas"/>
+                    </p:selectOneMenu>
                 </div>
                 <div class="financing-field">
                     <label for="fgtsMode">Modalidade de uso do FGTS</label>
-                    <select id="fgtsMode">
-                        <option value="none">Não usar FGTS</option>
-                        <option value="amortize">Amortizar saldo a cada 2 anos</option>
-                        <option value="installments">Acumular 12 meses e pagar as 12 seguintes</option>
-                    </select>
+                    <p:selectOneMenu id="fgtsMode" widgetVar="financingFgtsMode" value="none">
+                        <f:selectItem itemValue="none" itemLabel="Não usar FGTS"/>
+                        <f:selectItem itemValue="amortize" itemLabel="Amortizar saldo a cada 2 anos"/>
+                        <f:selectItem itemValue="installments" itemLabel="Acumular 12 meses e pagar as 12 seguintes"/>
+                    </p:selectOneMenu>
                 </div>
                 <div class="financing-field" id="fgtsStrategyField" hidden="hidden">
                     <label for="fgtsStrategy">Na amortização bienal, prefiro</label>
-                    <select id="fgtsStrategy">
-                        <option value="term">Reduzir o prazo</option>
-                        <option value="payment">Reduzir o valor das parcelas</option>
-                    </select>
+                    <p:selectOneMenu id="fgtsStrategy" widgetVar="financingFgtsStrategy" value="term">
+                        <f:selectItem itemValue="term" itemLabel="Reduzir o prazo"/>
+                        <f:selectItem itemValue="payment" itemLabel="Reduzir o valor das parcelas"/>
+                    </p:selectOneMenu>
                 </div>
             </div>
             <details class="financing-mip-settings">
@@ -153,9 +160,9 @@
                 seguradora. A taxa administrativa é R$ 25,00 por mês. Os dados ficam salvos somente neste navegador.
             </p>
             <div class="financing-calculation-actions">
-                <button id="calculateWithAbatements" class="financing-download" type="button">
-                    Calcular simulação e valorização do imóvel
-                </button>
+                <p:commandButton id="calculateWithAbatements" styleClass="financing-download"
+                                 type="button" value="Calcular simulação e valorização do imóvel">
+                </p:commandButton>
                 <span id="calculationStatus" role="status" aria-live="polite"></span>
             </div>
         </section>
@@ -427,16 +434,16 @@
                         <p class="performance-eyebrow">Acompanhamento</p>
                         <h2 id="scheduleTitle">Cronograma de parcelas e abatimentos</h2>
                     </div>
-                    <button id="downloadSchedule" class="financing-download" type="button">Baixar cronogramas CSV
-                    </button>
+                    <p:commandButton id="downloadSchedule" styleClass="financing-download"
+                                     type="button" value="Baixar cronogramas CSV"/>
                 </div>
                 <div class="financing-tabs" role="tablist" aria-label="Sistema de amortização">
-                    <button id="sacTab" class="financing-tab is-active" type="button" role="tab"
-                            aria-selected="true" aria-controls="schedulePanel" data-system="SAC">Tabela SAC
-                    </button>
-                    <button id="priceTab" class="financing-tab" type="button" role="tab"
-                            aria-selected="false" aria-controls="schedulePanel" data-system="PRICE">Tabela PRICE
-                    </button>
+                    <p:commandButton id="sacTab" styleClass="financing-tab is-active" type="button"
+                                     value="Tabela SAC" pt:role="tab" pt:aria-selected="true"
+                                     pt:aria-controls="schedulePanel" pt:data-system="SAC"/>
+                    <p:commandButton id="priceTab" styleClass="financing-tab" type="button"
+                                     value="Tabela PRICE" pt:role="tab" pt:aria-selected="false"
+                                     pt:aria-controls="schedulePanel" pt:data-system="PRICE"/>
                 </div>
                 <p id="scheduleDescription" class="financing-schedule-description"></p>
                 <div id="schedulePanel" class="financing-table-wrap" role="tabpanel" aria-labelledby="sacTab">
@@ -471,6 +478,7 @@
                 </div>
             </section>
         </section>
+        </h:form>
     </main>
 </h:body>
 </html>

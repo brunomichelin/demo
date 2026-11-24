@@ -1559,3 +1559,469 @@
         transition-duration: .01ms !important;
     }
 }
+
+.wine-page .ui-button {
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.wine-page .wine-button.ui-button {
+    min-height: 44px;
+    padding: 0 17px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    font-size: .78rem;
+    font-weight: 700;
+    box-shadow: none;
+}
+
+.wine-page .wine-button-light.ui-button,
+.wine-page .wine-button-light.ui-button:enabled:hover {
+    background: #f3eadb;
+    color: #4a3035;
+}
+
+.wine-page .wine-button-dark.ui-button,
+.wine-page .wine-button-dark.ui-button:enabled:hover {
+    background: var(--wine-plum);
+    color: #fffaf0;
+}
+
+.wine-page .wine-button-quiet.ui-button,
+.wine-page .wine-button-quiet.ui-button:enabled:hover {
+    border-color: var(--wine-line);
+    background: transparent;
+    color: #665c53;
+}
+
+.wine-page .wine-search .ui-inputfield {
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: var(--wine-ink);
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    font-size: .72rem;
+    box-shadow: none;
+}
+
+.wine-page .wine-view.ui-button {
+    min-height: 31px;
+    padding: 0 9px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #80756b;
+    font-size: .65rem;
+    box-shadow: none;
+}
+
+.wine-page .wine-view.ui-button.is-active,
+.wine-page .wine-view.ui-button:enabled:hover {
+    background: var(--wine-paper);
+    color: var(--wine-plum);
+    box-shadow: 0 1px 3px rgba(65, 48, 39, .09);
+}
+
+.wine-page .wine-filters .ui-selectonemenu {
+    width: auto;
+    max-width: 130px;
+    min-height: 29px;
+    border: 1px solid #e8e1d7;
+    border-radius: 0;
+    background: #fffefa;
+    color: #62574e;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    font-size: .64rem;
+    box-shadow: none;
+}
+
+.wine-page .wine-filters .ui-selectonemenu-label {
+    min-height: 27px;
+    padding: 5px 22px 4px 7px;
+}
+
+.wine-page .wine-filters .ui-selectonemenu-trigger {
+    width: 22px;
+    border: 0;
+    background: transparent;
+    color: #8c7564;
+}
+
+.wine-page .wine-clear-filters.ui-button {
+    min-height: 29px;
+    margin-left: auto;
+    padding: 0 5px;
+    border: 0;
+    background: transparent;
+    color: #8c665b;
+    font-size: .61rem;
+    box-shadow: none;
+}
+
+.wine-page .wine-heart.ui-button {
+    min-width: 28px;
+    min-height: 28px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #a99a8c;
+    font-family: Georgia, serif;
+    font-size: 1.16rem;
+    box-shadow: none;
+}
+
+.wine-page .wine-heart.ui-button.is-favorite {
+    color: #a25161;
+}
+
+.wine-page .wine-card-action.ui-button {
+    min-height: 25px;
+    padding: 3px 0;
+    border: 0;
+    background: transparent;
+    color: #827368;
+    font-size: .59rem;
+    box-shadow: none;
+}
+
+.wine-page .wine-card-action.ui-button.is-selected {
+    color: #875366;
+    font-weight: 700;
+}
+
+.wine-page .wine-card-action-delete.ui-button {
+    color: #a38e84;
+    font-size: 1rem;
+}
+
+.wine-page .wine-card-art > span,
+.wine-page .wine-card-art > div,
+.wine-page .wine-card-art > img {
+    position: relative;
+    z-index: 1;
+}
+
+.wine-page .wine-card-art.has-photo img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.wine-page .wine-card-art.has-photo::before,
+.wine-page .wine-card-art.has-photo::after {
+    display: none;
+}
+
+.wine-page .wine-card-art.has-photo .wine-card-type {
+    display: none;
+}
+
+.wine-page .wine-dialog-pf.ui-dialog {
+    width: min(760px, calc(100vw - 28px)) !important;
+    max-height: 90vh;
+    overflow: hidden;
+    border: 1px solid #ded5c9;
+    border-radius: 7px;
+    background: #fffefa;
+    color: var(--wine-ink);
+    box-shadow: 0 24px 90px rgba(36, 25, 21, .3);
+}
+
+.wine-page .wine-dialog-pf .ui-dialog-titlebar {
+    padding: 17px 25px;
+    border: 0;
+    border-bottom: 1px solid var(--wine-line);
+    background: #f8f6f1;
+    color: #382d29;
+    font-family: Georgia, serif;
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+.wine-page .wine-dialog-pf .ui-dialog-titlebar-close {
+    border: 1px solid var(--wine-line);
+    border-radius: 50%;
+    background: transparent;
+    color: #74685e;
+}
+
+.wine-page .wine-dialog-pf .ui-dialog-content {
+    max-height: calc(90vh - 60px);
+    padding: 24px 28px;
+    overflow-y: auto;
+}
+
+.wine-page .wine-form-intro {
+    margin: 0 0 19px;
+    color: #897d72;
+    font-size: .82rem;
+}
+
+.wine-page .wine-field {
+    display: grid;
+}
+
+.wine-page .wine-field .ui-inputfield,
+.wine-page .wine-field .ui-selectonemenu,
+.wine-page .wine-field .ui-inputnumber,
+.wine-page .wine-field .ui-calendar {
+    width: 100%;
+}
+
+.wine-page .wine-field .ui-inputfield,
+.wine-page .wine-field .ui-selectonemenu {
+    min-height: 38px;
+    padding: 8px 10px;
+    border: 1px solid #e5ddd3;
+    border-radius: 0;
+    background: #fff;
+    color: #4d4139;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    font-size: .72rem;
+    box-shadow: none;
+}
+
+.wine-page .wine-field .ui-selectonemenu-label {
+    padding: 9px 10px;
+}
+
+.wine-page .wine-field .ui-selectonemenu-trigger {
+    width: 30px;
+    border: 0;
+    background: #fff;
+    color: #8c7564;
+}
+
+.wine-page .wine-field .wine-date-picker {
+    display: flex;
+    min-height: 38px;
+}
+
+.wine-page .wine-field .wine-date-picker .ui-inputfield {
+    min-width: 0;
+    flex: 1;
+}
+
+.wine-page .wine-field .wine-date-picker .ui-datepicker-trigger {
+    width: 38px;
+    min-width: 38px;
+    border: 1px solid #e5ddd3;
+    border-left: 0;
+    border-radius: 0;
+    background: #f3eadb;
+    color: #542f3d;
+    box-shadow: none;
+}
+
+.wine-page .wine-field .wine-date-picker .ui-datepicker-trigger:hover,
+.wine-page .wine-field .wine-date-picker .ui-datepicker-trigger:focus-visible {
+    border-color: #b8935d;
+    background: #ead9bf;
+    color: #542f3d;
+}
+
+.wine-page .ui-datepicker {
+    z-index: 1102 !important;
+    overflow: hidden;
+    padding: 0;
+    border: 1px solid #d9c8b1;
+    border-radius: 5px;
+    background: #fffefa;
+    color: #29231f;
+    box-shadow: 0 12px 30px rgba(41, 35, 31, .2);
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.wine-page .ui-datepicker .ui-datepicker-header {
+    padding: 10px;
+    border: 0;
+    border-radius: 0;
+    background: #542f3d;
+    color: #fffefa;
+    font-size: .82rem;
+    font-weight: 700;
+}
+
+.wine-page .ui-datepicker .ui-datepicker-prev,
+.wine-page .ui-datepicker .ui-datepicker-next {
+    border: 1px solid rgba(255, 254, 250, .3);
+    border-radius: 3px;
+    color: #fffefa;
+}
+
+.wine-page .ui-datepicker .ui-datepicker-prev:hover,
+.wine-page .ui-datepicker .ui-datepicker-next:hover {
+    border-color: #b8935d;
+    background: #693b4a;
+    color: #fffefa;
+}
+
+.wine-page .ui-datepicker table {
+    margin: 8px;
+    width: calc(100% - 16px);
+}
+
+.wine-page .ui-datepicker th {
+    padding: 7px 3px;
+    color: #6b5144;
+    font-size: .68rem;
+    font-weight: 700;
+}
+
+.wine-page .ui-datepicker td {
+    padding: 2px;
+}
+
+.wine-page .ui-datepicker td a,
+.wine-page .ui-datepicker td span {
+    border: 1px solid #eee5da;
+    border-radius: 3px;
+    background: #f8f6f1;
+    color: #542f3d;
+    font-size: .72rem;
+    text-align: center;
+}
+
+.wine-page .ui-datepicker td a:hover {
+    border-color: #b8935d;
+    background: #f3eadb;
+    color: #542f3d;
+}
+
+.wine-page .ui-datepicker td a.ui-state-active,
+.wine-page .ui-datepicker td a.ui-state-highlight {
+    border-color: #693b4a;
+    background: #693b4a;
+    color: #fffefa;
+}
+
+.wine-page .ui-datepicker td.ui-datepicker-today a {
+    border-color: #b8935d;
+    background: #f3eadb;
+    color: #542f3d;
+}
+
+.wine-page .ui-datepicker td.ui-datepicker-today a.ui-state-active {
+    border-color: #693b4a;
+    background: #693b4a;
+    color: #fffefa;
+}
+
+.wine-page .ui-datepicker .ui-datepicker-buttonbar {
+    border-top: 1px solid #e9e3da;
+    background: #f8f6f1;
+}
+
+.wine-page .ui-datepicker .ui-datepicker-buttonbar .ui-button {
+    border: 1px solid #d9c8b1;
+    border-radius: 3px;
+    background: #fffefa;
+    color: #542f3d;
+    box-shadow: none;
+}
+
+.wine-page .ui-datepicker .ui-datepicker-buttonbar .ui-button:hover {
+    border-color: #b8935d;
+    background: #f3eadb;
+}
+
+.wine-page .wine-field .ui-inputfield:focus,
+.wine-page .wine-field .ui-selectonemenu.ui-state-focus {
+    border-color: #b99c76;
+    outline: 0;
+    box-shadow: 0 0 0 2px rgba(184, 147, 93, .13);
+}
+
+.wine-page .wine-photo-upload {
+    margin-top: 3px;
+}
+
+.wine-page .wine-photo-upload .ui-fileupload-buttonbar {
+    padding: 8px;
+    border: 1px dashed #ded4c7;
+    background: #fffaf3;
+}
+
+.wine-page .wine-photo-upload .ui-button {
+    border: 1px solid #e3d2bc;
+    border-radius: 3px;
+    background: #f3eadb;
+    color: #4a3035;
+    box-shadow: none;
+}
+
+.wine-page .wine-photo-upload .ui-fileupload-content {
+    border: 1px solid #eee5da;
+    border-top: 0;
+    background: #fff;
+}
+
+.wine-photo-help {
+    color: #9a8c7f;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    font-size: .62rem;
+}
+
+.wine-photo-preview {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.wine-photo-preview img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border: 1px solid var(--wine-line);
+}
+
+.wine-photo-remove.ui-button {
+    border: 1px solid #ead0c9;
+    background: #fff4f0;
+    color: #854d43;
+}
+
+.wine-page .wine-form-error {
+    display: block;
+    min-height: 0;
+    margin-top: 9px;
+    color: #9a443e;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    font-size: .75rem;
+}
+
+.wine-page .wine-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 13px;
+    padding-top: 15px;
+    border-top: 1px solid var(--wine-line);
+}
+
+.wine-page .ui-confirm-dialog {
+    border: 1px solid #ded5c9;
+    border-radius: 8px;
+    box-shadow: 0 18px 48px rgba(36, 25, 21, .22);
+}
+
+.wine-page .ui-confirm-dialog .ui-dialog-titlebar {
+    border-bottom: 1px solid var(--wine-line);
+    background: #f8f6f1;
+    color: #382d29;
+}
+
+@media (max-width: 720px) {
+    .wine-page .wine-dialog-pf.ui-dialog {
+        width: calc(100vw - 20px) !important;
+    }
+
+    .wine-page .wine-dialog-pf .ui-dialog-content {
+        padding: 20px 16px;
+    }
+}

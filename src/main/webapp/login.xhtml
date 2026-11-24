@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
       lang="pt-BR">
 <h:head>
     <title>Entrar | Sistemas de Bruno Michelin</title>
@@ -22,18 +23,19 @@
                 <h1>Bem-vindo</h1>
                 <p>Entre com suas credenciais para acessar seus sistemas.</p>
             </header>
-            <form id="loginForm" class="login-form">
+            <h:form id="loginForm" prependId="false" styleClass="login-form">
                 <label for="email">E-mail</label>
-                <input id="email" name="email" type="email" autocomplete="username" required="required"/>
+                <p:inputText id="email" autocomplete="username" required="true"/>
                 <label for="senha">Senha</label>
-                <input id="senha" name="senha" type="password" autocomplete="current-password" required="required"/>
-                <button id="submitButton" type="submit">Entrar</button>
+                <p:password id="senha" autocomplete="current-password" feedback="false" required="true"/>
+                <p:commandButton id="submitButton" type="button" value="Entrar"
+                                 onclick="submitLogin(); return false;"/>
                 <p id="erro" role="alert" aria-live="polite"></p>
                 <div class="login-register">
                     <span>Ainda não tem uma conta?</span>
                     <a id="cadastro" href="cadastro.xhtml">Criar uma conta</a>
                 </div>
-            </form>
+            </h:form>
         </section>
         <footer class="login-footer">Sistema de Gestão de Obras <span>•</span> Planejamento, controle e transparência</footer>
     </main>
@@ -47,8 +49,9 @@
             error.textContent = 'Cadastro recebido. Aguarde a aprovação do administrador para entrar.';
         }
 
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
+        async function submitLogin(event) {
+            if (event) event.preventDefault();
+            if (!form.reportValidity()) return;
             button.disabled = true;
             error.textContent = '';
 
@@ -76,6 +79,13 @@
                 error.textContent = 'Não foi possível conectar ao servidor.';
             } finally {
                 button.disabled = false;
+            }
+        }
+        form.addEventListener('submit', submitLogin);
+        form.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && event.target instanceof HTMLInputElement) {
+                event.preventDefault();
+                submitLogin(event);
             }
         });
         //]]>

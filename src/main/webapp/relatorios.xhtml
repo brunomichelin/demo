@@ -2,6 +2,8 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
       xml:lang="pt-BR" lang="pt-BR">
 <h:head>
     <title>Relatórios da obra</title>
@@ -9,16 +11,12 @@
     <h:outputStylesheet library="css" name="app.css"/>
 </h:head>
 <h:body styleClass="works-page reports-page">
-    <main id="pagina" class="reports-shell"
-          data-custo="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('FINANCEIRO') or facesContext.externalContext.isUserInRole('CLIENTE')}"
-          data-insumos="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('ORCAMENTISTA')}"
-          data-tarefas="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('CLIENTE')}"
-          data-prazos="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('CLIENTE')}">
+    <main class="reports-shell">
         <header class="reports-header">
             <div>
                 <nav class="system-return-links" aria-label="Navegação principal">
-                    <a href="indexObra.xhtml">Início</a><span> / </span>
-                    <a class="reports-back-link" id="obraLink" href="gestao.xhtml">Painel de obras</a>
+                    <p:link outcome="indexObra.xhtml">Início</p:link><span> / </span>
+                    <p:link styleClass="reports-back-link" outcome="gestao.xhtml">Painel de obras</p:link>
                 </nav>
                 <p class="reports-eyebrow">Dados para decisão</p>
                 <h1>Relatórios da obra</h1>
@@ -26,141 +24,80 @@
             </div>
             <span class="reports-header-icon" aria-hidden="true">▤</span>
         </header>
-        <section class="reports-card">
-            <div class="reports-section-heading">
-                <span class="reports-section-icon" aria-hidden="true">00</span>
-                <div><p class="reports-eyebrow">Seleção</p><h2>Obra em análise</h2></div>
-            </div>
-            <div class="reports-field">
-                <label for="obraSelect">Obra</label>
-                <select id="obraSelect"></select>
-            </div>
-        </section>
-        <section class="reports-card">
-            <div class="reports-section-heading">
-                <span class="reports-section-icon" aria-hidden="true">01</span>
-                <div><p class="reports-eyebrow">Configuração</p><h2>Gerar relatório</h2></div>
-            </div>
-            <div class="reports-form">
-                <div class="reports-field reports-field-wide">
-                    <label for="tipo">Tipo de relatório</label>
-                    <select id="tipo">
-                        <option value="custo-por-etapa">Custos por etapa</option>
-                        <option value="insumos-por-etapa">Insumos por etapa</option>
-                        <option value="tarefas-por-etapa">Tarefas por etapa</option>
-                        <option value="prazos-entrega">Prazos de entrega</option>
-                    </select>
+        <h:form id="reportsForm">
+            <section class="reports-card">
+                <div class="reports-section-heading">
+                    <span class="reports-section-icon" aria-hidden="true">00</span>
+                    <div><p class="reports-eyebrow">Seleção</p><h2>Obra em análise</h2></div>
                 </div>
                 <div class="reports-field">
-                    <label for="formato">Formato de saída</label>
-                    <select id="formato">
-                        <option value="json">Visualizar na tela</option>
-                        <option value="pdf">Documento PDF</option>
-                        <option value="xlsx">Planilha Excel (XLSX)</option>
-                    </select>
+                    <label for="obraSelect">Obra</label>
+                    <p:selectOneMenu id="obraSelect" value="#{relatoriosBean.obraId}"
+                                     styleClass="reports-select" disabled="#{empty relatoriosBean.obras}">
+                        <f:selectItems value="#{relatoriosBean.obras}" var="obra"
+                                       itemValue="#{obra.id}" itemLabel="#{obra.nome}"/>
+                        <p:ajax process="@this" listener="#{relatoriosBean.limparResultado}"
+                                update="status resultArea downloadArea"/>
+                    </p:selectOneMenu>
                 </div>
-                <div class="reports-field">
-                    <label for="versao">Versão do orçamento <span>(opcional)</span></label>
-                    <input id="versao" type="number" min="1" placeholder="Versão mais recente"/>
+            </section>
+            <section class="reports-card">
+                <div class="reports-section-heading">
+                    <span class="reports-section-icon" aria-hidden="true">01</span>
+                    <div><p class="reports-eyebrow">Configuração</p><h2>Gerar relatório</h2></div>
                 </div>
-                <button class="reports-button" id="gerar" type="button">
-                    <span aria-hidden="true">↗</span> Gerar relatório
-                </button>
-            </div>
-        </section>
-        <p id="mensagem" class="reports-message" role="status"></p>
-        <section class="reports-card reports-result-card">
-            <div class="reports-section-heading">
-                <span class="reports-section-icon" aria-hidden="true">02</span>
-                <div><p class="reports-eyebrow">Resultado</p><h2>Visualização</h2></div>
-            </div>
-            <pre id="resultado" aria-live="polite">Selecione um relatório e escolha “Visualizar na tela” para ver os dados aqui.</pre>
-        </section>
+                <div class="reports-form">
+                    <div class="reports-field reports-field-wide">
+                        <label for="tipo">Tipo de relatório</label>
+                        <p:selectOneMenu id="tipo" value="#{relatoriosBean.tipoRelatorio}">
+                            <f:selectItems value="#{relatoriosBean.tiposRelatorio}"/>
+                            <p:ajax event="change" process="@this" listener="#{relatoriosBean.limparResultado}"
+                                    update="status resultArea downloadArea"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="reports-field">
+                        <label for="formato">Formato de saída</label>
+                        <p:selectOneMenu id="formato" value="#{relatoriosBean.formato}">
+                            <f:selectItem itemValue="json" itemLabel="Visualizar na tela"/>
+                            <f:selectItem itemValue="pdf" itemLabel="Documento PDF"/>
+                            <f:selectItem itemValue="xlsx" itemLabel="Planilha Excel (XLSX)"/>
+                            <p:ajax event="change" process="@this" listener="#{relatoriosBean.limparResultado}"
+                                    update="status resultArea downloadArea"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="reports-field">
+                        <label for="versao">Versão do orçamento <span>(opcional)</span></label>
+                        <p:inputText id="versao" type="number" min="1" value="#{relatoriosBean.versaoId}"
+                                     placeholder="Versão mais recente">
+                            <p:ajax event="change" process="@this" listener="#{relatoriosBean.limparResultado}"
+                                    update="status resultArea downloadArea"/>
+                        </p:inputText>
+                    </div>
+                    <p:commandButton value="Gerar relatório" icon="pi pi-arrow-up-right"
+                                     action="#{relatoriosBean.gerar}" styleClass="reports-button"
+                                     process="@form" update="status resultArea downloadArea"/>
+                </div>
+            </section>
+            <p:outputPanel id="status" layout="block" styleClass="reports-message">
+                <h:outputText value="#{relatoriosBean.mensagem}"/>
+            </p:outputPanel>
+            <section class="reports-card reports-result-card">
+                <div class="reports-section-heading">
+                    <span class="reports-section-icon" aria-hidden="true">02</span>
+                    <div><p class="reports-eyebrow">Resultado</p><h2>Visualização</h2></div>
+                </div>
+                <p:outputPanel id="resultArea" layout="block">
+                    <pre aria-live="polite"><h:outputText value="#{relatoriosBean.resultado}"/></pre>
+                </p:outputPanel>
+                <p:outputPanel id="downloadArea" layout="block">
+                    <p:commandButton value="Baixar arquivo" icon="pi pi-download"
+                                     styleClass="reports-button reports-download-button"
+                                     ajax="false" rendered="#{relatoriosBean.arquivoDisponivel}">
+                        <p:fileDownload value="#{relatoriosBean.arquivo}"/>
+                    </p:commandButton>
+                </p:outputPanel>
+            </section>
+        </h:form>
     </main>
-    <script type="text/javascript">
-        //<![CDATA[
-        (() => {
-            const root = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
-            const api = `#{'${'}root}/api/v1`;
-            const params = new URLSearchParams(window.location.search);
-            let obraId = params.get('obraId');
-            const obraSelect = document.getElementById('obraSelect');
-            const message = document.getElementById('mensagem');
-            const flags = document.getElementById('pagina').dataset;
-            const permissaoPorRelatorio = {
-                'custo-por-etapa': flags.custo,
-                'insumos-por-etapa': flags.insumos,
-                'tarefas-por-etapa': flags.tarefas,
-                'prazos-entrega': flags.prazos
-            };
-            [...document.getElementById('tipo').options].forEach(option => {
-                option.hidden = permissaoPorRelatorio[option.value] !== 'true';
-            });
-            if (document.getElementById('tipo').selectedOptions[0]?.hidden) {
-                const primeiraOpcaoPermitida = [...document.getElementById('tipo').options]
-                    .find(option => !option.hidden);
-                if (primeiraOpcaoPermitida) document.getElementById('tipo').value = primeiraOpcaoPermitida.value;
-            }
-            document.getElementById('obraLink').href = 'gestao.xhtml';
-            async function carregarObras() {
-                try {
-                    const response = await fetch(`#{'${'}api}/obras?size=100&sort=nome,asc`,
-                        {credentials: 'same-origin'});
-                    if (!response.ok) {
-                        let error = {}; try { error = await response.json(); } catch (_) {}
-                        throw new Error(error.detail || error.message
-                            || `Falha ao carregar obras (#{'${'}response.status}).`);
-                    }
-                    const page = await response.json();
-                    obraSelect.replaceChildren();
-                    page.content.forEach(obra => obraSelect.add(new Option(obra.nome, obra.id)));
-                    if (!page.content.length) throw new Error('Você não está vinculado a nenhuma obra.');
-                    if (!obraId || !page.content.some(obra => String(obra.id) === String(obraId))) {
-                        obraId = String(page.content[0].id);
-                    }
-                    obraSelect.value = obraId;
-                    params.set('obraId', obraId);
-                    window.history.replaceState(null, '', `${window.location.pathname}?${params}`);
-                } catch (error) {
-                    message.textContent = error.message;
-                    document.getElementById('gerar').disabled = true;
-                }
-            }
-            obraSelect.addEventListener('change', () => {
-                obraId = obraSelect.value;
-                params.set('obraId', obraId);
-                window.history.replaceState(null, '', `${window.location.pathname}?${params}`);
-                document.getElementById('resultado').textContent =
-                    'Selecione um relatório e escolha “Visualizar na tela” para ver os dados aqui.';
-                message.textContent = '';
-            });
-            document.getElementById('gerar').addEventListener('click', async () => {
-                try {
-                    if (!obraSelect.value) throw new Error('Selecione uma obra.');
-                    obraId = obraSelect.value;
-                    const tipo = document.getElementById('tipo').value;
-                    const formato = document.getElementById('formato').value;
-                    const versao = document.getElementById('versao').value;
-                    const query = new URLSearchParams({formato});
-                    if (versao && (tipo === 'custo-por-etapa' || tipo === 'insumos-por-etapa')) query.set('versaoId', versao);
-                    const url = `#{'${'}api}/obras/#{'${'}obraId}/relatorios/#{'${'}tipo}?#{'${'}query}`;
-                    if (formato !== 'json') {
-                        window.location.assign(url);
-                        return;
-                    }
-                    message.textContent = 'Gerando relatório...';
-                    const response = await fetch(url, {credentials: 'same-origin'});
-                    if (!response.ok) {
-                        let error = {}; try { error = await response.json(); } catch (_) {}
-                        throw new Error(error.detail || error.message || `Falha na solicitação (#{'${'}response.status}).`);
-                    }
-                    document.getElementById('resultado').textContent = JSON.stringify(await response.json(), null, 2);
-                    message.textContent = 'Relatório gerado.';
-                } catch (error) { message.textContent = error.message; }
-            });
-            carregarObras();
-        })();
-        //]]>
-    </script>
 </h:body>
 </html>

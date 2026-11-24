@@ -2,274 +2,475 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xml:lang="pt-BR" lang="pt-BR">
-<h:head>
-    <title>Módulo 15 | Adega pessoal</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <meta name="description" content="Seu catálogo pessoal de vinhos, degustações e descobertas."/>
-    <h:outputStylesheet library="css" name="app.css"/>
-    <h:outputStylesheet library="css" name="vinhos.css"/>
-    <h:outputScript library="js" name="vinhos.js" target="body"/>
-</h:head>
-<h:body styleClass="wine-page">
-    <main class="wine-shell">
-        <nav class="wine-nav" aria-label="Navegação principal">
-            <h:link outcome="index.xhtml" styleClass="wine-brand">
-                <span class="wine-brand-mark" aria-hidden="true">V</span> Início
-            </h:link>
-            <div class="wine-nav-links">
-                <h:link outcome="index.xhtml">Módulos</h:link>
-                <span aria-hidden="true">/</span>
-                <span>Adega Pessoal</span>
-            </div>
-            <span class="wine-private"><span aria-hidden="true">●</span> SUA COLEÇÃO</span>
-        </nav>
-
-        <header class="wine-hero">
-            <div class="wine-hero-copy">
-                <p class="wine-eyebrow"><span></span> ADEGA PESSOAL <span class="wine-eyebrow-divider">/</span> MEMÓRIA
-                    DE GRANDES TAÇAS</p>
-                <h1>Uma adega feita<br/>de <em>boas histórias.</em></h1>
-                <p>Guarde cada descoberta, relembre suas degustações e encontre os sabores que mais combinam com
-                    você.</p>
-                <button class="wine-button wine-button-light" id="openWineForm" type="button">＋
-                    <span>Adicionar vinho</span></button>
-            </div>
-            <div class="wine-hero-art" aria-hidden="true">
-                <span class="wine-art-orbit wine-art-orbit-one"></span>
-                <span class="wine-art-orbit wine-art-orbit-two"></span>
-                <span class="wine-art-star">✳</span>
-                <div class="wine-bottle">
-                    <span class="wine-bottle-neck"></span>
-                    <span class="wine-bottle-seal"></span>
-                    <span class="wine-bottle-body"><span class="wine-bottle-label"><b>CASA</b><small>DA VINHA</small><i>✳</i><small>GRANDE RESERVA</small></span></span>
-                </div>
-                <span class="wine-art-note">COLHEITA<br/><b>2021</b></span>
-                <span class="wine-art-caption">BONS VINHOS, BOAS MEMÓRIAS</span>
-            </div>
-            <div class="wine-hero-bottom"><span>SEU DIÁRIO DE DEGUSTAÇÃO</span><span>EST. 2026 <i>✳</i></span></div>
-        </header>
-
-        <section class="wine-stats" aria-label="Resumo da sua adega">
-            <article class="wine-stat"><span class="wine-stat-icon">◉</span>
-                <div><span>RÓTULOS PROVADOS</span><strong id="statTasted">0</strong><small>na sua coleção</small></div>
-            </article>
-            <article class="wine-stat"><span class="wine-stat-icon wine-stat-gold">✳</span>
-                <div><span>SUA NOTA MÉDIA</span><strong id="statRating">—<small> / 5</small></strong><small>entre suas
-                    avaliações</small></div>
-            </article>
-            <article class="wine-stat"><span class="wine-stat-icon wine-stat-rose">♡</span>
-                <div><span>PARA A PRÓXIMA TAÇA</span><strong id="statWishlist">0</strong><small>na lista quero
-                    beber</small></div>
-            </article>
-            <article class="wine-stat"><span class="wine-stat-icon wine-stat-olive">R$</span>
-                <div><span>INVESTIDO EM DESCOBERTAS</span><strong id="statSpent">R$ 0</strong><small>valor dos rótulos
-                    provados</small></div>
-            </article>
-        </section>
-
-        <div class="wine-content-layout">
-            <section class="wine-collection" aria-labelledby="collectionTitle">
-                <div class="wine-section-heading">
-                    <div><p class="wine-eyebrow wine-eyebrow-dark">A SUA COLEÇÃO</p>
-                        <h2 id="collectionTitle">Rótulos com história</h2></div>
-                    <span class="wine-count" id="wineCount">0 vinhos</span>
-                </div>
-
-                <div class="wine-toolbar">
-                    <label class="wine-search"><span aria-hidden="true">⌕</span><input id="wineSearch" type="search"
-                                                                                       placeholder="Buscar vinho, uva, região..."
-                                                                                       aria-label="Buscar vinhos"/></label>
-                    <div class="wine-views" role="group" aria-label="Exibir vinhos">
-                        <button class="wine-view is-active" type="button" data-view="all">Todos</button>
-                        <button class="wine-view" type="button" data-view="favorites">♡ Favoritos</button>
-                        <button class="wine-view" type="button" data-view="wishlist">Quero beber <span
-                                id="wishlistTabCount">0</span></button>
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      lang="pt-BR" xml:lang="pt-BR">
+<f:view>
+    <h:head>
+        <title>Módulo 15 | Adega pessoal</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta name="description" content="Seu catálogo pessoal de vinhos, degustações e descobertas."/>
+        <h:outputStylesheet library="css" name="app.css"/>
+        <h:outputStylesheet library="css" name="vinhos.css"/>
+    </h:head>
+    <h:body styleClass="wine-page">
+        <h:form id="wineForm">
+            <p:growl id="messages" showDetail="true" autoUpdate="true" closable="true"/>
+            <main class="wine-shell">
+                <nav class="wine-nav" aria-label="Navegação principal">
+                    <h:link outcome="index.xhtml" styleClass="wine-brand">
+                        <span class="wine-brand-mark" aria-hidden="true">V</span> Início
+                    </h:link>
+                    <div class="wine-nav-links">
+                        <h:link outcome="index.xhtml">Módulos</h:link>
+                        <span aria-hidden="true">/</span>
+                        <span>Adega Pessoal</span>
                     </div>
-                </div>
+                    <span class="wine-private"><span aria-hidden="true">●</span> SUA COLEÇÃO</span>
+                </nav>
 
-                <div class="wine-filters" aria-label="Filtros">
-                    <label><span>PAÍS</span><select id="filterCountry">
-                        <option value="">Todos</option>
-                    </select></label>
-                    <label><span>UVA</span><select id="filterGrape">
-                        <option value="">Todas</option>
-                    </select></label>
-                    <label><span>TIPO</span><select id="filterType">
-                        <option value="">Todos</option>
-                        <option>Tinto</option>
-                        <option>Branco</option>
-                        <option>Rosé</option>
-                        <option>Espumante</option>
-                        <option>Fortificado</option>
-                        <option>Sobremesa</option>
-                    </select></label>
-                    <label><span>SAFRA</span><select id="filterVintage">
-                        <option value="">Todas</option>
-                    </select></label>
-                    <label><span>NOTA MÍNIMA</span><select id="filterRating">
-                        <option value="">Qualquer</option>
-                        <option value="4">4 estrelas</option>
-                        <option value="3">3 estrelas</option>
-                        <option value="2">2 estrelas</option>
-                    </select></label>
-                    <label class="wine-price-filter"><span>FAIXA DE PREÇO</span><select id="filterPrice">
-                        <option value="">Qualquer valor</option>
-                        <option value="0-100">Até R$ 100</option>
-                        <option value="100-250">R$ 100–250</option>
-                        <option value="250-500">R$ 250–500</option>
-                        <option value="500+">Acima de R$ 500</option>
-                    </select></label>
-                    <button class="wine-clear-filters" id="clearFilters" type="button">Limpar filtros</button>
-                </div>
-
-                <div id="storageNotice" class="wine-notice" role="status" hidden="hidden"></div>
-                <div id="wineGrid" class="wine-grid" aria-live="polite"></div>
-                <div id="emptyState" class="wine-empty" hidden="hidden">
-                    <span aria-hidden="true">⌕</span>
-                    <h3>Nenhum rótulo por aqui</h3>
-                    <p>Tente mudar os filtros ou adicione um novo vinho à sua adega.</p>
-                    <button class="wine-button wine-button-dark" id="emptyAddWine" type="button">Adicionar primeiro
-                        vinho
-                    </button>
-                </div>
-            </section>
-
-            <aside class="wine-insights" aria-label="Descobertas da sua adega">
-                <section class="wine-insight-card wine-preference">
-                    <p class="wine-eyebrow wine-eyebrow-dark">FEITO PARA O SEU PALADAR</p>
-                    <div class="wine-insight-heading"><span class="wine-insight-icon">✳</span>
-                        <h2>Uma descoberta<br/>sobre você</h2></div>
-                    <p id="preferenceInsight" class="wine-insight-copy">Suas próximas descobertas começam com a primeira
-                        taça.</p>
-                    <div class="wine-insight-rule"></div>
-                    <p class="wine-insight-foot">UMA PREFERÊNCIA, DESCOBERTA A CADA GARRAFA</p>
-                </section>
-                <section class="wine-insight-card wine-origins">
-                    <div class="wine-aside-heading">
-                        <div><p class="wine-eyebrow wine-eyebrow-dark">PASSAPORTE DO VINHO</p>
-                            <h2>Origens provadas</h2></div>
-                        <span class="wine-globe" aria-hidden="true">◎</span></div>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="wine-world-map" viewBox="0 0 360 180" role="img"
-                         aria-label="Mapa esquemático dos países de origem dos vinhos degustados">
-                        <path class="wine-map-land"
-                              d="M22 42 39 29 59 32 67 22 88 25 99 39 118 42 125 55 113 67 103 77 98 92 88 101 80 96 77 81 67 73 56 70 48 60 36 58 29 51ZM91 103 107 99 121 105 127 119 122 131 115 147 106 164 98 154 94 138 87 126ZM148 38 160 31 173 35 179 45 172 51 157 49ZM177 46 192 42 205 47 214 57 208 67 197 72 192 84 182 91 174 81 176 69 168 60ZM198 91 212 91 218 101 214 111 206 108ZM220 44 244 35 267 37 281 46 302 48 315 59 310 70 292 69 284 79 269 78 258 88 246 82 239 70 226 66 217 56ZM244 95 264 90 282 95 294 107 288 121 275 125 267 138 253 134 247 121 236 114ZM301 127 315 123 327 129 324 139 310 142 300 136Z"/>
-                        <g id="wineMapMarkers"></g>
-                    </svg>
-                    <div id="countryList" class="wine-country-list"></div>
-                    <p id="countryEmpty" class="wine-country-empty">Seus países favoritos vão aparecer aqui.</p>
-                    <div class="wine-insight-rule"></div>
-                    <p class="wine-insight-foot"><span id="countryCount">0</span> PAÍSES DESCOBERTOS</p>
-                </section>
-                <section class="wine-cellar-tip">
-                    <span aria-hidden="true">⌁</span>
-                    <div><b>Um brinde ao próximo capítulo</b>
-                        <p>Registre também o lugar, a companhia e o prato. Os melhores detalhes moram nas histórias.</p>
+                <header class="wine-hero">
+                    <div class="wine-hero-copy">
+                        <p class="wine-eyebrow"><span></span> ADEGA PESSOAL <span
+                                class="wine-eyebrow-divider">/</span> MEMÓRIA DE GRANDES TAÇAS</p>
+                        <h1>Uma adega feita<br/>de <em>boas histórias.</em></h1>
+                        <p>Guarde cada descoberta, relembre suas degustações e encontre os sabores que mais combinam
+                            com você.</p>
+                        <p:commandButton value="＋ Adicionar vinho" icon="pi pi-plus"
+                                         styleClass="wine-button wine-button-light"
+                                         action="#{vinhosBean.novoVinho}" process="@this"
+                                         update=":wineForm:wineDialogContent"
+                                         oncomplete="PF('wineDialog').show()"/>
                     </div>
-                </section>
-            </aside>
-        </div>
+                    <div class="wine-hero-art" aria-hidden="true">
+                        <span class="wine-art-orbit wine-art-orbit-one"></span>
+                        <span class="wine-art-orbit wine-art-orbit-two"></span>
+                        <span class="wine-art-star">✳</span>
+                        <div class="wine-bottle">
+                            <span class="wine-bottle-neck"></span>
+                            <span class="wine-bottle-seal"></span>
+                            <span class="wine-bottle-body"><span class="wine-bottle-label"><b>CASA</b><small>DA
+                                VINHA</small><i>✳</i><small>GRANDE RESERVA</small></span></span>
+                        </div>
+                        <span class="wine-art-note">COLHEITA<br/><b>2021</b></span>
+                        <span class="wine-art-caption">BONS VINHOS, BOAS MEMÓRIAS</span>
+                    </div>
+                    <div class="wine-hero-bottom"><span>SEU DIÁRIO DE DEGUSTAÇÃO</span><span>EST. 2026 <i>✳</i></span>
+                    </div>
+                </header>
 
-        <footer class="wine-footer"><span><b>V</b> VINHO·CADERNO</span><span>O seu gosto, em boa companhia.</span>
-            <h:link outcome="index.xhtml">Voltar aos módulos <span aria-hidden="true">→</span></h:link>
-        </footer>
-    </main>
+                <p:outputPanel id="wineContent">
+                    <section class="wine-stats" aria-label="Resumo da sua adega">
+                        <article class="wine-stat"><span class="wine-stat-icon">◉</span>
+                            <div><span>RÓTULOS PROVADOS</span><strong>#{vinhosBean.quantidadeProvada}</strong><small>na
+                                sua coleção</small></div>
+                        </article>
+                        <article class="wine-stat"><span class="wine-stat-icon wine-stat-gold">✳</span>
+                            <div><span>SUA NOTA MÉDIA</span><strong>#{vinhosBean.notaMedia}<small> / 5</small></strong>
+                                <small>entre suas avaliações</small></div>
+                        </article>
+                        <article class="wine-stat"><span class="wine-stat-icon wine-stat-rose">♡</span>
+                            <div><span>PARA A PRÓXIMA TAÇA</span><strong>#{vinhosBean.quantidadeListaDesejos}</strong>
+                                <small>na lista quero beber</small></div>
+                        </article>
+                        <article class="wine-stat"><span class="wine-stat-icon wine-stat-olive">R$</span>
+                            <div><span>INVESTIDO EM DESCOBERTAS</span>
+                                <strong><h:outputText value="#{vinhosBean.totalInvestido}">
+                                    <f:convertNumber type="currency" currencySymbol="R$ " locale="pt_BR"
+                                                     maxFractionDigits="0"/>
+                                </h:outputText></strong><small>valor dos rótulos provados</small></div>
+                        </article>
+                    </section>
 
-    <dialog id="wineDialog" class="wine-dialog" aria-labelledby="dialogTitle">
-        <form id="wineForm" class="wine-form">
-            <input name="wineId" type="hidden"/>
-            <div class="wine-dialog-heading">
-                <div><p class="wine-eyebrow wine-eyebrow-dark">UM NOVO CAPÍTULO</p>
-                    <h2 id="dialogTitle">Adicionar vinho</h2></div>
-                <button id="closeWineForm" class="wine-dialog-close" type="button" aria-label="Fechar">×</button>
-            </div>
-            <p class="wine-form-intro">Guarde os detalhes do rótulo e o que tornou essa taça especial.</p>
-            <div class="wine-form-grid">
-                <label class="wine-field wine-field-wide"><span>VINHO *</span><input name="name" required="required"
-                                                                                     maxlength="100"
-                                                                                     placeholder="Ex.: Malbec de Altura"/></label>
-                <label class="wine-field"><span>PRODUTOR / VINÍCOLA</span><input name="producer" maxlength="100"
-                                                                                 placeholder="Ex.: Bodega Norton"/></label>
-                <label class="wine-field"><span>SAFRA</span><input name="vintage" type="number" min="1900" max="2100"
-                                                                   placeholder="2021"/></label>
-                <label class="wine-field"><span>PAÍS</span><input name="country" maxlength="60"
-                                                                  placeholder="Argentina"/></label>
-                <label class="wine-field"><span>REGIÃO</span><input name="region" maxlength="80"
-                                                                    placeholder="Mendoza · Vale do Uco"/></label>
-                <label class="wine-field"><span>DENOMINAÇÃO</span><input name="denomination" maxlength="60"
-                                                                         placeholder="DOC, AOC, DO, IG..."/></label>
-                <label class="wine-field"><span>TIPO</span><select name="type">
-                    <option>Tinto</option>
-                    <option>Branco</option>
-                    <option>Rosé</option>
-                    <option>Espumante</option>
-                    <option>Fortificado</option>
-                    <option>Sobremesa</option>
-                </select></label>
-                <label class="wine-field"><span>UVAS / CASTAS</span><input name="grapes" maxlength="120"
-                                                                           placeholder="Malbec, Cabernet Sauvignon..."/></label>
-                <label class="wine-field"><span>VARIETAL OU CORTE</span><input name="blend" maxlength="100"
-                                                                               placeholder="100% Malbec ou blend"/></label>
-                <label class="wine-field"><span>TEOR ALCOÓLICO (%)</span><input name="alcohol" type="number" min="0"
-                                                                                max="100" step="0.1"
-                                                                                placeholder="14.5"/></label>
-                <label class="wine-field"><span>CORPO</span><select name="body">
-                    <option>Leve</option>
-                    <option selected="selected">Médio</option>
-                    <option>Encorpado</option>
-                </select></label>
-                <label class="wine-field"><span>PASSAGEM POR MADEIRA</span><input name="oak" maxlength="80"
-                                                                                  placeholder="Não, carvalho francês..."/></label>
-                <label class="wine-field"><span>DATA DA DEGUSTAÇÃO</span><input name="tastedAt" type="date"/></label>
-                <label class="wine-field"><span>ONDE / OCASIÃO</span><input name="occasion" maxlength="120"
-                                                                            placeholder="Jantar em família, Mendoza..."/></label>
-                <label class="wine-field"><span>COM QUEM</span><input name="company" maxlength="100"
-                                                                      placeholder="Amigos, família..."/></label>
-                <label class="wine-field"><span>NOTA PESSOAL</span><select name="rating">
-                    <option value="">Ainda não avaliado</option>
-                    <option value="5">5 — memorável</option>
-                    <option value="4">4 — adorei</option>
-                    <option value="3">3 — gostei</option>
-                    <option value="2">2 — interessante</option>
-                    <option value="1">1 — não repetiria</option>
-                </select></label>
-                <label class="wine-field"><span>PREÇO PAGO (R$)</span><input name="price" type="number" min="0"
-                                                                             step="0.01" placeholder="189,90"/></label>
-                <label class="wine-field"><span>ONDE COMPROU</span><input name="retailer" maxlength="100"
-                                                                          placeholder="Loja, restaurante..."/></label>
-                <label class="wine-field"><span>TEMPERATURA DE SERVIÇO</span><input name="temperature" maxlength="30"
-                                                                                    placeholder="16–18 °C"/></label>
-                <label class="wine-field"><span>DECANTOU?</span><select name="decanted">
-                    <option>Não</option>
-                    <option>Sim</option>
-                </select></label>
-                <label class="wine-field"><span>POTENCIAL DE GUARDA</span><input name="cellaring" maxlength="60"
-                                                                                 placeholder="Até 2030"/></label>
-                <label class="wine-field"><span>COMPRARIA DE NOVO?</span><select name="buyAgain">
-                    <option>Talvez</option>
-                    <option>Sim</option>
-                    <option>Não</option>
-                </select></label>
-                <label class="wine-field wine-field-wide"><span>HARMONIZAÇÃO</span><input name="pairing" maxlength="160"
-                                                                                          placeholder="O que você comeu junto?"/></label>
-                <label class="wine-field wine-field-wide"><span>APARÊNCIA</span><input name="appearance" maxlength="160"
-                                                                                       placeholder="Cor, brilho, lágrimas..."/></label>
-                <label class="wine-field"><span>AROMA</span><textarea name="aroma" rows="2" maxlength="240"
-                                                                      placeholder="Frutas, especiarias, notas..."></textarea></label>
-                <label class="wine-field"><span>SABOR E FINAL</span><textarea name="palate" rows="2" maxlength="240"
-                                                                              placeholder="Textura, equilíbrio, persistência..."></textarea></label>
-                <label class="wine-field wine-field-wide"><span>FOTO DO RÓTULO OU DA GARRAFA</span><input name="photo"
-                                                                                                          type="file"
-                                                                                                          accept="image/png,image/jpeg,image/webp,image/gif"/><small>PNG,
-                    JPEG, WebP ou GIF de até 2 MB; a foto é salva no banco da sua adega.</small></label>
-            </div>
-            <div id="formError" class="wine-form-error" role="alert"></div>
-            <div class="wine-form-actions">
-                <button class="wine-button wine-button-quiet" id="cancelWineForm" type="button">Cancelar</button>
-                <button class="wine-button wine-button-dark" type="submit">Guardar na adega <span
-                        aria-hidden="true">→</span></button>
-            </div>
-        </form>
-    </dialog>
-</h:body>
+                    <div class="wine-content-layout">
+                        <section class="wine-collection" aria-labelledby="collectionTitle">
+                            <div class="wine-section-heading">
+                                <div><p class="wine-eyebrow wine-eyebrow-dark">A SUA COLEÇÃO</p>
+                                    <h2 id="collectionTitle">Rótulos com história</h2></div>
+                                <span class="wine-count">#{vinhosBean.vinhos.size()}
+                                    #{vinhosBean.vinhos.size() == 1 ? 'vinho' : 'vinhos'}</span>
+                            </div>
+
+                            <div class="wine-toolbar">
+                                <label class="wine-search"><span aria-hidden="true">⌕</span>
+                                    <p:inputText id="search" value="#{vinhosBean.busca}"
+                                                 placeholder="Buscar vinho, uva, região..."
+                                                 ariaLabel="Buscar vinhos">
+                                        <p:ajax event="keyup" delay="250" update=":wineForm:wineContent"/>
+                                    </p:inputText>
+                                </label>
+                                <div class="wine-views" role="group" aria-label="Exibir vinhos">
+                                    <p:commandButton value="Todos" action="#{vinhosBean.setVisualizacao('all')}"
+                                                     process="@this" update=":wineForm:wineContent"
+                                                     styleClass="wine-view #{vinhosBean.visualizacao == 'all' ? 'is-active' : ''}"/>
+                                    <p:commandButton value="♡ Favoritos"
+                                                     action="#{vinhosBean.setVisualizacao('favorites')}"
+                                                     process="@this" update=":wineForm:wineContent"
+                                                     styleClass="wine-view #{vinhosBean.visualizacao == 'favorites' ? 'is-active' : ''}"/>
+                                    <p:commandButton value="Quero beber (#{vinhosBean.quantidadeListaDesejos})"
+                                                     action="#{vinhosBean.setVisualizacao('wishlist')}"
+                                                     process="@this" update=":wineForm:wineContent"
+                                                     styleClass="wine-view #{vinhosBean.visualizacao == 'wishlist' ? 'is-active' : ''}"/>
+                                </div>
+                            </div>
+
+                            <div class="wine-filters" aria-label="Filtros">
+                                <label><span>PAÍS</span>
+                                    <p:selectOneMenu value="#{vinhosBean.filtroPais}">
+                                        <f:selectItem itemLabel="Todos" itemValue=""/>
+                                        <f:selectItems value="#{vinhosBean.paises}" var="pais"
+                                                       itemLabel="#{pais}" itemValue="#{pais}"/>
+                                        <p:ajax update=":wineForm:wineContent"/>
+                                    </p:selectOneMenu>
+                                </label>
+                                <label><span>UVA</span>
+                                    <p:selectOneMenu value="#{vinhosBean.filtroUva}">
+                                        <f:selectItem itemLabel="Todas" itemValue=""/>
+                                        <f:selectItems value="#{vinhosBean.uvas}" var="uva"
+                                                       itemLabel="#{uva}" itemValue="#{uva}"/>
+                                        <p:ajax update=":wineForm:wineContent"/>
+                                    </p:selectOneMenu>
+                                </label>
+                                <label><span>TIPO</span>
+                                    <p:selectOneMenu value="#{vinhosBean.filtroTipo}">
+                                        <f:selectItem itemLabel="Todos" itemValue=""/>
+                                        <f:selectItems value="#{vinhosBean.tipos}" var="tipo"
+                                                       itemLabel="#{tipo}" itemValue="#{tipo}"/>
+                                        <p:ajax update=":wineForm:wineContent"/>
+                                    </p:selectOneMenu>
+                                </label>
+                                <label><span>SAFRA</span>
+                                    <p:selectOneMenu value="#{vinhosBean.filtroSafra}">
+                                        <f:selectItem itemLabel="Todas" itemValue="#{null}"
+                                                      noSelectionOption="true"/>
+                                        <f:selectItems value="#{vinhosBean.safras}" var="safra"
+                                                       itemLabel="#{safra}" itemValue="#{safra}"/>
+                                        <p:ajax update=":wineForm:wineContent"/>
+                                    </p:selectOneMenu>
+                                </label>
+                                <label><span>NOTA MÍNIMA</span>
+                                    <p:selectOneMenu value="#{vinhosBean.filtroNota}">
+                                        <f:selectItem itemLabel="Qualquer" itemValue="#{null}"
+                                                      noSelectionOption="true"/>
+                                        <f:selectItem itemLabel="4 estrelas" itemValue="4"/>
+                                        <f:selectItem itemLabel="3 estrelas" itemValue="3"/>
+                                        <f:selectItem itemLabel="2 estrelas" itemValue="2"/>
+                                        <p:ajax update=":wineForm:wineContent"/>
+                                    </p:selectOneMenu>
+                                </label>
+                                <label class="wine-price-filter"><span>FAIXA DE PREÇO</span>
+                                    <p:selectOneMenu value="#{vinhosBean.filtroPreco}">
+                                        <f:selectItem itemLabel="Qualquer valor" itemValue=""/>
+                                        <f:selectItem itemLabel="Até R$ 100" itemValue="0-100"/>
+                                        <f:selectItem itemLabel="R$ 100–250" itemValue="100-250"/>
+                                        <f:selectItem itemLabel="R$ 250–500" itemValue="250-500"/>
+                                        <f:selectItem itemLabel="Acima de R$ 500" itemValue="500+"/>
+                                        <p:ajax update=":wineForm:wineContent"/>
+                                    </p:selectOneMenu>
+                                </label>
+                                <p:commandButton value="Limpar filtros" action="#{vinhosBean.limparFiltros}"
+                                                 process="@this" update=":wineForm:wineContent"
+                                                 styleClass="wine-clear-filters"/>
+                            </div>
+
+                            <p:outputPanel id="wineGrid" layout="block" styleClass="wine-grid">
+                                <ui:repeat value="#{vinhosBean.vinhosFiltrados}" var="item" varStatus="loop">
+                                    <article class="wine-card">
+                                        <div class="wine-card-main">
+                                            <div class="wine-card-art #{loop.index mod 4 == 1 ? 'tone-rose' : loop.index mod 4 == 2 ? 'tone-gold' : loop.index mod 4 == 3 ? 'tone-olive' : ''} #{not empty item.foto ? 'has-photo' : ''}">
+                                                <h:panelGroup rendered="#{not empty item.foto}">
+                                                    <h:graphicImage value="#{item.foto}" alt="Foto de #{item.nome}"/>
+                                                </h:panelGroup>
+                                                <h:panelGroup rendered="#{empty item.foto}">
+                                                    <span class="wine-mini-bottle"><span class="wine-mini-label">CASA<small>DA VINHA</small></span></span>
+                                                </h:panelGroup>
+                                                <span class="wine-card-type">#{empty item.tipo ? 'VINHO' : item.tipo}</span>
+                                            </div>
+                                            <div class="wine-card-copy">
+                                                <div class="wine-card-topline">
+                                                    <span class="wine-tag">#{empty item.tipo ? 'Vinho' : item.tipo}
+                                                        #{not empty item.safra ? ' · '.concat(item.safra) : ''}</span>
+                                                    <p:commandButton value="#{item.favorito ? '♥' : '♡'}"
+                                                                     title="#{item.favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}"
+                                                                     action="#{vinhosBean.alternarFavorito(item)}"
+                                                                     process="@this" update=":wineForm:wineContent"
+                                                                     styleClass="wine-heart #{item.favorito ? 'is-favorite' : ''}"/>
+                                                </div>
+                                                <h3><h:outputText value="#{item.nome}"/></h3>
+                                                <p class="wine-producer">#{empty item.produtor ? 'Produtor não informado' : item.produtor}</p>
+                                                <div class="wine-rating">
+                                                    <h:outputText value="#{vinhosBean.estrelas(item.nota)}"/>
+                                                    <small>
+                                                        <h:outputText value="Ainda não degustado" rendered="#{item.nota == null}"/>
+                                                        <h:outputText value="#{item.nota}" rendered="#{item.nota != null}"/>
+                                                        <h:outputText value=",0" rendered="#{item.nota != null}"/>
+                                                    </small>
+                                                </div>
+                                                <div class="wine-card-origin">#{empty item.pais ? 'Origem não informada' : item.pais}</div>
+                                                <p class="wine-card-notes">
+                                                    <h:outputText value="#{not empty item.aroma ? item.aroma : not empty item.saborFinal ? item.saborFinal : not empty item.aparencia ? item.aparencia : 'Uma nova história espera pela primeira degustação.'}"/>
+                                                </p>
+                                                <div class="wine-card-footer">
+                                                    <span>#{empty item.uvas ? 'Castas não informadas' : item.uvas}</span>
+                                                    <strong><h:outputText value="#{item.precoPago}">
+                                                        <f:convertNumber type="currency" currencySymbol="R$ "
+                                                                         locale="pt_BR"/>
+                                                    </h:outputText></strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <details class="wine-card-details">
+                                            <summary>Ficha completa</summary>
+                                            <dl>
+                                                <div><dt>Origem</dt><dd>#{empty item.regiao ? '' : item.regiao}
+                                                    #{not empty item.denominacao ? ' · '.concat(item.denominacao) : ''}
+                                                    #{not empty item.pais ? ' · '.concat(item.pais) : ''}</dd></div>
+                                                <div><dt>Corte / varietal</dt><dd>#{empty item.corte ? 'Não informado' : item.corte}</dd></div>
+                                                <div><dt>Perfil</dt><dd>#{empty item.corpo ? 'Não informado' : item.corpo}
+                                                    #{not empty item.teorAlcoolico ? ' · '.concat(item.teorAlcoolico).concat('% vol.') : ''}</dd></div>
+                                                <div><dt>Madeira</dt><dd>#{empty item.madeira ? 'Não informado' : item.madeira}</dd></div>
+                                                <div><dt>Degustação</dt><dd>#{item.dataDegustacao}
+                                                    #{not empty item.ocasiao ? ' · '.concat(item.ocasiao) : ''}
+                                                    #{not empty item.companhia ? ' · '.concat(item.companhia) : ''}</dd></div>
+                                                <div><dt>Aparência</dt><dd>#{empty item.aparencia ? '—' : item.aparencia}</dd></div>
+                                                <div><dt>Aroma e sabor</dt><dd>#{empty item.aroma ? '' : item.aroma}
+                                                    #{not empty item.saborFinal ? ' · '.concat(item.saborFinal) : ''}</dd></div>
+                                                <div><dt>Harmonização</dt><dd>#{empty item.harmonizacao ? '—' : item.harmonizacao}</dd></div>
+                                                <div><dt>Serviço / guarda</dt><dd>#{empty item.temperaturaServico ? '' : item.temperaturaServico}
+                                                    #{not empty item.decantado ? ' · Decantado: '.concat(item.decantado) : ''}
+                                                    #{not empty item.potencialGuarda ? ' · '.concat(item.potencialGuarda) : ''}</dd></div>
+                                                <div><dt>Compra</dt><dd>#{empty item.localCompra ? '' : item.localCompra}
+                                                    #{not empty item.comprariaNovamente ? ' · Compraria de novo: '.concat(item.comprariaNovamente) : ''}</dd></div>
+                                            </dl>
+                                        </details>
+                                        <div class="wine-card-actions">
+                                            <p:commandButton value="#{item.queroBeber ? '✓ Na lista quero beber' : '＋ Quero beber'}"
+                                                             action="#{vinhosBean.alternarListaDesejos(item)}"
+                                                             process="@this" update=":wineForm:wineContent"
+                                                             styleClass="wine-card-action #{item.queroBeber ? 'is-selected' : ''}"/>
+                                            <span class="wine-card-action">#{vinhosBean.provado(item) ? 'Degustado em '.concat(item.dataDegustacao) : 'Na lista de desejos'}</span>
+                                            <p:commandButton value="Editar" action="#{vinhosBean.editar(item)}"
+                                                             process="@this" update=":wineForm:wineDialogContent"
+                                                             oncomplete="if (args &amp;&amp; !args.validationFailed) PF('wineDialog').show()"
+                                                             styleClass="wine-card-action"/>
+                                            <p:commandButton value="×" title="Remover vinho"
+                                                             action="#{vinhosBean.excluir(item)}"
+                                                             process="@this" update=":wineForm:wineContent"
+                                                             styleClass="wine-card-action wine-card-action-delete">
+                                                <p:confirm header="Remover vinho"
+                                                           message="Remover este rótulo da sua adega?"
+                                                           icon="pi pi-exclamation-triangle"/>
+                                            </p:commandButton>
+                                        </div>
+                                    </article>
+                                </ui:repeat>
+                            </p:outputPanel>
+                            <p:outputPanel layout="block" styleClass="wine-empty"
+                                           rendered="#{empty vinhosBean.vinhosFiltrados}">
+                                <span aria-hidden="true">⌕</span>
+                                <h3>Nenhum rótulo por aqui</h3>
+                                <p>Tente mudar os filtros ou adicione um novo vinho à sua adega.</p>
+                                <p:commandButton value="Adicionar primeiro vinho"
+                                                 action="#{vinhosBean.novoVinho}" process="@this"
+                                                 update=":wineForm:wineDialogContent"
+                                                 oncomplete="PF('wineDialog').show()"
+                                                 styleClass="wine-button wine-button-dark"/>
+                            </p:outputPanel>
+                        </section>
+
+                        <aside class="wine-insights" aria-label="Descobertas da sua adega">
+                            <section class="wine-insight-card wine-preference">
+                                <p class="wine-eyebrow wine-eyebrow-dark">FEITO PARA O SEU PALADAR</p>
+                                <div class="wine-insight-heading"><span class="wine-insight-icon">✳</span>
+                                    <h2>Uma descoberta<br/>sobre você</h2></div>
+                                <p class="wine-insight-copy"><h:outputText value="#{vinhosBean.insightPreferencia}"/></p>
+                                <div class="wine-insight-rule"></div>
+                                <p class="wine-insight-foot">UMA PREFERÊNCIA, DESCOBERTA A CADA GARRAFA</p>
+                            </section>
+                            <section class="wine-insight-card wine-origins">
+                                <div class="wine-aside-heading">
+                                    <div><p class="wine-eyebrow wine-eyebrow-dark">PASSAPORTE DO VINHO</p>
+                                        <h2>Origens provadas</h2></div>
+                                    <span class="wine-globe" aria-hidden="true">◎</span></div>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="wine-world-map" viewBox="0 0 360 180"
+                                     role="img" aria-label="Mapa esquemático dos países de origem dos vinhos degustados">
+                                    <path class="wine-map-land"
+                                          d="M22 42 39 29 59 32 67 22 88 25 99 39 118 42 125 55 113 67 103 77 98 92 88 101 80 96 77 81 67 73 56 70 48 60 36 58 29 51ZM91 103 107 99 121 105 127 119 122 131 115 147 106 164 98 154 94 138 87 126ZM148 38 160 31 173 35 179 45 172 51 157 49ZM177 46 192 42 205 47 214 57 208 67 197 72 192 84 182 91 174 81 176 69 168 60ZM198 91 212 91 218 101 214 111 206 108ZM220 44 244 35 267 37 281 46 302 48 315 59 310 70 292 69 284 79 269 78 258 88 246 82 239 70 226 66 217 56ZM244 95 264 90 282 95 294 107 288 121 275 125 267 138 253 134 247 121 236 114ZM301 127 315 123 327 129 324 139 310 142 300 136Z"/>
+                                </svg>
+                                <div class="wine-country-list">
+                                    <ui:repeat value="#{vinhosBean.paisesProvados}" var="pais">
+                                        <div class="wine-country-row"><span class="wine-country-flag"
+                                                                          aria-hidden="true">✦</span>
+                                            <span><h:outputText value="#{pais}"/></span>
+                                            <strong>#{vinhosBean.quantidadePorPais(pais)}
+                                                #{vinhosBean.quantidadePorPais(pais) == 1 ? 'rótulo' : 'rótulos'}</strong>
+                                        </div>
+                                    </ui:repeat>
+                                </div>
+                                <h:panelGroup layout="block" styleClass="wine-country-empty"
+                                              rendered="#{empty vinhosBean.paisesProvados}">
+                                    Seus países favoritos vão aparecer aqui.
+                                </h:panelGroup>
+                                <div class="wine-insight-rule"></div>
+                                <p class="wine-insight-foot">#{vinhosBean.paisesProvados.size()} PAÍSES DESCOBERTOS</p>
+                            </section>
+                            <section class="wine-cellar-tip">
+                                <span aria-hidden="true">⌁</span>
+                                <div><b>Um brinde ao próximo capítulo</b>
+                                    <p>Registre também o lugar, a companhia e o prato. Os melhores detalhes moram nas
+                                        histórias.</p>
+                                </div>
+                            </section>
+                        </aside>
+                    </div>
+                </p:outputPanel>
+
+                <footer class="wine-footer"><span><b>V</b> VINHO·CADERNO</span>
+                    <span>O seu gosto, em boa companhia.</span>
+                    <h:link outcome="index.xhtml">Voltar aos módulos <span aria-hidden="true">→</span></h:link>
+                </footer>
+            </main>
+
+            <p:dialog id="wineDialog" widgetVar="wineDialog" modal="true" responsive="true"
+                      appendTo="@(form)" width="760" styleClass="wine-dialog-pf"
+                      header="#{vinhosBean.vinho.id == null ? 'Adicionar vinho' : 'Editar vinho'}">
+                <p:outputPanel id="wineDialogContent">
+                    <p class="wine-form-intro">Guarde os detalhes do rótulo e o que tornou essa taça especial.</p>
+                    <div class="wine-form-grid">
+                        <label class="wine-field wine-field-wide"><span>VINHO *</span>
+                            <p:inputText value="#{vinhosBean.vinho.nome}" required="true"
+                                         requiredMessage="Informe o nome do vinho." maxlength="100"
+                                         placeholder="Ex.: Malbec de Altura"/></label>
+                        <label class="wine-field"><span>PRODUTOR / VINÍCOLA</span>
+                            <p:inputText value="#{vinhosBean.vinho.produtor}" maxlength="100"
+                                         placeholder="Ex.: Bodega Norton"/></label>
+                        <label class="wine-field"><span>SAFRA</span>
+                            <p:inputNumber value="#{vinhosBean.vinho.safra}" decimalPlaces="0"
+                                           minValue="1900" maxValue="2100" placeholder="2021"/></label>
+                        <label class="wine-field"><span>PAÍS</span>
+                            <p:inputText value="#{vinhosBean.vinho.pais}" maxlength="60" placeholder="Argentina"/></label>
+                        <label class="wine-field"><span>REGIÃO</span>
+                            <p:inputText value="#{vinhosBean.vinho.regiao}" maxlength="100"
+                                         placeholder="Mendoza · Vale do Uco"/></label>
+                        <label class="wine-field"><span>DENOMINAÇÃO</span>
+                            <p:inputText value="#{vinhosBean.vinho.denominacao}" maxlength="80"
+                                         placeholder="DOC, AOC, DO, IG..."/></label>
+                        <label class="wine-field"><span>TIPO</span>
+                            <p:selectOneMenu value="#{vinhosBean.vinho.tipo}">
+                                <f:selectItems value="#{vinhosBean.tipos}"/>
+                            </p:selectOneMenu></label>
+                        <label class="wine-field"><span>UVAS / CASTAS</span>
+                            <p:inputText value="#{vinhosBean.vinho.uvas}" maxlength="160"
+                                         placeholder="Malbec, Cabernet Sauvignon..."/></label>
+                        <label class="wine-field"><span>VARIETAL OU CORTE</span>
+                            <p:inputText value="#{vinhosBean.vinho.corte}" maxlength="120"
+                                         placeholder="100% Malbec ou blend"/></label>
+                        <label class="wine-field"><span>TEOR ALCOÓLICO (%)</span>
+                            <p:inputNumber value="#{vinhosBean.vinho.teorAlcoolico}" decimalPlaces="2"
+                                           minValue="0" maxValue="100" placeholder="14,5"/></label>
+                        <label class="wine-field"><span>CORPO</span>
+                            <p:selectOneMenu value="#{vinhosBean.vinho.corpo}">
+                                <f:selectItems value="#{vinhosBean.corpos}"/>
+                            </p:selectOneMenu></label>
+                        <label class="wine-field"><span>PASSAGEM POR MADEIRA</span>
+                            <p:inputText value="#{vinhosBean.vinho.madeira}" maxlength="100"
+                                         placeholder="Não, carvalho francês..."/></label>
+                        <label class="wine-field"><span>DATA DA DEGUSTAÇÃO</span>
+                            <p:datePicker value="#{vinhosBean.vinho.dataDegustacao}" pattern="dd/MM/yyyy"
+                                          showIcon="true" styleClass="wine-date-picker"
+                                          appendTo="@(form)"/></label>
+                        <label class="wine-field"><span>ONDE / OCASIÃO</span>
+                            <p:inputText value="#{vinhosBean.vinho.ocasiao}" maxlength="140"
+                                         placeholder="Jantar em família, Mendoza..."/></label>
+                        <label class="wine-field"><span>COM QUEM</span>
+                            <p:inputText value="#{vinhosBean.vinho.companhia}" maxlength="100"
+                                         placeholder="Amigos, família..."/></label>
+                        <label class="wine-field"><span>NOTA PESSOAL</span>
+                            <p:selectOneMenu value="#{vinhosBean.vinho.nota}">
+                                <f:selectItem itemLabel="Ainda não avaliado" itemValue="#{null}"
+                                              noSelectionOption="true"/>
+                                <f:selectItem itemLabel="5 — memorável" itemValue="5"/>
+                                <f:selectItem itemLabel="4 — adorei" itemValue="4"/>
+                                <f:selectItem itemLabel="3 — gostei" itemValue="3"/>
+                                <f:selectItem itemLabel="2 — interessante" itemValue="2"/>
+                                <f:selectItem itemLabel="1 — não repetiria" itemValue="1"/>
+                            </p:selectOneMenu></label>
+                        <label class="wine-field"><span>PREÇO PAGO (R$)</span>
+                            <p:inputNumber value="#{vinhosBean.vinho.precoPago}" decimalPlaces="2"
+                                           minValue="0" placeholder="189,90"/></label>
+                        <label class="wine-field"><span>ONDE COMPROU</span>
+                            <p:inputText value="#{vinhosBean.vinho.localCompra}" maxlength="120"
+                                         placeholder="Loja, restaurante..."/></label>
+                        <label class="wine-field"><span>TEMPERATURA DE SERVIÇO</span>
+                            <p:inputText value="#{vinhosBean.vinho.temperaturaServico}" maxlength="40"
+                                         placeholder="16–18 °C"/></label>
+                        <label class="wine-field"><span>DECANTOU?</span>
+                            <p:selectOneMenu value="#{vinhosBean.vinho.decantado}">
+                                <f:selectItem itemLabel="Não" itemValue="Não"/>
+                                <f:selectItem itemLabel="Sim" itemValue="Sim"/>
+                            </p:selectOneMenu></label>
+                        <label class="wine-field"><span>POTENCIAL DE GUARDA</span>
+                            <p:inputText value="#{vinhosBean.vinho.potencialGuarda}" maxlength="80"
+                                         placeholder="Até 2030"/></label>
+                        <label class="wine-field"><span>COMPRARIA DE NOVO?</span>
+                            <p:selectOneMenu value="#{vinhosBean.vinho.comprariaNovamente}">
+                                <f:selectItem itemLabel="Talvez" itemValue="Talvez"/>
+                                <f:selectItem itemLabel="Sim" itemValue="Sim"/>
+                                <f:selectItem itemLabel="Não" itemValue="Não"/>
+                            </p:selectOneMenu></label>
+                        <label class="wine-field wine-field-wide"><span>HARMONIZAÇÃO</span>
+                            <p:inputText value="#{vinhosBean.vinho.harmonizacao}" maxlength="200"
+                                         placeholder="O que você comeu junto?"/></label>
+                        <label class="wine-field wine-field-wide"><span>APARÊNCIA</span>
+                            <p:inputText value="#{vinhosBean.vinho.aparencia}" maxlength="200"
+                                         placeholder="Cor, brilho, lágrimas..."/></label>
+                        <label class="wine-field"><span>AROMA</span>
+                            <p:inputTextarea value="#{vinhosBean.vinho.aroma}" rows="2" maxlength="300"
+                                             placeholder="Frutas, especiarias, notas..."/></label>
+                        <label class="wine-field"><span>SABOR E FINAL</span>
+                            <p:inputTextarea value="#{vinhosBean.vinho.saborFinal}" rows="2" maxlength="300"
+                                             placeholder="Textura, equilíbrio, persistência..."/></label>
+                        <div class="wine-field wine-field-wide">
+                            <span>FOTO DO RÓTULO OU DA GARRAFA</span>
+                            <p:fileUpload mode="advanced" auto="true" multiple="false"
+                                          styleClass="wine-photo-upload"
+                                          listener="#{vinhosBean.enviarFoto}"
+                                          update=":wineForm:winePhoto :wineForm:formError :wineForm:messages"
+                                          allowTypes="/(\.|\/)(png|jpe?g|webp|gif)$/"
+                                          accept="image/png,image/jpeg,image/webp,image/gif"
+                                          maxFileSize="2097152" fileLimit="1" label="Selecionar foto"
+                                          uploadLabel="Enviar foto" cancelLabel="Cancelar"/>
+                            <h:outputText value="PNG, JPEG, WebP ou GIF com até 2 MB; salva no banco da sua adega."
+                                          styleClass="wine-photo-help"/>
+                            <p:outputPanel id="winePhoto" layout="block" styleClass="wine-photo-preview">
+                                <h:panelGroup rendered="#{not empty vinhosBean.vinho.foto}">
+                                    <h:graphicImage value="#{vinhosBean.vinho.foto}" alt="Foto selecionada do vinho"/>
+                                    <p:commandButton value="Remover foto" icon="pi pi-trash"
+                                                     action="#{vinhosBean.removerFoto}" process="@this"
+                                                     update=":wineForm:winePhoto"
+                                                     styleClass="wine-photo-remove"/>
+                                </h:panelGroup>
+                            </p:outputPanel>
+                        </div>
+                    </div>
+                    <h:outputText id="formError" value="#{vinhosBean.erro}" styleClass="wine-form-error"/>
+                    <div class="wine-form-actions">
+                        <p:commandButton value="Cancelar" type="button" onclick="PF('wineDialog').hide()"
+                                         styleClass="wine-button wine-button-quiet"/>
+                        <p:commandButton value="Guardar na adega →" action="#{vinhosBean.salvar}"
+                                         process="wineDialogContent" update=":wineForm:wineContent :wineForm:wineDialogContent :wineForm:messages"
+                                         styleClass="wine-button wine-button-dark"/>
+                    </div>
+                </p:outputPanel>
+            </p:dialog>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes"
+                                 icon="pi pi-check"/>
+                <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no"
+                                 icon="pi pi-times"/>
+            </p:confirmDialog>
+        </h:form>
+    </h:body>
+</f:view>
 </html>

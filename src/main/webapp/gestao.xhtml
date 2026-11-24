@@ -2,6 +2,9 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
       xml:lang="pt-BR" lang="pt-BR">
 <h:head>
     <title>Painel de obras</title>
@@ -9,107 +12,65 @@
     <h:outputStylesheet library="css" name="app.css"/>
 </h:head>
 <h:body styleClass="works-page dashboard-page">
-    <main id="painel" class="dashboard-shell"
-          data-detail="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR')}"
-          data-budget="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('ORCAMENTISTA')}"
-          data-costs="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('FINANCEIRO')}"
-          data-deliveries="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('CLIENTE')}"
-          data-reports="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('FINANCEIRO') or facesContext.externalContext.isUserInRole('ORCAMENTISTA') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('CLIENTE')}"
-          data-performance="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR') or facesContext.externalContext.isUserInRole('MESTRE_OBRA') or facesContext.externalContext.isUserInRole('TECNICO_OBRA') or facesContext.externalContext.isUserInRole('CLIENTE')}">
+    <main class="dashboard-shell">
         <header class="dashboard-header">
             <div>
-                <a class="dashboard-back-link" href="indexObra.xhtml">← Início</a>
+                <p:link styleClass="dashboard-back-link" outcome="indexObra.xhtml">← Início</p:link>
                 <p class="dashboard-eyebrow">Visão geral</p>
                 <h1>Suas obras</h1>
                 <p class="dashboard-subtitle">Acesse projetos e acompanhe cada etapa do trabalho.</p>
-                <a class="dashboard-financing-link" href="financiamento.xhtml">Simulador de financiamento <span
-                        aria-hidden="true">→</span></a>
+                <p:link styleClass="dashboard-financing-link" outcome="financiamento.xhtml">
+                    Simulador de financiamento <span aria-hidden="true">→</span>
+                </p:link>
             </div>
             <div class="dashboard-header-mark" aria-hidden="true">
                 <span class="home-card-arrow pi pi-building" aria-hidden="true"></span>
             </div>
         </header>
-        <p id="mensagem" class="dashboard-message" role="status"></p>
-        <div id="obras" class="dashboard-grid"></div>
+        <h:form id="dashboardForm">
+            <p:outputPanel id="mensagem" layout="block" styleClass="dashboard-message dashboard-empty"
+                           rendered="#{empty gestaoBean.obras}">
+                <h:outputText value="#{gestaoBean.mensagem}"/>
+            </p:outputPanel>
+            <p:outputPanel id="obras" layout="block" styleClass="dashboard-grid">
+                <ui:repeat value="#{gestaoBean.obras}" var="obra">
+                    <section class="dashboard-card">
+                        <div class="dashboard-card-top">
+                            <span class="dashboard-card-icon pi pi-home" aria-hidden="true"></span>
+                            <span class="dashboard-status"><h:outputText value="#{obra.status}"/></span>
+                        </div>
+                        <div class="dashboard-card-heading"><h2><h:outputText value="#{obra.nome}"/></h2></div>
+                        <div class="dashboard-card-divider"></div>
+                        <div class="dashboard-card-links">
+                            <p:link styleClass="dashboard-link" outcome="detailObra.xhtml"
+                                    rendered="#{gestaoBean.podeDetalhes}">
+                                Detalhes <f:param name="id" value="#{obra.id}"/>
+                            </p:link>
+                            <p:link styleClass="dashboard-link" outcome="orcamento.xhtml"
+                                    rendered="#{gestaoBean.podeOrcamento}">
+                                Orçamento <f:param name="obraId" value="#{obra.id}"/>
+                            </p:link>
+                            <p:link styleClass="dashboard-link" outcome="custos.xhtml"
+                                    rendered="#{gestaoBean.podeCustos}">
+                                Custos <f:param name="obraId" value="#{obra.id}"/>
+                            </p:link>
+                            <p:link styleClass="dashboard-link" outcome="entregas.xhtml"
+                                    rendered="#{gestaoBean.podeEntregas}">
+                                Entregas <f:param name="obraId" value="#{obra.id}"/>
+                            </p:link>
+                            <p:link styleClass="dashboard-link" outcome="relatorios.xhtml"
+                                    rendered="#{gestaoBean.podeRelatorios}">
+                                Relatórios <f:param name="obraId" value="#{obra.id}"/>
+                            </p:link>
+                            <p:link styleClass="dashboard-link" outcome="desempenho.xhtml"
+                                    rendered="#{gestaoBean.podeDesempenho}">
+                                Desempenho <f:param name="obraId" value="#{obra.id}"/>
+                            </p:link>
+                        </div>
+                    </section>
+                </ui:repeat>
+            </p:outputPanel>
+        </h:form>
     </main>
-    <script type="text/javascript">
-        //<![CDATA[
-        (() => {
-            const root = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
-            const flags = document.getElementById('painel').dataset;
-            const message = document.getElementById('mensagem');
-
-            async function carregar() {
-                try {
-                    const response = await fetch(`#{'${'}root}/api/v1/obras?size=100&sort=nome,asc`,
-                    {credentials: 'same-origin'});
-                    if (!response.ok) {
-                    let error = {}; try {error = await response.json();} catch (_) {}
-                    throw new Error(error.detail || error.message || `
-                Falha ao carregar obras (#{'$
-                    {
-                        '}response.status}).`);
-                    }
-
-                                    const page = await response.json();
-                                    const container = document.getElementById('obras');
-                                    container.replaceChildren();
-                                    if (!page.content.length) {
-                                        message.className = 'dashboard-message dashboard-empty';
-                                        message.textContent = 'Você ainda não está vinculado a nenhuma obra.';
-                                        return;
-                                    }
-                                    page.content.forEach(obra => {
-                                        const card = document.createElement('section');
-                                        card.className = 'dashboard-card';
-                                        const cardTop = document.createElement('div');
-                                        cardTop.className = 'dashboard-card-top';
-                                        const icon = document.createElement('span');
-                                        icon.className = 'dashboard-card-icon pi pi-home';
-                                        icon.setAttribute('aria-hidden', 'true');
-                                        const title = document.createElement('h2'); title.textContent = obra.nome;
-                                        const status = document.createElement('span');
-                                        status.className = 'dashboard-status';
-                                        status.textContent = obra.status || 'Sem status';
-                                        cardTop.append(icon, status);
-                                        const details = document.createElement('div');
-                                        details.className = 'dashboard-card-heading';
-                                        details.append(title);
-                                        card.append(cardTop, details);
-                                        const divider = document.createElement('div');
-                                        divider.className = 'dashboard-card-divider';
-                                        card.append(divider);
-                                        const linkGroup = document.createElement('div');
-                                        linkGroup.className = 'dashboard-card-links';
-                                        const links = [
-                                            ['Detalhes', 'detailObra.xhtml', flags.detail === 'true'],
-                                            ['Orçamento', 'orcamento.xhtml', flags.budget === 'true'],
-                                            ['Custos', 'custos.xhtml', flags.costs === 'true'],
-                                            ['Entregas', 'entregas.xhtml', flags.deliveries === 'true'],
-                                            ['Relatórios', 'relatorios.xhtml', flags.reports === 'true'],
-                                            ['Desempenho', 'desempenho.xhtml', flags.performance === 'true']
-                                        ];
-                                        links.forEach(([label, pageName, enabled]) => {
-                                            if (!enabled) return;
-                                            const link = document.createElement('a');
-                                            link.textContent = label;
-                                            link.className = 'dashboard-link';
-                                            const query = new URLSearchParams(
-                                                pageName === 'detailObra.xhtml' ? {id: obra.id} : {obraId: obra.id});
-                                            link.href =
-                    `#{'${'}root}/#{'${'}pageName}?#{'${'}query}`;
-                    linkGroup.append(link);
-                    });
-                        card.append(linkGroup);
-                        container.append(card);
-                    });
-                    message.className = 'dashboard-message';
-                    message.textContent = '';
-                } catch (error) { message.textContent = error.message; }
-            }
-            carregar();
-        })();
-        //]]>
-    </script>
 </h:body>
 </html>

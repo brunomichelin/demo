@@ -2,6 +2,8 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
       lang="pt-BR">
 <h:head>
     <title>Criar conta | Sistemas de Bruno Michelin</title>
@@ -20,41 +22,33 @@
                 <h1>Criar sua conta</h1>
                 <p>Preencha seus dados e solicite o perfil adequado para sua atuação.</p>
             </header>
-            <form id="cadastroForm" class="registration-form">
+            <h:form id="cadastroForm" prependId="false" styleClass="registration-form">
                 <label for="nome">Nome</label>
-                <input id="nome" name="nome" type="text" autocomplete="name"
-                       required="required" maxlength="120"/>
+                <p:inputText id="nome" autocomplete="name" required="true" maxlength="120"/>
                 <label for="email">E-mail</label>
-                <input id="email" name="email" type="email" autocomplete="email"
-                       required="required" maxlength="180"/>
+                <p:inputText id="email" type="email" autocomplete="email" required="true" maxlength="180"/>
                 <label for="telefone">Telefone <span>(opcional)</span></label>
-                <input id="telefone" name="telefone" type="tel" autocomplete="tel" maxlength="30"/>
+                <p:inputText id="telefone" type="tel" autocomplete="tel" maxlength="30"/>
                 <label for="papel">Papel desejado</label>
-                <select id="papel" name="papel" required="required">
-                    <option value="">Selecione o papel desejado</option>
-                    <option value="ADMIN">Administrador</option>
-                    <option value="GESTOR">Gestor de obras</option>
-                    <option value="ENGENHEIRO">Engenheiro de obras</option>
-                    <option value="ORCAMENTISTA">Orçamentista de obras</option>
-                    <option value="MESTRE_OBRA">Mestre de obras</option>
-                    <option value="TECNICO_OBRA">Técnico de obras</option>
-                    <option value="FINANCEIRO">Financeiro</option>
-                    <option value="CLIENTE">Cliente</option>
-                </select>
+                <p:selectOneMenu id="papel" required="true" widgetVar="papelCadastro">
+                    <f:selectItem itemValue="" itemLabel="Selecione o papel desejado" noSelectionOption="true"/>
+                    <f:selectItems value="#{authBean.papeisCadastro}"/>
+                </p:selectOneMenu>
                 <p class="registration-notice">
                     <span aria-hidden="true">i</span>
                     O papel selecionado precisa ser aprovado por um administrador antes de liberar o acesso.
                 </p>
                 <label for="senha">Senha <span>(mínimo 8 caracteres)</span></label>
-                <input id="senha" name="senha" type="password" autocomplete="new-password"
-                       required="required" minlength="8"/>
-                <button id="submitButton" type="submit">Solicitar cadastro</button>
+                <p:password id="senha" autocomplete="new-password" feedback="false"
+                            required="true" minlength="8"/>
+                <p:commandButton id="submitButton" type="button" value="Solicitar cadastro"
+                                 onclick="submitCadastro(); return false;"/>
                 <p id="mensagem" role="alert"></p>
                 <div class="registration-login">
                     <span>Já possui uma conta?</span>
                     <a href="login.xhtml">Voltar para entrar</a>
                 </div>
-            </form>
+            </h:form>
         </section>
         <footer class="registration-footer">Sistema de Gestão de Obras <span>•</span> Planejamento, controle e transparência</footer>
     </main>
@@ -65,8 +59,20 @@
         const message = document.getElementById('mensagem');
         const contextPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
 
-        form.addEventListener('submit', async (event) => {
-            event.preventDefault();
+        async function submitCadastro(event) {
+            if (event) event.preventDefault();
+            const camposObrigatorios = ['nome', 'email', 'senha']
+                .map(id => document.getElementById(id));
+            const campoInvalido = camposObrigatorios.find(campo => !campo.checkValidity());
+            if (campoInvalido) {
+                campoInvalido.reportValidity();
+                return;
+            }
+            if (!document.querySelector('[id$="papel_input"]').value) {
+                message.textContent = 'Selecione o papel desejado.';
+                message.className = 'erro';
+                return;
+            }
             button.disabled = true;
             message.textContent = '';
             message.className = '';
@@ -80,7 +86,7 @@
                         email: document.getElementById('email').value,
                         telefone: document.getElementById('telefone').value,
                         senha: document.getElementById('senha').value,
-                        papel: document.getElementById('papel').value
+                        papel: document.querySelector('[id$="papel_input"]').value
                     })
                 });
 
@@ -96,6 +102,13 @@
                 message.className = 'erro';
             } finally {
                 button.disabled = false;
+            }
+        }
+        form.addEventListener('submit', submitCadastro);
+        form.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && event.target instanceof HTMLInputElement) {
+                event.preventDefault();
+                submitCadastro(event);
             }
         });
         //]]>

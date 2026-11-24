@@ -2,214 +2,172 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xml:lang="pt-BR" lang="pt-BR">
-<h:head>
-    <title>Orçamento da obra</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <h:outputStylesheet library="css" name="app.css"/>
-</h:head>
-<h:body styleClass="works-page budget-page">
-    <main id="pagina" class="budget-shell" data-can-freeze="#{facesContext.externalContext.isUserInRole('ADMIN') or facesContext.externalContext.isUserInRole('GESTOR')}">
-        <header class="budget-header">
-            <div>
-                <nav class="system-return-links" aria-label="Navegação principal">
-                    <a href="indexObra.xhtml">Início</a><span> / </span>
-                    <a class="budget-back-link" id="obraLink" href="gestao.xhtml">Painel de obras</a>
-                </nav>
-                <p class="budget-eyebrow">Planejamento financeiro</p>
-                <h1>Orçamento da obra</h1>
-                <p class="budget-subtitle">Organize versões e acompanhe os itens planejados por etapa.</p>
-            </div>
-            <span class="budget-header-icon" aria-hidden="true">R$</span>
-        </header>
-        <section class="budget-card budget-version-card">
-            <div class="budget-section-heading">
-                <span class="budget-section-icon" aria-hidden="true">00</span>
-                <div><p class="budget-eyebrow">Seleção</p><h2>Obra em análise</h2></div>
-            </div>
-            <div class="budget-field budget-field-wide">
-                <label for="obraSelect">Obra</label>
-                <select id="obraSelect"></select>
-            </div>
-        </section>
-        <p id="mensagem" class="budget-message" role="status"></p>
-        <section class="budget-card budget-version-card">
-            <div class="budget-section-heading">
-                <span class="budget-section-icon" aria-hidden="true">01</span>
-                <div><p class="budget-eyebrow">Controle de versões</p><h2>Versões do orçamento</h2></div>
-            </div>
-            <div class="budget-version-controls">
-                <div class="budget-field">
-                    <label for="versao">Versão selecionada</label>
-                    <select id="versao"></select>
-                </div>
-                <div class="budget-actions">
-                    <button class="budget-button budget-button-primary" type="button" id="criarVersao">
-                        <span aria-hidden="true">＋</span> Criar versão
-                    </button>
-                    <button class="budget-button budget-button-secondary" type="button" id="congelarVersao">Congelar versão</button>
-                </div>
-            </div>
-        </section>
-        <section class="budget-card">
-            <div class="budget-section-heading">
-                <span class="budget-section-icon" aria-hidden="true">02</span>
-                <div><p class="budget-eyebrow">Composição</p><h2>Itens por etapa</h2></div>
-            </div>
-            <div class="budget-item-form">
-                <div class="budget-field">
-                    <label for="etapa">Etapa da obra</label><select id="etapa"></select>
-                </div>
-                <div class="budget-field">
-                    <label for="insumo">Insumo</label><select id="insumo"></select>
-                </div>
-                <div class="budget-field">
-                    <label for="quantidade">Quantidade</label>
-                    <input id="quantidade" type="number" min="0.001" step="0.001" placeholder="0,000"/>
-                </div>
-                <div class="budget-field">
-                    <label for="valor">Preço unitário <span>(opcional)</span></label>
-                    <input id="valor" type="number" min="0.01" step="0.01" placeholder="Usar preço de referência"/>
-                </div>
-                <button class="budget-button budget-button-primary budget-add-button" type="button" id="adicionar">
-                    <span aria-hidden="true">＋</span> Adicionar item
-                </button>
-            </div>
-            <div class="budget-table-wrap">
-                <table class="budget-table">
-                    <thead><tr><th>Insumo</th><th>Etapa</th><th>Quantidade</th><th>Preço unitário</th><th>Total</th></tr></thead>
-                    <tbody id="itens"><tr><td colspan="5">Selecione uma etapa e versão.</td></tr></tbody>
-                </table>
-            </div>
-        </section>
-    </main>
-    <script type="text/javascript">
-        //<![CDATA[
-        (() => {
-            const api = `#{'${'}window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'))}/api/v1`;
-            const params = new URLSearchParams(window.location.search);
-            let obraId = params.get('obraId');
-            const podeTrocarObra = !obraId || params.get('origem') === 'index';
-            const obraSelect = document.getElementById('obraSelect');
-            const stageSelect = document.getElementById('etapa');
-            const versionSelect = document.getElementById('versao');
-            const message = document.getElementById('mensagem');
-            document.getElementById('congelarVersao').hidden =
-                document.getElementById('pagina').dataset.canFreeze !== 'true';
-            document.getElementById('obraLink').href = 'gestao.xhtml';
+<f:view>
+    <h:head>
+        <title>Orçamento da obra</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <h:outputStylesheet library="css" name="app.css"/>
+    </h:head>
+    <h:body styleClass="works-page budget-page">
+        <h:form id="budgetForm">
+            <p:messages id="messages" showDetail="true" closable="true"/>
+            <main class="budget-shell">
+                <header class="budget-header">
+                    <div>
+                        <nav class="system-return-links" aria-label="Navegação principal">
+                            <h:link outcome="indexObra.xhtml">Início</h:link><span> / </span>
+                            <h:link outcome="gestao.xhtml" styleClass="budget-back-link">Painel de obras</h:link>
+                        </nav>
+                        <p class="budget-eyebrow">Planejamento financeiro</p>
+                        <h1>Orçamento da obra</h1>
+                        <p class="budget-subtitle">Organize versões e acompanhe os itens planejados por etapa.</p>
+                    </div>
+                    <span class="budget-header-icon" aria-hidden="true">R$</span>
+                </header>
 
-            async function request(url, options = {}) {
-                const response = await fetch(url, {credentials: 'same-origin', ...options,
-                    headers: {'Content-Type': 'application/json', ...(options.headers || {})}});
-                if (!response.ok) {
-                    let body = {};
-                    try { body = await response.json(); } catch (_) {}
-                    throw new Error(body.detail || body.message || `Falha na solicitação (#{'${'}response.status}).`);
-                }
-                return response.status === 204 ? null : response.json();
-            }
-            function showError(error) { message.textContent = error.message; }
-            async function carregarObras() {
-                const response = await fetch(`#{'${'}api}/obras?size=100&sort=nome,asc`, {credentials: 'same-origin'});
-                if (!response.ok) {
-                    let error = {}; try { error = await response.json(); } catch (_) {}
-                    throw new Error(error.detail || error.message || `Falha ao carregar obras (#{'${'}response.status}).`);
-                }
-                const page = await response.json();
-                obraSelect.replaceChildren();
-                page.content.forEach(obra => obraSelect.add(new Option(obra.nome, obra.id)));
-                if (!obraId && page.content[0]) {
-                    obraId = String(page.content[0].id);
-                    obraSelect.value = obraId;
-                    params.set('obraId', obraId);
-                    params.set('origem', 'index');
-                    window.history.replaceState(null, '', `${window.location.pathname}?${params}`);
-                } else if (!page.content.length) {
-                    throw new Error('Você não está vinculado a nenhuma obra.');
-                } else if (obraId) {
-                    obraSelect.value = String(obraId);
-                }
-                obraSelect.disabled = !podeTrocarObra;
-                if (obraId) {
-                    await load();
-                }
-            }
-            async function loadItems() {
-                if (!stageSelect.value || !versionSelect.value) return;
-                const page = await request(`#{'${'}api}/etapas/#{'${'}stageSelect.value}/itens-orcamento?size=100&versaoId=#{'${'}versionSelect.value}`);
-                const body = document.getElementById('itens');
-                body.replaceChildren();
-                if (!page.content.length) {
-                    const row = body.insertRow(); row.insertCell().textContent = 'Nenhum item nesta etapa.';
-                    row.cells[0].colSpan = 5; return;
-                }
-                page.content.forEach(item => {
-                    const row = body.insertRow();
-                    [item.insumo?.descricao, item.etapa?.nome, item.quantidade, item.valorUnitario,
-                        Number(item.quantidade) * Number(item.valorUnitario)].forEach(value => {
-                        row.insertCell().textContent = value == null ? '-' : String(value);
-                    });
-                });
-            }
-            async function load() {
-                try {
-                    if (!obraId) throw new Error('Identificador da obra não informado.');
-                    const [stages, versions, supplies] = await Promise.all([
-                        request(`#{'${'}api}/obras/#{'${'}obraId}/etapas?size=100`),
-                        request(`#{'${'}api}/obras/#{'${'}obraId}/orcamento/versoes`),
-                        request(`#{'${'}api}/insumos?size=100`)
-                    ]);
-                    stageSelect.replaceChildren();
-                    stages.content.forEach(stage => stageSelect.add(new Option(`#{'${'}stage.ordem} - #{'${'}stage.nome}`, stage.id)));
-                    const insumoSelect = document.getElementById('insumo');
-                    insumoSelect.replaceChildren();
-                    supplies.content.forEach(supply => insumoSelect.add(new Option(`#{'${'}supply.codigo || ''} #{'${'}supply.descricao}`, supply.id)));
-                    versionSelect.replaceChildren();
-                    versions.forEach(version => versionSelect.add(new Option(
-                        `Versão #{'${'}version.numero}#{'${'}version.congelada ? ' (congelada)' : ''}`, version.id)));
-                    if (versions.length) versionSelect.value = String(versions[versions.length - 1].id);
-                    await loadItems();
-                } catch (error) { showError(error); }
-            }
-            obraSelect.addEventListener('change', () => {
-                if (!podeTrocarObra || !obraSelect.value) return;
-                obraId = obraSelect.value;
-                params.set('obraId', obraId);
-                params.set('origem', 'index');
-                window.history.replaceState(null, '', `${window.location.pathname}?${params}`);
-                load();
-            });
-            document.getElementById('criarVersao').addEventListener('click', async () => {
-                try { await request(`#{'${'}api}/obras/#{'${'}obraId}/orcamento/versoes`, {method: 'POST'}); message.textContent = 'Versão criada.'; await load(); }
-                catch (error) { showError(error); }
-            });
-            document.getElementById('congelarVersao').addEventListener('click', async () => {
-                try {
-                    if (!versionSelect.value) throw new Error('Não há versão selecionada.');
-                    await request(`#{'${'}api}/orcamento/versoes/#{'${'}versionSelect.value}/congelar`, {method: 'POST'});
-                    message.textContent = 'Versão congelada.'; await load();
-                } catch (error) { showError(error); }
-            });
-            document.getElementById('adicionar').addEventListener('click', async () => {
-                try {
-                    if (!stageSelect.value || !versionSelect.value) throw new Error('Selecione uma etapa e uma versão.');
-                    const body = {insumoId: Number(document.getElementById('insumo').value),
-                        quantidade: Number(document.getElementById('quantidade').value)};
-                    const value = document.getElementById('valor').value;
-                    if (value) body.valorUnitario = Number(value);
-                    await request(`#{'${'}api}/etapas/#{'${'}stageSelect.value}/itens-orcamento?versaoId=#{'${'}versionSelect.value}`,
-                        {method: 'POST', body: JSON.stringify(body)});
-                    document.getElementById('quantidade').value = '';
-                    document.getElementById('valor').value = '';
-                    message.textContent = 'Item incluído.'; await loadItems();
-                } catch (error) { showError(error); }
-            });
-            stageSelect.addEventListener('change', () => loadItems().catch(showError));
-            versionSelect.addEventListener('change', () => loadItems().catch(showError));
-            carregarObras().catch(showError);
-        })();
-        //]]>
-    </script>
-</h:body>
+                <section class="budget-card budget-version-card">
+                    <div class="budget-section-heading">
+                        <span class="budget-section-icon" aria-hidden="true">00</span>
+                        <div><p class="budget-eyebrow">Seleção</p><h2>Obra em análise</h2></div>
+                    </div>
+                    <div class="budget-field budget-field-wide">
+                        <p:outputLabel for="obraSelect" value="Obra"/>
+                        <p:selectOneMenu id="obraSelect" value="#{orcamentoBean.obraSelecionadaId}"
+                                         disabled="#{not orcamentoBean.podeTrocarObra}">
+                            <f:selectItem itemLabel="Selecione uma obra" itemValue="#{null}"
+                                          noSelectionOption="true"/>
+                            <f:selectItems value="#{orcamentoBean.obras}" var="obra"
+                                           itemLabel="#{obra.nome}" itemValue="#{obra.id}"/>
+                            <p:ajax listener="#{orcamentoBean.carregarObra}" process="@this"
+                                    update=":budgetForm"/>
+                        </p:selectOneMenu>
+                    </div>
+                </section>
+
+                <p:outputPanel id="statusMessage" layout="block" styleClass="budget-message">
+                    <h:outputText value="#{orcamentoBean.mensagem}"/>
+                </p:outputPanel>
+
+                <section class="budget-card budget-version-card">
+                    <div class="budget-section-heading">
+                        <span class="budget-section-icon" aria-hidden="true">01</span>
+                        <div><p class="budget-eyebrow">Controle de versões</p><h2>Versões do orçamento</h2></div>
+                    </div>
+                    <div class="budget-version-controls">
+                        <div class="budget-field">
+                            <p:outputLabel for="versao" value="Versão selecionada"/>
+                            <p:selectOneMenu id="versao" value="#{orcamentoBean.versaoSelecionadaId}"
+                                             disabled="#{empty orcamentoBean.versoes}">
+                                <f:selectItem itemLabel="Selecione uma versão" itemValue="#{null}"
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{orcamentoBean.versoes}" var="versao"
+                                               itemLabel="Versão #{versao.numero}#{versao.congelada ? ' (congelada)' : ''}"
+                                               itemValue="#{versao.id}"/>
+                                <p:ajax listener="#{orcamentoBean.carregarItens}" process="@this"
+                                        update=":budgetForm"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="budget-actions">
+                            <p:commandButton value="Criar versão" icon="pi pi-plus"
+                                             action="#{orcamentoBean.criarVersao}" process="@this"
+                                             update=":budgetForm" disabled="#{not orcamentoBean.podeGerenciar or empty orcamentoBean.obras}"
+                                             styleClass="budget-button budget-button-primary"/>
+                            <p:commandButton value="Congelar versão" icon="pi pi-lock"
+                                             action="#{orcamentoBean.congelarVersao}" process="@this"
+                                             update=":budgetForm" rendered="#{orcamentoBean.podeCongelar}"
+                                             disabled="#{empty orcamentoBean.versaoSelecionadaId or orcamentoBean.versaoCongelada}"
+                                             styleClass="budget-button budget-button-secondary"/>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="budget-card">
+                    <div class="budget-section-heading">
+                        <span class="budget-section-icon" aria-hidden="true">02</span>
+                        <div><p class="budget-eyebrow">Composição</p><h2>Itens por etapa</h2></div>
+                    </div>
+                    <p:outputPanel id="itemEditor" layout="block" styleClass="budget-item-form">
+                        <div class="budget-field">
+                            <p:outputLabel for="etapa" value="Etapa da obra"/>
+                            <p:selectOneMenu id="etapa" value="#{orcamentoBean.etapaSelecionadaId}"
+                                             disabled="#{empty orcamentoBean.etapas}">
+                                <f:selectItem itemLabel="Selecione uma etapa" itemValue="#{null}"
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{orcamentoBean.etapas}" var="etapa"
+                                               itemLabel="#{etapa.ordem} - #{etapa.nome}" itemValue="#{etapa.id}"/>
+                                <p:ajax listener="#{orcamentoBean.carregarItens}" process="@this"
+                                        update=":budgetForm:itemTable :budgetForm:itemTotals"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="budget-field">
+                            <p:outputLabel for="insumo" value="Insumo"/>
+                            <p:selectOneMenu id="insumo" value="#{orcamentoBean.insumoSelecionadoId}"
+                                             disabled="#{empty orcamentoBean.insumos}">
+                                <f:selectItem itemLabel="Selecione um insumo" itemValue="#{null}"
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{orcamentoBean.insumos}" var="insumo"
+                                               itemLabel="#{insumo.codigo} #{insumo.descricao}"
+                                               itemValue="#{insumo.id}"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="budget-field">
+                            <p:outputLabel for="quantidade" value="Quantidade"/>
+                            <p:inputNumber id="quantidade" value="#{orcamentoBean.quantidade}"
+                                           minValue="0.001" decimalPlaces="3" placeholder="0,000"
+                                           disabled="#{not orcamentoBean.podeGerenciar or orcamentoBean.versaoCongelada}"/>
+                        </div>
+                        <div class="budget-field">
+                            <p:outputLabel for="valor" value="Preço unitário (opcional)"/>
+                            <p:inputNumber id="valor" value="#{orcamentoBean.valorUnitario}"
+                                           minValue="0.01" decimalPlaces="2"
+                                           placeholder="Usar preço de referência"
+                                           disabled="#{not orcamentoBean.podeGerenciar or orcamentoBean.versaoCongelada}"/>
+                        </div>
+                        <p:commandButton value="Adicionar item" icon="pi pi-plus"
+                                         action="#{orcamentoBean.adicionarItem}" process="@this etapa insumo quantidade valor"
+                                         update=":budgetForm" disabled="#{not orcamentoBean.podeGerenciar or orcamentoBean.versaoCongelada}"
+                                         styleClass="budget-button budget-button-primary budget-add-button"/>
+                    </p:outputPanel>
+                    <p:outputPanel id="itemTable" layout="block" styleClass="budget-table-wrap">
+                        <p:dataTable value="#{orcamentoBean.itens}" var="item"
+                                     emptyMessage="Selecione uma etapa e versão para consultar os itens."
+                                     styleClass="budget-pf-table">
+                            <p:column headerText="Insumo">
+                                <h:outputText value="#{item.insumo.descricao}"/>
+                            </p:column>
+                            <p:column headerText="Etapa">
+                                <h:outputText value="#{item.etapa.nome}"/>
+                            </p:column>
+                            <p:column headerText="Quantidade" styleClass="budget-number-cell">
+                                <h:outputText value="#{item.quantidade}">
+                                    <f:convertNumber locale="pt_BR" minFractionDigits="3" maxFractionDigits="3"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Preço unitário" styleClass="budget-number-cell">
+                                <h:outputText value="#{item.valorUnitario}">
+                                    <f:convertNumber type="currency" currencySymbol="R$ " locale="pt_BR"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="Total" styleClass="budget-number-cell">
+                                <h:outputText value="#{item.quantidade.multiply(item.valorUnitario)}">
+                                    <f:convertNumber type="currency" currencySymbol="R$ " locale="pt_BR"/>
+                                </h:outputText>
+                            </p:column>
+                        </p:dataTable>
+                    </p:outputPanel>
+                    <p:outputPanel id="itemTotals" layout="block" styleClass="budget-total">
+                        <span>Total da etapa</span>
+                        <strong><h:outputText value="#{orcamentoBean.totalItens}">
+                            <f:convertNumber type="currency" currencySymbol="R$ " locale="pt_BR"/>
+                        </h:outputText></strong>
+                    </p:outputPanel>
+                </section>
+            </main>
+        </h:form>
+    </h:body>
+</f:view>
 </html>

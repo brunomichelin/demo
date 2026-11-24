@@ -2,6 +2,8 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
       xml:lang="pt-BR" lang="pt-BR">
 <h:head>
     <title>Auditoria</title>
@@ -12,121 +14,58 @@
     <main class="audit-shell">
         <header class="audit-header">
             <div>
-                <a class="audit-back-link" href="index.xhtml">Início</a>
+                <p:link styleClass="audit-back-link" outcome="index.xhtml">Início</p:link>
                 <p class="audit-eyebrow">Administração e segurança</p>
                 <h1>Auditoria do sistema</h1>
                 <p class="audit-subtitle">Histórico de atividades e alterações registradas na aplicação.</p>
             </div>
             <span class="audit-header-icon" aria-hidden="true">⌕</span>
         </header>
-        <p id="mensagem" class="audit-message" role="status"></p>
-        <section class="audit-card">
-            <div class="audit-section-heading">
-                <div>
-                    <p class="audit-eyebrow">Registro cronológico</p>
-                    <h2>Eventos recentes</h2>
+        <h:form id="auditForm">
+            <p:messages id="messages" showDetail="true" closable="true" styleClass="audit-message"/>
+            <section class="audit-card">
+                <div class="audit-section-heading">
+                    <div><p class="audit-eyebrow">Registro cronológico</p><h2>Eventos recentes</h2></div>
+                    <span class="audit-live-label"><span aria-hidden="true"></span> Atualizado ao carregar</span>
                 </div>
-                <span class="audit-live-label"><span aria-hidden="true"></span> Atualizado ao carregar</span>
-            </div>
-            <div class="audit-table-wrap">
-                <table class="audit-table">
-                    <thead>
-                    <tr>
-                        <th>Data/hora</th>
-                        <th>Usuário</th>
-                        <th>Entidade</th>
-                        <th>ID</th>
-                        <th>Ação</th>
-                        <th>Anterior</th>
-                        <th>Novo</th>
-                    </tr>
-                    </thead>
-                    <tbody id="eventos"></tbody>
-                </table>
-            </div>
-            <footer class="audit-pagination">
-                <span id="pagina" class="audit-page-label"></span>
-                <div>
-                    <button class="audit-page-button" id="anterior" type="button"><span aria-hidden="true">←</span>
-                        Anterior
-                    </button>
-                    <button class="audit-page-button audit-page-button-next" id="proxima" type="button">Próxima <span
-                            aria-hidden="true">→</span></button>
+                <div class="audit-table-wrap">
+                    <p:dataTable id="eventTable" value="#{auditoriaBean.eventos}" var="evento"
+                                 styleClass="audit-table" emptyMessage="Nenhum evento registrado nesta página.">
+                        <p:column headerText="Data/hora">
+                            <h:outputText value="#{evento.dataHora}">
+                                <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm:ss"/>
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="Usuário">
+                            <h:outputText value="#{empty evento.usuario ? '-' : evento.usuario.nome}"/>
+                        </p:column>
+                        <p:column headerText="Entidade"><h:outputText value="#{empty evento.entidade ? '-' : evento.entidade}"/></p:column>
+                        <p:column headerText="ID"><h:outputText value="#{empty evento.entidadeId ? '-' : evento.entidadeId}"/></p:column>
+                        <p:column headerText="Ação">
+                            <span class="audit-action-badge"><h:outputText value="#{empty evento.acao ? '-' : evento.acao}"/></span>
+                        </p:column>
+                        <p:column headerText="Anterior"><h:outputText value="#{empty evento.valorAnterior ? '-' : evento.valorAnterior}"/></p:column>
+                        <p:column headerText="Novo"><h:outputText value="#{empty evento.valorNovo ? '-' : evento.valorNovo}"/></p:column>
+                    </p:dataTable>
                 </div>
-            </footer>
-        </section>
+                <p:outputPanel id="pagination" layout="block" styleClass="audit-pagination">
+                    <span class="audit-page-label">
+                        Página #{auditoriaBean.pagina + 1}
+                        de #{auditoriaBean.totalPaginas eq 0 ? 1 : auditoriaBean.totalPaginas}
+                    </span>
+                    <div>
+                        <p:commandButton value="Anterior" icon="pi pi-arrow-left"
+                                         action="#{auditoriaBean.anterior}" disabled="#{not auditoriaBean.temAnterior}"
+                                         styleClass="audit-page-button" process="@this"
+                                         update="messages eventTable pagination"/>
+                        <p:commandButton value="Próxima" icon="pi pi-arrow-right" iconPos="right"
+                                         action="#{auditoriaBean.proxima}" disabled="#{not auditoriaBean.temProxima}"
+                                         styleClass="audit-page-button audit-page-button-next" process="@this"
+                                         update="messages eventTable pagination"/>
+                    </div>
+                </p:outputPanel>
+            </section>
+        </h:form>
     </main>
-    <script type="text/javascript">
-        //<![CDATA[
-        (() => {
-            const root = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
-            const message = document.getElementById('mensagem');
-            let pageNumber = 0;
-            let totalPages = 0;
-
-            async function load() {
-                try {
-                    const response = await fetch(`#{'${'}root}/api/v1/auditoria?page=#{'${'}pageNumber}&size=50&sort=dataHora,desc`,
-                    {credentials: 'same-origin'});
-                    if (!response.ok) {
-                    let body = {}; try {body = await response.json();} catch (_) {}
-                    throw new Error(body.detail || body.message || `
-
-
-
-                                                                Falha na solicitação (#{'$
-                                                                    {
-                                                                        '}response.status}).
-
-
-                    `);
-                    }
-
-                    const page = await response.json();
-                    totalPages = page.totalPages;
-                    const body = document.getElementById('eventos'); body.replaceChildren();
-                    page.content.forEach(event => {
-                    const row = body.insertRow();
-                    [event.dataHora, event.usuario?.nome, event.entidade, event.entidadeId]
-                    .forEach(value =>
-                    row.insertCell().textContent = value == null ? '-' : String(value));
-                    const actionCell = row.insertCell();
-                    const actionBadge = document.createElement('span');
-                    actionBadge.className = 'audit-action-badge';
-                    actionBadge.textContent = event.acao || '-';
-                    actionCell.append(actionBadge);
-                    [event.valorAnterior, event.valorNovo].forEach(value =>
-                    row.insertCell().textContent = value == null ? '-' : String(value));
-                    });
-                    document.getElementById('pagina').textContent =
-                    `
-
-
-                                                Página #{'$
-                                                    {
-                                                        '}pageNumber + 1} de #{'
-                                                        $
-                                                        {
-                                                            '}Math.max(totalPages, 1)}
-
-                    `
-                    ;
-                    document.getElementById('anterior').disabled = pageNumber <= 0;
-                    document.getElementById('proxima').disabled = pageNumber + 1 >= totalPages;
-                    message.textContent = '';
-                    }
-                    catch
-                    (error)
-                    {
-                    message.textContent = error.message;
-                    }
-                    }
-
-                                            document.getElementById('anterior').addEventListener('click', () => { if (pageNumber > 0) { pageNumber--; load(); } });
-                                            document.getElementById('proxima').addEventListener('click', () => { if (pageNumber + 1 < totalPages) { pageNumber++; load(); } });
-                                            load();
-                                        })();
-                                        //]]>
-</script>
 </h:body>
 </html>

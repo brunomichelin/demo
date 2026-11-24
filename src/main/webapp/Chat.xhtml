@@ -2,74 +2,170 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xml:lang="pt-BR" lang="pt-BR">
-<h:head>
-    <title>Conversas | Gestão de Obras</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <h:outputStylesheet library="css" name="app.css"/>
-    <h:outputStylesheet library="css" name="chat.css"/>
-    <h:outputScript library="js" name="chat.js" target="body"/>
-</h:head>
-<h:body styleClass="works-page chat-page">
-    <main class="chat-shell">
-        <header class="chat-header">
-            <div>
-                <a class="chat-back-link" href="index.xhtml">Início</a>
-                <p class="chat-eyebrow">Comunicação da equipe</p>
-                <h1>Mensagens</h1>
-                <p class="chat-subtitle">Retome suas conversas ou inicie uma nova.</p>
-            </div>
-            <span class="chat-header-mark pi pi-comments" aria-hidden="true"></span>
-        </header>
+<f:view>
+    <h:head>
+        <title>Conversas | Gestão de Obras</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <h:outputStylesheet library="css" name="app.css"/>
+        <h:outputStylesheet library="css" name="chat.css"/>
+        <h:outputScript target="body">
+            function chatStoreScroll() {
+                const list = document.getElementById('chatForm:messageList');
+                window.chatScrollState = list ? {
+                    top: list.scrollTop,
+                    atBottom: list.scrollHeight - list.scrollTop - list.clientHeight &lt; 60
+                } : null;
+            }
 
-        <p id="chatStatus" class="chat-status" role="status" aria-live="polite"></p>
+            function chatRestoreScroll() {
+                const list = document.getElementById('chatForm:messageList');
+                if (!list || !window.chatScrollState) return;
+                list.scrollTop = window.chatScrollState.atBottom
+                    ? list.scrollHeight
+                    : window.chatScrollState.top;
+            }
 
-        <section class="chat-layout" aria-label="Mensagens e conversas">
-            <aside class="chat-sidebar">
-                <div class="chat-sidebar-heading">
+            function chatScrollToBottom() {
+                const list = document.getElementById('chatForm:messageList');
+                if (list) list.scrollTop = list.scrollHeight;
+            }
+        </h:outputScript>
+    </h:head>
+    <h:body styleClass="works-page chat-page">
+        <h:form id="chatForm">
+            <p:messages id="messages" showDetail="true" closable="true" styleClass="chat-messages"/>
+            <p:poll interval="5" listener="#{chatBean.atualizar}"
+                    update="chatCount chatList messageList messages"
+                    process="@this" onstart="chatStoreScroll()" oncomplete="chatRestoreScroll()"/>
+            <main class="chat-shell">
+                <header class="chat-header">
                     <div>
-                        <p class="chat-eyebrow">Histórico</p>
-                        <h2>Conversas</h2>
+                        <h:link styleClass="chat-back-link" outcome="index.xhtml">Início</h:link>
+                        <p class="chat-eyebrow">Comunicação da equipe</p>
+                        <h1>Mensagens</h1>
+                        <p class="chat-subtitle">Retome suas conversas ou inicie uma nova.</p>
                     </div>
-                    <span id="chatCount" class="chat-count">0</span>
-                </div>
-                <div id="chatList" class="chat-list" aria-label="Conversas abertas"></div>
-                <form id="newChatForm" class="new-chat-form">
-                    <label for="chatUser">Nova conversa</label>
-                    <select id="chatUser" required="required">
-                        <option value="">Carregando usuários...</option>
-                    </select>
-                    <button class="chat-button chat-button-secondary" type="submit">Iniciar conversa</button>
-                </form>
-            </aside>
+                    <span class="chat-header-mark pi pi-comments" aria-hidden="true"></span>
+                </header>
 
-            <section class="chat-conversation" aria-label="Conversa selecionada">
-                <div id="chatEmpty" class="chat-empty">
-                    <span class="pi pi-comments" aria-hidden="true"></span>
-                    <h2>Suas conversas começam aqui</h2>
-                    <p>Selecione uma conversa existente ou escolha um usuário para enviar uma mensagem.</p>
-                </div>
-                <div id="chatActive" class="chat-active" hidden="hidden">
-                    <header class="chat-contact">
-                        <span id="contactAvatar" class="chat-avatar" aria-hidden="true"></span>
-                        <div>
-                            <h2 id="contactName"></h2>
-                            <p id="contactEmail"></p>
+                <p:outputPanel id="chatLayout" layout="block" styleClass="chat-layout">
+                    <aside class="chat-sidebar">
+                        <div class="chat-sidebar-heading">
+                            <div>
+                                <p class="chat-eyebrow">Histórico</p>
+                                <h2>Conversas</h2>
+                            </div>
+                            <h:outputText id="chatCount" value="#{chatBean.conversas.size()}"
+                                          styleClass="chat-count"/>
                         </div>
-                    </header>
-                    <div id="messageList" class="message-list" role="log" aria-live="polite"
-                         aria-relevant="additions text"></div>
-                    <form id="messageForm" class="message-form">
-                        <label class="visually-hidden" for="messageInput">Escreva sua mensagem</label>
-                        <textarea id="messageInput" maxlength="2000" rows="1" required="required"
-                                  placeholder="Escreva uma mensagem..."></textarea>
-                        <button class="chat-button chat-button-primary" type="submit">
-                            Enviar <span class="pi pi-send" aria-hidden="true"></span>
-                        </button>
-                    </form>
-                </div>
-            </section>
-        </section>
-    </main>
-</h:body>
+                        <p:outputPanel id="chatList" layout="block" styleClass="chat-list">
+                            <ui:repeat value="#{chatBean.conversas}" var="conversa">
+                                <p:commandLink action="#{chatBean.selecionarConversa(conversa.id())}"
+                                               process="@this" update=":chatForm:chatLayout :chatForm:messages"
+                                               oncomplete="chatScrollToBottom()"
+                                               styleClass="chat-list-item #{chatBean.conversaSelecionada != null and chatBean.conversaSelecionada.id() == conversa.id() ? 'is-selected' : ''}">
+                                    <span class="chat-list-name">
+                                        <h:outputText value="#{conversa.outroUsuarioNome() == null or conversa.outroUsuarioNome().isBlank() ? conversa.outroUsuarioEmail() : conversa.outroUsuarioNome()}"/>
+                                    </span>
+                                    <span class="chat-list-preview">
+                                        <h:outputText value="#{empty conversa.ultimaMensagem() ? 'Conversa iniciada' : conversa.ultimaMensagem()}"/>
+                                    </span>
+                                </p:commandLink>
+                            </ui:repeat>
+                            <h:panelGroup layout="block" rendered="#{empty chatBean.conversas}"
+                                          styleClass="chat-list-empty">
+                                Nenhuma conversa aberta. Inicie uma nova abaixo.
+                            </h:panelGroup>
+                        </p:outputPanel>
+
+                        <div class="new-chat-form">
+                            <h:outputLabel for="chatUser" value="Nova conversa"/>
+                            <p:selectOneMenu id="chatUser" value="#{chatBean.usuarioSelecionadoId}">
+                                <f:selectItem itemLabel="Selecione um usuário" itemValue="#{null}"
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{chatBean.usuarios}" var="usuario"
+                                               itemLabel="#{usuario.nome()} (#{usuario.email()})"
+                                               itemValue="#{usuario.id()}"/>
+                            </p:selectOneMenu>
+                            <p:commandButton value="Iniciar conversa" icon="pi pi-plus"
+                                             action="#{chatBean.abrirConversa}" process="@this chatUser"
+                                             update=":chatForm:chatLayout :chatForm:messages"
+                                             oncomplete="chatScrollToBottom()"
+                                             styleClass="chat-button chat-button-secondary"/>
+                        </div>
+                    </aside>
+
+                    <section class="chat-conversation" aria-label="Conversa selecionada">
+                        <p:outputPanel layout="block" styleClass="chat-empty"
+                                       rendered="#{empty chatBean.conversaSelecionada}">
+                            <span class="pi pi-comments" aria-hidden="true"></span>
+                            <h2>Suas conversas começam aqui</h2>
+                            <p>Selecione uma conversa existente ou escolha um usuário para enviar uma mensagem.</p>
+                        </p:outputPanel>
+
+                        <p:outputPanel id="chatActive" layout="block"
+                                       styleClass="chat-active #{empty chatBean.conversaSelecionada ? 'chat-active-empty' : ''}">
+                            <h:panelGroup layout="block" rendered="#{not empty chatBean.conversaSelecionada}">
+                                <header class="chat-contact">
+                                <h:outputText
+                                        value="#{chatBean.conversaSelecionada.outroUsuarioNome() == null or chatBean.conversaSelecionada.outroUsuarioNome().isBlank() ? chatBean.conversaSelecionada.outroUsuarioEmail().substring(0, 1).toUpperCase() : chatBean.conversaSelecionada.outroUsuarioNome().substring(0, 1).toUpperCase()}"
+                                        styleClass="chat-avatar"/>
+                                <div>
+                                    <h2>
+                                        <h:outputText value="#{chatBean.conversaSelecionada.outroUsuarioNome() == null or chatBean.conversaSelecionada.outroUsuarioNome().isBlank() ? chatBean.conversaSelecionada.outroUsuarioEmail() : chatBean.conversaSelecionada.outroUsuarioNome()}"/>
+                                    </h2>
+                                    <p>
+                                        <h:outputText value="#{chatBean.conversaSelecionada.outroUsuarioEmail()}"/>
+                                    </p>
+                                </div>
+                                </header>
+                            </h:panelGroup>
+                            <p:outputPanel id="messageList" layout="block"
+                                           styleClass="message-list #{empty chatBean.conversaSelecionada ? 'chat-message-list-hidden' : ''}"
+                                           role="log" aria-live="polite" aria-relevant="additions text">
+                                <h:panelGroup rendered="#{not empty chatBean.conversaSelecionada}">
+                                    <ui:repeat value="#{chatBean.mensagens}" var="mensagem">
+                                        <article class="message #{mensagem.minhaMensagem() ? 'message-own' : ''}">
+                                            <h:outputText rendered="#{not mensagem.minhaMensagem()}"
+                                                          value="#{mensagem.remetenteNome()}"
+                                                          styleClass="message-sender"/>
+                                            <p class="message-content">
+                                                <h:outputText value="#{mensagem.conteudo()}"/>
+                                            </p>
+                                            <h:outputText value="#{mensagem.enviadaEm()}"
+                                                          styleClass="message-time">
+                                                <f:convertDateTime type="localDateTime" pattern="dd/MM/yyyy HH:mm"/>
+                                            </h:outputText>
+                                        </article>
+                                    </ui:repeat>
+                                    <h:panelGroup layout="block" rendered="#{empty chatBean.mensagens}"
+                                                  styleClass="message-empty">
+                                        Envie a primeira mensagem para iniciar a conversa.
+                                    </h:panelGroup>
+                                </h:panelGroup>
+                            </p:outputPanel>
+                            <h:panelGroup layout="block" styleClass="message-form"
+                                          rendered="#{not empty chatBean.conversaSelecionada}">
+                                <p:inputTextarea id="messageInput" value="#{chatBean.novaMensagem}"
+                                                 maxlength="2000" rows="1" autoResize="true"
+                                                 placeholder="Escreva uma mensagem..."
+                                                 styleClass="message-input"/>
+                                <p:commandButton value="Enviar" icon="pi pi-send" iconPos="right"
+                                                 action="#{chatBean.enviarMensagem}"
+                                                 process="@this messageInput"
+                                                 update=":chatForm:chatList :chatForm:chatCount :chatForm:messageList :chatForm:messageInput :chatForm:messages"
+                                                 oncomplete="chatScrollToBottom()"
+                                                 styleClass="chat-button chat-button-primary"/>
+                            </h:panelGroup>
+                        </p:outputPanel>
+                    </section>
+                </p:outputPanel>
+            </main>
+        </h:form>
+    </h:body>
+</f:view>
 </html>
